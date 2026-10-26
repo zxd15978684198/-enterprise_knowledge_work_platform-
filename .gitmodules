@@ -1,0 +1,3 @@
+[submodule "references/WeKnora"]
+	path = references/WeKnora
+	url = https://github.com/Tencent/WeKnora
