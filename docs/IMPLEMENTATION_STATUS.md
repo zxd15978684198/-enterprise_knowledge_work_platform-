@@ -1,6 +1,18 @@
 # PyKnora 实施状态
 
-更新日期：2026-10-27（Asia/Shanghai）。当前为 **Phase 0 / 初始化完成，源码审计待开始**。本轮仅规范、参考仓库元数据及文档目录，不实现业务功能，不代表 Phase 0 架构验证完成。
+更新日期：2026-10-27（Asia/Shanghai）。当前为 **Phase 0 / 五条主链源码静态审计已交付，TDD/ADR 与运行验证待开展**。本轮仅研究并写文档，不实现业务功能，不代表穷尽安全审计或 Phase 0 架构验证完成。
+
+## 当前轮：源码审计
+
+- 开始时主仓库工作树干净，HEAD `a6220dd`；参考仓库仍为 `main` / `662abaf9f944e37689d04c42160034b2cdec6829`，工作树干净。
+- 新增 [01_Source_Architecture.md](research/01_Source_Architecture.md)：Agent、BrowserSkill、DocReader、摄取、RAG/Agent Chat/SSE 的静态调用链、状态和真实路径/符号/行号，区分 A/D/N/U 证据。
+- 新增 [02_Architecture_Mapping.md](research/02_Architecture_Mapping.md)：Python 模块建议及复用/重写/替换/延期依据，明确 Harness、Graph、Task DAG、Celery 边界，尚非已接受 ADR。
+- 新增 [03_Compatibility_Risks.md](research/03_Compatibility_Risks.md)：协议、数据、队列、许可与风险矩阵，以及 Phase 0 必验证假设/退出条件。
+- 重要修正：上下文摘要 checkpoint 与 RunSnapshot 不同；Python DocReader 不覆盖原 Go simple 路径的全部格式；普通上传未验证为统一 Outbox；attempt guard 不等于 PRD 的不可变版本索引激活；官方 ListEngines 描述与当前调用存在漂移。
+- BrowserSkill 配套构建清单固定 0.3.1 / `da6bf4eed2dd7256567e152df8c903c87f6598c3`，只核验了 WeKnora 接入层和构建清单，未获取单独 upstream 实现或运行真实扩展。
+- 本轮无报告编写硬阻塞；真实测试前置未落实：当前 shell 无 Go 命令，DocReader 依赖/服务、模型、数据库/队列和浏览器设备未验证可用。未运行单元、集成、安全或性能测试；不得解读成通过。
+- 保留原 PRD、旧报告、AGENTS、参考源码和 Python 业务代码；本轮预期改动仅三份研究报告与此状态文件。
+- 静态验证通过：PowerShell 断言检查 100 个本地链接、90 处源码行号范围、6 个成对的 Mermaid fenced 代码块；另抽查 30 个关键源码符号、参考 SHA/工作树和受保护文件未变化。新增报告无行尾空白，`git diff --check` 通过。未使用 Mermaid 渲染器验证布局，也未运行参考项目业务测试。
 
 ## 仓库现状
 
@@ -9,7 +21,7 @@
 - 已有 PRD、Codex 开发指南、源码架构调研报告；全部保留，不替换已有结论。
 - `references/WeKnora` 已存在官方 origin 和完整 Git 元数据，工作树干净。基线 `main` / `662abaf9f944e37689d04c42160034b2cdec6829`；详见 [源码基线](research/00_Source_Baseline.md)。
 
-## 本轮完成
+## 初始化记录（已完成，提交 a6220dd）
 
 - 阅读 PRD、开发指南和已有研究；检查已有文件、主仓库和参考仓库状态。
 - 新增根 `AGENTS.md`，约束职责、安全、幂等/版本、测试与每轮交付。
@@ -17,7 +29,7 @@
 - 记录参考仓库 commit/branch/tree、版本区别、许可证及第三方通知。
 - 补充已有 gitlink 缺失的 `.gitmodules`，保留源码 SHA 与忽略规则；未重新克隆、fetch 或更改原源码。
 
-## 验证记录
+## 初始化验证记录
 
 - `git status --short`、`git ls-files --stage references/WeKnora` 及参考仓库 `rev-parse` / `branch` / `remote` / `describe`：确认初始工作树干净、来源与指针一致。
 - 文档路径、相对链接、Markdown fence 成对、规范必需项与基线一致性：PowerShell 断言检查通过（8 个新增文件），原有业务与文档文件无改动，参考源码工作树仍干净。
@@ -27,7 +39,7 @@
 
 ## 待办（不在本轮实施）
 
-1. 以固定源码 commit 复核旧报告，补充 `research/01_Source_Architecture.md`、`02_Architecture_Mapping.md`、`03_Compatibility_Risks.md`，引用实际文件、函数与行号。
+1. 已交付固定 commit 的三份静态审计报告；后续补充运行与故障注入证据，并继续核验未覆盖分支及外部 BrowserSkill 实现。
 2. 完成有效 ADR 和 TDD：明确 Harness/LangGraph/Task DAG/Celery、权限作用域、业务/执行状态及可靠投递/索引发布边界。
 3. 规划六项 Phase 0 PoC 与 Backlog、验收门槛和环境；优先评估 Python DocReader 复用及 Checkpoint/审批恢复。
 4. 按任务依赖逐项实现并记录真实测试证据，之后再进入 P0 业务闭环。
