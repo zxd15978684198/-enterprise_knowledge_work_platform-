@@ -1,0 +1,858 @@
+{
+  "schema_version": 1,
+  "task": "P0-T04",
+  "generated_at": "2026-10-27T10:23:59+00:00",
+  "generator": "ControlSite 真实响应 → sha256（见 docs/poc/evidence/control-site.md §复现）",
+  "control_site": {
+    "host": "127.0.0.1",
+    "default_port": 5500,
+    "ephemeral_port_supported": true,
+    "fault_injection_default": false,
+    "fault_injection_env": "PYKNORA_CONTROL_SITE_ALLOW_FAULTS=1 + --allow-fault-injection",
+    "forbidden_in_production": true,
+    "service_name": "pyknora-phase0-control-site"
+  },
+  "content_license": {
+    "spdx": "LicenseRef-PyKnora-Phase0-TestFixture",
+    "text": "本仓库 Phase0 自产的确定性测试载荷，非第三方素材，无外部许可约束；仓库暂无 LICENSE 文件，故使用 LicenseRef 而非 SPDX 标准标识。"
+  },
+  "vector_count": 33,
+  "hash_vector_count": 7,
+  "vectors": [
+    {
+      "id": "CS-001",
+      "type": "static_page",
+      "polarity": "positive",
+      "method": "GET",
+      "path": "/",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py（确定性常量载荷，字节级可复算）",
+      "integrity": {
+        "mode": "sha256",
+        "sha256": "818a1d13f18223f607e0b20477c3566bd34e70da262147a733dff6d532b92be9",
+        "bytes": 761
+      },
+      "expected": {
+        "status": 200,
+        "content_type": "text/html; charset=utf-8",
+        "body_sha256": "818a1d13f18223f607e0b20477c3566bd34e70da262147a733dff6d532b92be9",
+        "note": "逐字节比对本文件记录的 sha256"
+      },
+      "fault_matrix": [],
+      "consumers": [
+        "T04",
+        "T16",
+        "T29"
+      ]
+    },
+    {
+      "id": "CS-002",
+      "type": "static_page",
+      "polarity": "positive",
+      "method": "GET",
+      "path": "/static/page.html",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py（确定性常量载荷，字节级可复算）",
+      "integrity": {
+        "mode": "sha256",
+        "sha256": "609fa18fb47efcceba55297b830eda5599e58d7108809186a4038870061f9223",
+        "bytes": 483
+      },
+      "expected": {
+        "status": 200,
+        "content_type": "text/html; charset=utf-8",
+        "body_sha256": "609fa18fb47efcceba55297b830eda5599e58d7108809186a4038870061f9223",
+        "note": "逐字节比对本文件记录的 sha256"
+      },
+      "fault_matrix": [],
+      "consumers": [
+        "T04",
+        "T16",
+        "T29"
+      ]
+    },
+    {
+      "id": "CS-003",
+      "type": "js_page",
+      "polarity": "positive",
+      "method": "GET",
+      "path": "/static/js.html",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py（确定性常量载荷，字节级可复算）",
+      "integrity": {
+        "mode": "sha256",
+        "sha256": "4977c66c4a88618d80a4df0427610b598c5aa095afe5df1a252829342203852d",
+        "bytes": 858
+      },
+      "expected": {
+        "status": 200,
+        "content_type": "text/html; charset=utf-8",
+        "body_sha256": "4977c66c4a88618d80a4df0427610b598c5aa095afe5df1a252829342203852d",
+        "note": "逐字节比对本文件记录的 sha256"
+      },
+      "fault_matrix": [],
+      "consumers": [
+        "T04",
+        "T16",
+        "T29"
+      ]
+    },
+    {
+      "id": "CS-004",
+      "type": "js_page",
+      "polarity": "positive",
+      "method": "GET",
+      "path": "/js/beacon?key=js-beacon-1",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 200,
+        "note": "JS 页 beacon；到达日志记录 key 与最终端点"
+      },
+      "fault_matrix": [
+        "F15"
+      ],
+      "consumers": [
+        "T16",
+        "T29"
+      ]
+    },
+    {
+      "id": "CS-005",
+      "type": "iframe_page",
+      "polarity": "positive",
+      "method": "GET",
+      "path": "/static/iframe.html",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py（确定性常量载荷，字节级可复算）",
+      "integrity": {
+        "mode": "sha256",
+        "sha256": "81db89fd97989a86456c3b13e735a55da063e87a5f1533984fa80464b93dd35d",
+        "bytes": 413
+      },
+      "expected": {
+        "status": 200,
+        "content_type": "text/html; charset=utf-8",
+        "body_sha256": "81db89fd97989a86456c3b13e735a55da063e87a5f1533984fa80464b93dd35d",
+        "note": "逐字节比对本文件记录的 sha256"
+      },
+      "fault_matrix": [
+        "F15"
+      ],
+      "consumers": [
+        "T04",
+        "T16",
+        "T29"
+      ]
+    },
+    {
+      "id": "CS-006",
+      "type": "iframe_page",
+      "polarity": "positive",
+      "method": "GET",
+      "path": "/static/frame.html",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py（确定性常量载荷，字节级可复算）",
+      "integrity": {
+        "mode": "sha256",
+        "sha256": "7bdd6b105cf4f8bad93a47a18c9300ccc899b70b45cdc81a411938f8aff0bcc7",
+        "bytes": 205
+      },
+      "expected": {
+        "status": 200,
+        "content_type": "text/html; charset=utf-8",
+        "body_sha256": "7bdd6b105cf4f8bad93a47a18c9300ccc899b70b45cdc81a411938f8aff0bcc7",
+        "note": "逐字节比对本文件记录的 sha256"
+      },
+      "fault_matrix": [
+        "F15"
+      ],
+      "consumers": [
+        "T04",
+        "T16",
+        "T29"
+      ]
+    },
+    {
+      "id": "CS-007",
+      "type": "redirect",
+      "polarity": "positive",
+      "method": "GET",
+      "path": "/redirect/301",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 301,
+        "location": "/static/page.html",
+        "note": "永久跳转，用于每跳 SSRF 校验"
+      },
+      "fault_matrix": [
+        "F15"
+      ],
+      "consumers": [
+        "T11",
+        "T16"
+      ]
+    },
+    {
+      "id": "CS-008",
+      "type": "redirect",
+      "polarity": "positive",
+      "method": "GET",
+      "path": "/redirect/302",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 302,
+        "location": "/static/page.html",
+        "note": "临时跳转"
+      },
+      "fault_matrix": [
+        "F15"
+      ],
+      "consumers": [
+        "T11",
+        "T16"
+      ]
+    },
+    {
+      "id": "CS-009",
+      "type": "download_html",
+      "polarity": "positive",
+      "method": "GET",
+      "path": "/download/html",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py（确定性常量载荷，字节级可复算）",
+      "integrity": {
+        "mode": "sha256",
+        "sha256": "9fb097d1aac887d76229c9eaa21490f33a30fe98179358b6b44c22ce46db777f",
+        "bytes": 277
+      },
+      "expected": {
+        "status": 200,
+        "content_type": "text/html; charset=utf-8",
+        "body_sha256": "9fb097d1aac887d76229c9eaa21490f33a30fe98179358b6b44c22ce46db777f",
+        "note": "逐字节比对本文件记录的 sha256"
+      },
+      "fault_matrix": [
+        "F15"
+      ],
+      "consumers": [
+        "T04",
+        "T16",
+        "T29"
+      ]
+    },
+    {
+      "id": "CS-010",
+      "type": "download_binary",
+      "polarity": "positive",
+      "method": "GET",
+      "path": "/download/binary",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py（确定性常量载荷，字节级可复算）",
+      "integrity": {
+        "mode": "sha256",
+        "sha256": "68ac8f88f84d009702dc367219a9c05db454ac61db49df5f785bd33722a74046",
+        "bytes": 4096
+      },
+      "expected": {
+        "status": 200,
+        "content_type": "application/octet-stream",
+        "body_sha256": "68ac8f88f84d009702dc367219a9c05db454ac61db49df5f785bd33722a74046",
+        "note": "逐字节比对本文件记录的 sha256"
+      },
+      "fault_matrix": [
+        "F15"
+      ],
+      "consumers": [
+        "T04",
+        "T16",
+        "T29"
+      ]
+    },
+    {
+      "id": "CS-011",
+      "type": "login_page",
+      "polarity": "positive",
+      "method": "GET",
+      "path": "/login",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 200,
+        "note": "人工登录表单；合成账号见 payloads.py"
+      },
+      "fault_matrix": [
+        "F9"
+      ],
+      "consumers": [
+        "T17",
+        "T18"
+      ]
+    },
+    {
+      "id": "CS-012",
+      "type": "login_page",
+      "polarity": "negative",
+      "method": "POST",
+      "path": "/login",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 401,
+        "body": {
+          "username": "phase0-manual-user",
+          "password": "wrong"
+        },
+        "note": "错误口令必须 401，不得建立会话"
+      },
+      "fault_matrix": [
+        "F9"
+      ],
+      "consumers": [
+        "T17"
+      ]
+    },
+    {
+      "id": "CS-013",
+      "type": "login_page",
+      "polarity": "positive",
+      "method": "POST",
+      "path": "/login",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 303,
+        "body": {
+          "username": "phase0-manual-user",
+          "password": "phase0-manual-pass"
+        },
+        "note": "正确口令返回 303 + Set-Cookie；自动化只用于演练用户在场流程"
+      },
+      "fault_matrix": [
+        "F9"
+      ],
+      "consumers": [
+        "T17"
+      ]
+    },
+    {
+      "id": "CS-014",
+      "type": "counter_idempotent",
+      "polarity": "positive",
+      "method": "POST",
+      "path": "/idem/write",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "key": "manifest-idem-1"
+        },
+        "note": "同 key 重复调用 applied_calls 恒为 1，attempts 递增"
+      },
+      "fault_matrix": [
+        "F2",
+        "F3",
+        "F5"
+      ],
+      "consumers": [
+        "T05",
+        "T06",
+        "T07",
+        "T21"
+      ]
+    },
+    {
+      "id": "CS-015",
+      "type": "counter_non_idempotent",
+      "polarity": "positive",
+      "method": "POST",
+      "path": "/nonidem/write",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "key": "manifest-nonidem-1"
+        },
+        "note": "每次调用 applied_calls +1，用于暴露重复副作用"
+      },
+      "fault_matrix": [
+        "F2",
+        "F5"
+      ],
+      "consumers": [
+        "T05",
+        "T06",
+        "T07"
+      ]
+    },
+    {
+      "id": "CS-016",
+      "type": "counter_read",
+      "polarity": "positive",
+      "method": "GET",
+      "path": "/idem/count?key=manifest-idem-read",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 200,
+        "note": "只读查单：返回已有计数与最后状态"
+      },
+      "fault_matrix": [
+        "F3"
+      ],
+      "consumers": [
+        "T06",
+        "T21"
+      ]
+    },
+    {
+      "id": "CS-017",
+      "type": "counter_read",
+      "polarity": "positive",
+      "method": "GET",
+      "path": "/nonidem/count?key=manifest-nonidem-read",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 200,
+        "note": "只读查单（非幂等面）"
+      },
+      "fault_matrix": [
+        "F3"
+      ],
+      "consumers": [
+        "T06",
+        "T21"
+      ]
+    },
+    {
+      "id": "CS-018",
+      "type": "counter_idempotent",
+      "polarity": "negative",
+      "method": "POST",
+      "path": "/idem/write",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 400,
+        "body": {
+          "key": "bad key!"
+        },
+        "note": "非法 key 必须 400 且零副作用"
+      },
+      "fault_matrix": [
+        "F13"
+      ],
+      "consumers": [
+        "T05"
+      ]
+    },
+    {
+      "id": "CS-019",
+      "type": "error_unknown",
+      "polarity": "negative",
+      "method": "GET",
+      "path": "/nope",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 404,
+        "note": "未知路径统一 404 not_found"
+      },
+      "fault_matrix": [],
+      "consumers": [
+        "T16",
+        "T29"
+      ]
+    },
+    {
+      "id": "CS-020",
+      "type": "counter_idempotent",
+      "polarity": "negative",
+      "method": "GET",
+      "path": "/idem/write",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 405,
+        "note": "方法不允许必须 405 且带 Allow 头"
+      },
+      "fault_matrix": [],
+      "consumers": [
+        "T05"
+      ]
+    },
+    {
+      "id": "CS-021",
+      "type": "fault_delay",
+      "polarity": "positive",
+      "method": "GET",
+      "path": "/fault/delay?key=manifest-delay",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 200,
+        "note": "可控延迟，屏障 hit 后才返回 200；用于 receipt 前窗口"
+      },
+      "fault_matrix": [
+        "F3",
+        "F5"
+      ],
+      "consumers": [
+        "T06",
+        "T21",
+        "T05"
+      ]
+    },
+    {
+      "id": "CS-022",
+      "type": "fault_timeout",
+      "polarity": "negative",
+      "method": "GET",
+      "path": "/fault/timeout",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 200,
+        "note": "屏障 hit 后主动断连，客户端拿不到任何响应"
+      },
+      "fault_matrix": [
+        "F3",
+        "F5"
+      ],
+      "consumers": [
+        "T06",
+        "T21"
+      ]
+    },
+    {
+      "id": "CS-023",
+      "type": "fault_server_error",
+      "polarity": "negative",
+      "method": "GET",
+      "path": "/fault/server_error",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 503,
+        "note": "注入 5xx；未 arm 时为基线 503"
+      },
+      "fault_matrix": [
+        "F2",
+        "F3"
+      ],
+      "consumers": [
+        "T06",
+        "T07",
+        "T21"
+      ]
+    },
+    {
+      "id": "CS-024",
+      "type": "fault_truncate",
+      "polarity": "negative",
+      "method": "GET",
+      "path": "/fault/truncate",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 200,
+        "note": "声明 Content-Length 但只写部分字节，客户端 IncompleteRead"
+      },
+      "fault_matrix": [
+        "F3",
+        "F5"
+      ],
+      "consumers": [
+        "T08",
+        "T21"
+      ]
+    },
+    {
+      "id": "CS-025",
+      "type": "fault_disconnect_after_success",
+      "polarity": "negative",
+      "method": "GET",
+      "path": "/fault/disconnect_after_success?key=manifest-disconnect",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 200,
+        "note": "副作用已计数后主动断连：applied_calls=1 但客户端无 receipt（F3 窗口）"
+      },
+      "fault_matrix": [
+        "F3",
+        "F5"
+      ],
+      "consumers": [
+        "T06",
+        "T21"
+      ]
+    },
+    {
+      "id": "CS-026",
+      "type": "fault_login_required",
+      "polarity": "positive",
+      "method": "GET",
+      "path": "/fault/login_required",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 200,
+        "note": "需要人工登录；自动化不得绕过"
+      },
+      "fault_matrix": [
+        "F9"
+      ],
+      "consumers": [
+        "T17",
+        "T18"
+      ]
+    },
+    {
+      "id": "CS-027",
+      "type": "error_unknown",
+      "polarity": "negative",
+      "method": "GET",
+      "path": "/_fault/state",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 404,
+        "note": "故障入口默认关闭时与未知路径不可区分（生产默认不可启用）"
+      },
+      "fault_matrix": [],
+      "consumers": [
+        "T04",
+        "T05"
+      ]
+    },
+    {
+      "id": "CS-028",
+      "type": "static_page",
+      "polarity": "negative",
+      "method": "GET",
+      "path": "/static/missing.html",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 404,
+        "note": "静态资源缺失 404"
+      },
+      "fault_matrix": [],
+      "consumers": [
+        "T16"
+      ]
+    },
+    {
+      "id": "CS-029",
+      "type": "health",
+      "polarity": "positive",
+      "method": "GET",
+      "path": "/healthz",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 200,
+        "note": "健康检查返回 fault_injection 门态与请求计数"
+      },
+      "fault_matrix": [],
+      "consumers": [
+        "T04",
+        "T05",
+        "T07"
+      ]
+    },
+    {
+      "id": "CS-030",
+      "type": "login_page",
+      "polarity": "negative",
+      "method": "GET",
+      "path": "/protected",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 401,
+        "note": "未登录访问受保护页 401 login_required"
+      },
+      "fault_matrix": [
+        "F9"
+      ],
+      "consumers": [
+        "T17",
+        "T18"
+      ]
+    },
+    {
+      "id": "CS-031",
+      "type": "counter_read",
+      "polarity": "negative",
+      "method": "GET",
+      "path": "/idem/count",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 400,
+        "note": "缺 key 参数必须 400 key_required"
+      },
+      "fault_matrix": [],
+      "consumers": [
+        "T05"
+      ]
+    },
+    {
+      "id": "CS-032",
+      "type": "fault_delay",
+      "polarity": "positive",
+      "method": "POST",
+      "path": "/_fault/arm",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "name": "delay"
+        },
+        "note": "控制面：布置故障屏障（仅显式开启故障入口的站点）"
+      },
+      "fault_matrix": [
+        "F3"
+      ],
+      "consumers": [
+        "T05",
+        "T06"
+      ]
+    },
+    {
+      "id": "CS-033",
+      "type": "fault_delay",
+      "polarity": "positive",
+      "method": "POST",
+      "path": "/_fault/release",
+      "license": "LicenseRef-PyKnora-Phase0-TestFixture",
+      "source": "experiments/phase0/control_site/payloads.py / handlers.py（行为由实现定义）",
+      "integrity": {
+        "mode": "structural",
+        "strategy": "服务端行为断言（状态码/计数/头/到达日志），不做字节哈希"
+      },
+      "expected": {
+        "status": 200,
+        "body": {
+          "name": "delay"
+        },
+        "note": "控制面：释放屏障并清理"
+      },
+      "fault_matrix": [
+        "F3"
+      ],
+      "consumers": [
+        "T05",
+        "T06"
+      ]
+    }
+  ]
+}
