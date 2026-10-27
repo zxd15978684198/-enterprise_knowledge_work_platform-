@@ -1,0 +1,96 @@
+# PyKnora Phase 0 隔离实验编排（隔离、无秘密、镜像按 digest 固定）。
+#
+# 设计口径：
+#   * 只提供 core profile 的两个真实可启动服务：postgres + redis。
+#   * 镜像一律 `tag@sha256:<digest>` 双固定：tag 便于人读，digest 才是重建依据。
+#     digest 来自本机 `docker pull` 实测（见 docs/poc/evidence/environment.md）。
+#   * 端口只绑 127.0.0.1，实验栈不对外暴露；宿主端口 5433 / 6380 由 T02 独占。
+#   * 未就绪 profile 只留骨架与说明，不填 image（不猜镜像、不退回 latest）。
+#
+# profile 清单一览：
+# profile: core    — 已实现：postgres + redis（本任务 T02 验收对象）
+# profile: queue   — not_ready：P0-T08 负责（Celery worker 入口未实现）
+# profile: parser  — not_ready：P0-T09 负责（DocReader 镜像 digest 未定）
+# profile: browser — not_ready：P0-T14 负责（BrowserSkill 真实协议未验证）
+# control-site     — not_ready：P0-T04 负责（可控故障站点，本任务不实现）
+
+name: ${PHASE0_COMPOSE_PROJECT:-pyknora-phase0}
+
+services:
+  postgres:
+    image: postgres:17-alpine@sha256:266d3c257594e195b309ae9d1805e54c788f1d7b375f56bf6c367aac6c917e7b
+    profiles: ["core"]
+    environment:
+      # 凭证与库名必须由使用者显式提供（`${VAR:?msg}`）：缺变量时 compose 直接失败，
+      # 不静默回退默认值。这是 P0-T02「注入场景：缺环境变量必须明确失败」的落点。
+      POSTGRES_USER: ${PHASE0_PG_USER:?PYKNORA_T02_MISSING_PHASE0_PG_USER}
+      POSTGRES_PASSWORD: ${PHASE0_PG_PASSWORD:?PYKNORA_T02_MISSING_PHASE0_PG_PASSWORD}
+      POSTGRES_DB: ${PHASE0_PG_DB:?PYKNORA_T02_MISSING_PHASE0_PG_DB}
+      # PG 17 起 data_checksums 只能在 initdb 时开启，且开源版无法事后打开。
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+    ports:
+      - "127.0.0.1:${PHASE0_PG_HOST_PORT:-5433}:5432"
+    volumes:
+      - phase0-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    shm_size: "128mb"
+    stop_grace_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: "no"
+
+  redis:
+    image: redis:7.4-alpine@sha256:6ba19c50b56777f5c11c58eff8ddb69d0d5f27ba131cffb63f180ccfd43c66af
+    profiles: ["core"]
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --maxmemory-policy
+      - noeviction
+    ports:
+      - "127.0.0.1:${PHASE0_REDIS_HOST_PORT:-6380}:6379"
+    volumes:
+      - phase0-redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    restart: "no"
+
+  # ---------------------------------------------------------------------------
+  # profile: queue  — not_ready（P0-T08）
+  #   Celery worker 入口不存在，T02 不写 image/command，避免出现未验证镜像。
+  #   启用方式（T08 完成后）：补 image 为 tag@sha256:...、command 指向真实
+  #   celery_app，depends_on 复用下方两个服务的 healthy 条件。
+  #
+  # profile: parser — not_ready（P0-T09）
+  #   复用原 Python DocReader gRPC 服务的镜像 digest 未取得（参考源码克隆失败），
+  #   本任务不虚构；T09 取得 digest 后再补 service。
+  #
+  # profile: browser — not_ready（P0-T14）
+  #   BrowserSkill 的真实协议与授权兼容性尚未验证，T02 不预装相关依赖/镜像。
+  # ---------------------------------------------------------------------------
+
+volumes:
+  phase0-pgdata:
+  phase0-redisdata:

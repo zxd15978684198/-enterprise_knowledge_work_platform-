@@ -1,0 +1,33 @@
+[project]
+name = "pyknora-phase0"
+version = "0.1.0"
+description = "PyKnora Phase 0 isolated experiment environment (experiment project, not the product package)"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "psycopg[binary]>=3.1",
+    "redis>=5",
+    "sqlalchemy[asyncio]>=2.0",
+]
+
+[dependency-groups]
+dev = [
+    "pyyaml>=6,<7",
+    "pytest>=9.0.3",
+    "pytest-asyncio>=1.0",
+    "ruff>=0.9,<0.13",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["../../tests/phase0"]
+addopts = "-q"
+asyncio_mode = "auto"
