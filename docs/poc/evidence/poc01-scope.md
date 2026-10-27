@@ -386,4 +386,3 @@ p0_app_sessions          = 0
 | Owner | `w2-t03-scope`（W2 子任务执行者） |
 | 上游 | Team Lead `lead` |
 | 复核建议 | T05（Scope 落库路径收敛）、T07（outbox/事务边界）、T29（worker 受限角色与 `SECURITY DEFINER` 评审） |
-
