@@ -4,99 +4,99 @@
     {
       "id": "test_00_proto_copy_matches_t09_anchor",
       "outcome": "passed",
-      "duration_s": 0.002
+      "duration_s": 0.0026
     },
     {
       "id": "test_01_generated_stubs_match_real_proto",
       "outcome": "passed",
-      "duration_s": 0.055
+      "duration_s": 0.0509
     },
     {
       "id": "test_02_schema_matches_proto_field_table",
       "outcome": "passed",
-      "duration_s": 0.0009
+      "duration_s": 0.0007
     },
     {
       "id": "test_03_unary_read_round_trip_fields",
       "outcome": "passed",
-      "duration_s": 0.007
+      "duration_s": 0.0065
     },
     {
       "id": "test_04_empty_parse_result_error_field_keeps_status_ok",
       "outcome": "passed",
-      "duration_s": 0.0014
+      "duration_s": 0.0013
     },
     {
       "id": "test_05_unsupported_file_type_error_field_keeps_status_ok",
       "outcome": "passed",
-      "duration_s": 0.0015
+      "duration_s": 0.0016
     },
     {
       "id": "test_06_read_stream_frame_order_and_termination",
       "outcome": "passed",
-      "duration_s": 0.0046
+      "duration_s": 0.0039
     },
     {
       "id": "test_07_read_stream_parse_failure_only_meta_error",
       "outcome": "passed",
-      "duration_s": 0.0029
+      "duration_s": 0.0023
     },
     {
       "id": "test_08_read_stream_send_phase_failure_is_not_ok",
       "outcome": "passed",
-      "duration_s": 0.0097
+      "duration_s": 0.0066
     },
     {
       "id": "test_09_read_stream_bypasses_unary_message_cap",
       "outcome": "passed",
-      "duration_s": 0.0129
+      "duration_s": 0.0124
     },
     {
       "id": "test_10_client_cancel_is_observed_by_server",
       "outcome": "passed",
-      "duration_s": 0.003
+      "duration_s": 0.0025
     },
     {
       "id": "test_11_deadline_exceeded_is_observed_by_server",
       "outcome": "passed",
-      "duration_s": 0.5092
+      "duration_s": 0.5106
     },
     {
       "id": "test_12_auth_token_required",
       "outcome": "passed",
-      "duration_s": 0.0088
+      "duration_s": 0.0085
     },
     {
       "id": "test_13_list_engines_round_trip",
       "outcome": "passed",
-      "duration_s": 0.0012
+      "duration_s": 0.0016
     },
     {
       "id": "test_14_preprocess_image_branches",
       "outcome": "passed",
-      "duration_s": 0.0029
+      "duration_s": 0.0021
     },
     {
       "id": "test_15_all_four_methods_over_real_tcp",
       "outcome": "passed",
-      "duration_s": 0.0036
+      "duration_s": 0.0035
     },
     {
       "id": "test_16_stream_without_meta_is_protocol_error",
       "outcome": "passed",
-      "duration_s": 0.0025
+      "duration_s": 0.0023
     }
   ],
   "secondary_servers": {
     "message_cap": {
-      "bound_port": 51109,
+      "bound_port": 56819,
       "cap_bytes": 262144
     },
     "auth": {
-      "bound_port": 51111
+      "bound_port": 56821
     }
   },
-  "started_at": "2026-10-27T20:30:15+0800",
+  "started_at": "2026-10-27T22:17:13+0800",
   "proto": {
     "path": "experiments/phase0/docreader_probe/proto/docreader.proto",
     "sha256": "33d4135cfcd2ec95f8d160d6cefdd54be669167e8b8fb69ef81095d218a738d0",
@@ -149,15 +149,15 @@
   "cancellation": {
     "server_observed": true,
     "server_is_active": false,
-    "server_waited_s": 0.0005,
+    "server_waited_s": 0.0002,
     "client_status": "CANCELLED",
-    "client_elapsed_s": 0.0006
+    "client_elapsed_s": 0.0003
   },
   "deadline": {
     "client_status": "DEADLINE_EXCEEDED",
     "timeout_s": 0.5,
     "server_observed": true,
-    "client_elapsed_s": 0.5064
+    "client_elapsed_s": 0.5084
   },
   "auth": {
     "missing_token_status": "UNAUTHENTICATED",
@@ -200,6 +200,6 @@
     "grpcio-tools": "1.85.0",
     "pytest": "9.1.1"
   },
-  "finished_at": "2026-10-27T20:31:18+0800",
+  "finished_at": "2026-10-27T22:18:04+0800",
   "real_docreader_service": "NOT_RUN (T09: image digest UNKNOWN, licenses UNKNOWN)"
 }

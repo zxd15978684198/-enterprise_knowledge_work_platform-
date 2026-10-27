@@ -952,13 +952,13 @@ def test_intent_key_is_stable_and_matches_c04_formula() -> None:
     )
     assert intent_one.intent_key == intent_two.intent_key  # 同一语义 → 同一键
     assert intent_one.requires_approval is False
-    assert intent_one.schema_version == "tool-intent/1"
+    assert intent_one.schema_version == 1  # 与 T06 tool_ledger.INTENT_SCHEMA_VERSION 同源
     assert intent_one.canonicalization_version == "json-c14n/1"
 
     manual = gw.sha256_hex(
         gw.canonical_json(
             {
-                "schema_version": "tool-intent/1",
+                "schema_version": 1,
                 "run_id": str(RUN_ID),
                 "response_artifact_id": str(ARTIFACT_ID),
                 "call_ordinal": 0,
@@ -983,7 +983,7 @@ def test_intent_key_is_stable_and_matches_c04_formula() -> None:
         ("tool_version", "1.0.1"),
         ("arguments_hash", "0" * 64),
         ("scope_hash", "f" * 64),
-        ("schema_version", "tool-intent/2"),
+        ("schema_version", 2),
     ],
 )
 def test_intent_key_changes_with_every_bound_field(field: str, value: object) -> None:

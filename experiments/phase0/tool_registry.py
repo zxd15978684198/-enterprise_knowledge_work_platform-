@@ -12,6 +12,13 @@
 * ``docs/poc/03_Phase0_Task_Backlog.md`` P0-T19 卡：一个 provider + 三个受控工具的
   typed 调用契约；重名注册拒绝、未授权/截断参数执行 0。
 
+**intent_key 单一实现（W5 门禁修缺口）**：``compute_intent_key`` 不再本地重写 C-04
+公式，而是把 ``run_id`` 存在的调用**直接委托**给 T06 ``tool_ledger.intent_key``；
+``schema_version`` 统一为 T06 的整数 ``INTENT_SCHEMA_VERSION``。历史版本本模块用
+字符串 ``"tool-intent/1"``，导致 T19 与 T06 对同一调用算出不同 key、跨组件去重
+静默失效；现在两侧逐字节一致。``run_id is None`` 只是未绑定 Run 的草稿键（T06 账本
+拒绝 ``None``），不可作为跨组件持久键。
+
 边界（本任务**不做**）
 ----------------------
 * **没有执行器**：本模块只做 resolve → validate → intent → 审批门检查；
@@ -42,6 +49,10 @@ from uuid import UUID
 
 from contracts import ResourceRef, WorkspaceScope, compute_resource_scope_hash
 from model_gateway import ToolDeclaration, canonical_json
+from tool_ledger import INTENT_SCHEMA_VERSION
+from tool_ledger import LedgerError as _ToolLedgerError
+from tool_ledger import canonical_json as _ledger_canonical_json
+from tool_ledger import intent_key as _ledger_intent_key
 
 __all__ = [
     "APPROVAL_REQUIRED",
@@ -73,7 +84,10 @@ __all__ = [
     "validate_arguments",
 ]
 
-SCHEMA_VERSION = "tool-intent/1"
+#: 与 T06 ``tool_ledger.INTENT_SCHEMA_VERSION`` 同源（整数）。旧版本这里是字符串
+#: ``"tool-intent/1"``，导致同一调用在 T06 与本模块算出不同 intent_key（跨组件去重静默
+#: 失效）；现已统一为同一整数常量，并由 ``compute_intent_key`` 直接委托 T06 实现。
+SCHEMA_VERSION = INTENT_SCHEMA_VERSION
 CANONICALIZATION_VERSION = "json-c14n/1"
 APPROVAL_REQUIRED = "TOOL_APPROVAL_REQUIRED"
 
@@ -602,7 +616,7 @@ def compute_scope_hash(scope: WorkspaceScope, resource_refs: Sequence[ResourceRe
 
 def compute_intent_key(
     *,
-    schema_version: str,
+    schema_version: int = SCHEMA_VERSION,
     run_id: UUID | None,
     response_artifact_id: UUID,
     call_ordinal: int,
@@ -611,18 +625,54 @@ def compute_intent_key(
     arguments_hash: str,
     scope_hash: str,
 ) -> str:
-    """C-04 精确公式；字段顺序由 canonical JSON 的排序键保证确定。"""
+    """C-04 稳定意图键；与 T06 ``tool_ledger.intent_key`` **同一实现**。
 
+    - 有 ``run_id`` 时直接委托 ``tool_ledger.intent_key``：字段集合、canonical JSON 与
+      参数校验全部共用，因此 T19 契约与 T06 账本对同一调用得到逐字节相同的 key。
+    - ``schema_version`` 统一为 T06 的整数 ``INTENT_SCHEMA_VERSION``（默认 1）；字符串
+      （如旧的 ``"tool-intent/1"`` 或 ``"1"``）一律拒绝，不做隐式转换——两侧行为一致。
+    - ``run_id is None`` 是**无 Run 草稿**：T06 账本明确拒绝 ``None``（key 必须绑定已持久
+      Run），这里仅用同一 canonical 规则做本地预览哈希，不能当跨组件去重键；T21 注入
+      真实 ``run_id`` 后自然走委托分支。
+    """
+
+    if run_id is not None:
+        try:
+            return _ledger_intent_key(
+                schema_version=schema_version,
+                run_id=run_id,
+                response_artifact_id=response_artifact_id,
+                call_ordinal=call_ordinal,
+                name=name,
+                tool_version=tool_version,
+                arguments_hash=arguments_hash,
+                scope_hash=scope_hash,
+            )
+        except _ToolLedgerError as exc:
+            raise ToolContractError(str(exc), field_path="intent_key") from exc
+
+    # 无 Run 草稿：镜像 T06 intent_key 的字段校验 + canonical JSON（不另写一套序列化）。
+    if not isinstance(schema_version, int) or schema_version < 1:
+        raise ToolContractError(
+            f"schema_version 必须是 >= 1 的 int（与 T06 INTENT_SCHEMA_VERSION 同源），"
+            f"收到 {schema_version!r}",
+            field_path="schema_version",
+        )
+    if not isinstance(response_artifact_id, UUID):
+        raise ToolContractError(
+            "response_artifact_id 必须是 uuid.UUID", field_path="response_artifact_id"
+        )
     if not isinstance(call_ordinal, int) or isinstance(call_ordinal, bool) or call_ordinal < 0:
-        raise ToolContractError("call_ordinal 必须是非负 int", field_path="call_ordinal")
+        raise ToolContractError("call_ordinal 必须是 >= 0 的 int", field_path="call_ordinal")
+    for label, value in (("name", name), ("tool_version", tool_version)):
+        if not isinstance(value, str) or not value:
+            raise ToolContractError(f"{label} 必须是非空字符串", field_path=label)
     for label, value in (("arguments_hash", arguments_hash), ("scope_hash", scope_hash)):
-        if not isinstance(value, str) or not _HEX64_RE.match(value):
-            raise ToolContractError(f"{label} 必须是 sha256 hex", field_path=label)
-    if not isinstance(schema_version, str) or not schema_version:
-        raise ToolContractError("schema_version 必须是非空字符串", field_path="schema_version")
+        if not isinstance(value, str) or _HEX64_RE.match(value) is None:
+            raise ToolContractError(f"{label} 必须是 64 位 sha256 hex", field_path=label)
     payload = {
         "schema_version": schema_version,
-        "run_id": str(run_id) if run_id is not None else None,
+        "run_id": None,
         "response_artifact_id": str(response_artifact_id),
         "call_ordinal": call_ordinal,
         "name": name,
@@ -630,7 +680,7 @@ def compute_intent_key(
         "arguments_hash": arguments_hash,
         "scope_hash": scope_hash,
     }
-    return hashlib.sha256(canonical_json(payload).encode("utf-8")).hexdigest()
+    return hashlib.sha256(_ledger_canonical_json(payload).encode("utf-8")).hexdigest()
 
 
 @dataclass(frozen=True, slots=True)
@@ -651,7 +701,7 @@ class ToolIntent:
     run_id: UUID | None
     requires_approval: bool
     schema_hash: str
-    schema_version: str = SCHEMA_VERSION
+    schema_version: int = SCHEMA_VERSION
     canonicalization_version: str = CANONICALIZATION_VERSION
 
     def recompute_key(self) -> str:
