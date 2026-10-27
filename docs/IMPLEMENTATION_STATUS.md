@@ -152,9 +152,10 @@
 - 素材前置：`git submodule update --init references/WeKnora` 于 2026-10-27T17:00:11 成功，钉 `662abaf9f944e37689d04c42160034b2cdec6829`（`git submodule status` 无 `-` 前缀，`git -C references/WeKnora rev-parse HEAD` 一致）。
 - **P0-T02 PASS**：`experiments/phase0/` 为独立 uv 项目（Python 3.12.13、`requires-python >=3.12,<3.13`、`uv.lock` 16 包 sha256 `bf0b2dc0…`）；compose core 固定 `postgres:17-alpine@sha256:266d3c25…`（`127.0.0.1:5433`）+ `redis:7.4-alpine@sha256:6ba19c50…`（`127.0.0.1:6380`），两容器 healthy；E1 `PostgreSQL 17.11` + DDL/DML 往返 0.303 s，E2 `PING=true` + `SET/GET` + server `7.4.12` 0.141 s；`pytest` 12 passed、`ruff` All checks passed、`pip-audit` 零已知漏洞；必填变量缺失改为 `:?` 显式失败并有负向用例。证据 `docs/poc/evidence/environment.md`（§13 为门禁硬化复跑）。
 - **P0-T14 PASS（限域）**：`docs/poc/evidence/browserskill_protocol_manifest.md`（535 行）。31 个暴露动作全部映射到 `internal/browserskill/manager.go:816-848` 白名单与 `manager.go:986` 的 `"tool."+method`；daemon（Rust `bsk`）与扩展不在参考库内，版本 `0.3.1`、上游 commit `da6bf4eed2dd7256567e152df8c903c87f6598c3`；参考实现内 SSRF/域名/速率**无任何代码**，网络策略必须网关前置。自评 PASS 9 / PARTIAL 3（产物 hash、capabilities 语义、真机 OS 矩阵）/ NOT_RUN 2。
-- **P0-T09 进行中**：`w1-t09-docreader` 仍在执行，产物 `docs/poc/evidence/docreader_manifest.md`、`docreader_fixture_plan.md` 尚未落盘；W1 门禁待其完成后收口。
+- **P0-T09 PARTIAL**：`docs/poc/evidence/docreader_manifest.md`（315 行）+ `docreader_fixture_plan.md`（190 行）。proto 锚点 `docreader/proto/docreader.proto`（sha256 `33d4135c…`，28.2 KB，v1.0.0）的 4 个 RPC 逐个列出请求/响应/错误/限制；解析失败走 `ParseResponse.error` 字段而 gRPC status 仍 OK（直接影响 T10 断言）；默认部署**无 token 鉴权、无 TLS**；镜像 digest、22 个非 OCR 依赖许可、apt 包许可、OCR 权重清单均 `UNKNOWN`，须在 T10 前补 `docreader_sbom.md`。
 - 依赖口径变更：PG 驱动由 Lead 底稿 `asyncpg` 改为 `psycopg[binary]>=3.1`（TDD01 §7），并修 CVE 升级 `pytest 9.1.1` / `pytest-asyncio 1.4.1`；现装 `sqlalchemy 2.1.6`、`redis 8.1.0`、`pyyaml 6.0.3`、`ruff 0.12.12`。
-- 根 `.gitignore` 追加 `.env`、`.env.*`、`.pytest_cache/`、`.ruff_cache/`、`pytest-of-*/`（防止实验 `.env` 与 pytest 临时目录误入库）。
-- 门禁检查（`%TEMP%\w1_gate.log`，17:30:50）：`pytest` 12 passed exit 0、`ruff` exit 0、秘密扫描仅命中 `.venv` 第三方库与 `.env.example` 占位值（无真实凭据）、`git status` 仅 `.gitignore` + 本文件被修改、**暂存区为空**。
-- **未提交**：零 `git add` / `commit` / `push`；是否提交由用户在本波次门禁明确决定。
-- 下一步：T09 收口 → 补齐 `wave-w1-record.md` §3 门禁与 §4 提交决策 → 向用户提请提交分支。
+- 根 `.gitignore` 追加 `.env`、`.env.*` + `!.env.example`、`.pytest_cache/`、`.ruff_cache/`、`pytest-of-*/`（既防止真实 `.env` 与 pytest 临时目录误入库，又保留 `.env.example` 可提交）。
+- 门禁检查（`%TEMP%\w1_gate2.log`，17:40:34 复跑）：`pytest -c experiments/phase0/pyproject.toml tests/phase0 -q` 12 passed exit 0、`ruff` exit 0、仓库自有 12 文件秘密扫描 `no_high_risk_secret_hits`、compose core 两容器 `Up (healthy)`、已跟踪差异仅 `.gitignore` 与 `.env.example` 相关、**暂存区为空**。
+- **已提交（用户 17:42 明确授权）**：`08c3c67` 于 `feature/w1-t02-t09-t14`，13 文件 / +2823 −1；未 push、未合并 `dev`。首提交 `e78a498` 因 `.gitignore` 的 `.env.*` 误伤 `.env.example` 而漏文件，加 `!.env.example` 例外后 `--amend` 修正。
+- 未提交：`.idea/`、`CLAUDE.md`、`docs/teacher/`、`experiments/phase0/.venv/`；`references/WeKnora` gitlink 保持 `662abaf9f944e37689d04c42160034b2cdec6829`。
+- 波次收官证据：`docs/poc/evidence/wave-w1-record.md`（声明块、素材阻塞与解除、§3 门禁、§4 提交结果）。下一前沿 **W2 = T03/T04**，未启动，等用户授权。

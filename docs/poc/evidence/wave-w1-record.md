@@ -89,12 +89,14 @@ per_task:
 | T09 | **PARTIAL** | 镜像 digest、22 个非 OCR 依赖许可、apt 包许可、OCR 权重清单 = `UNKNOWN`，须在 T10 前补 `docreader_sbom.md`；证据分级用 A/B/C（卡片字面为 A/D/U），待裁定 |
 | T14 | **PASS（限域）** | 产物 hash、capabilities 语义、真机 OS 矩阵 3 项 PARTIAL；上游 daemon/extension 不在库内且本机不可构建（无 windows 目标、`/tmp` 硬编码） |
 
-## 4. 提交决策
+## 4. 提交决策与结果
 
-- 用户答复：**待询问**（本波次未提交，`ahead_of_dev=0`）
-- 建议提交内容（需用户明确同意后才 `git add` 具体路径）：
-  - 新增 `experiments/phase0/{pyproject.toml,uv.lock,compose.yaml,.env.example}`、`tests/phase0/test_environment.py`
-  - 新增 `docs/poc/evidence/{environment.md,docreader_manifest.md,docreader_fixture_plan.md,browserskill_protocol_manifest.md,wave-w1-record.md}`、`docs/plans/2026-10-27-phase0-execution-plan.md`
-  - 修改 `docs/IMPLEMENTATION_STATUS.md`、`.gitignore`
-  - **不提交**：`.idea/`、`CLAUDE.md`、`docs/teacher/`、`references/`（子模块除外，gitlink 保持 `662abaf9…` 不动）、`experiments/phase0/.venv/`
-- 提交信息草案：`feat(phase0): close W1 - isolated env (T02), docreader & browserskill static prechecks (T09/T14)`
+- 用户答复（2026-10-27 17:42）：**「提交到当前分支，不推送」**。
+- 实际提交：`08c3c67`（`feature/w1-t02-t09-t14`，`ahead_of_dev=1`，**未 push、未合并 dev**）。
+  - 13 文件 / +2823 −1：`.gitignore`、`docs/IMPLEMENTATION_STATUS.md`、`docs/plans/2026-10-27-phase0-execution-plan.md`、`docs/poc/evidence/{environment,wave-w1-record,docreader_manifest,docreader_fixture_plan,browserskill_protocol_manifest}.md`、`experiments/phase0/{pyproject.toml,uv.lock,compose.yaml,.env.example}`、`tests/phase0/test_environment.py`。
+  - 提交前校验：`git diff --cached --check` exit 0；暂存区无 `.env` / `.venv` / `.idea` / `references`；`user.name=zxd15978684198`、`user.email=zxd15978684198@163.com`（沿用本机既有配置）。
+  - 首次 commit `e78a498` 漏了 `.env.example`：新加的 `.gitignore` 规则 `.env.*` 把它一并忽略（`add` 报 `paths are ignored`，add_exit=1）。修正方式 = 在 `.gitignore` 加 `!.env.example` 例外后 `git commit --amend`，得 `08c3c67`；实测 `git check-ignore -v` 显示 `.env.example` 命中 `!.env.example`（不被忽略）、`.env` 命中 `.env`（被忽略）。
+  - 提交后工作树仅剩开工前既有未跟踪项：`.idea/`、`CLAUDE.md`、`docs/plans/README.md`、`docs/teacher/`。
+- 提交信息：`feat(phase0): close W1 - isolated env (T02), docreader & browserskill static prechecks (T09/T14)`
+- **未提交**：`.idea/`、`CLAUDE.md`、`docs/teacher/`、`experiments/phase0/.venv/`；`references/WeKnora` 为已初始化的 gitlink，保持钉住 `662abaf9f944e37689d04c42160034b2cdec6829`，本轮未改动、未提交。
+- 另有门禁后记账提交：`docs(phase0): record W1 gate result and W2 frontier`（本文件 §4/§3 与计划前沿标注的更新）。

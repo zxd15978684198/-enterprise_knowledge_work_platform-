@@ -25,8 +25,9 @@
 | 位置 | 波次 | 任务 | 状态 | 派发条件 |
 | --- | --- | --- | --- | --- |
 | 已完成 | W0 | T01 | ✅ 完成 | 产物 `docs/poc/07_Contract_Closure.md` |
-| **执行前沿** | **W1** | **T02、T09、T14** | **待授权（唯一可派发）** | 建分支 `feature/w1-t02-t09-t14`；先执行子模块初始化；`N = 3`（已确认 A 方案） |
-| 未解锁 | W2–W11 | T03–T08、T10–T32（28 项） | 未解锁 | 前置未 `PASS`，不得派发，也不得预先建分支 |
+| 已完成 | W1 | T02、T09、T14 | ✅ 门禁通过并提交（`08c3c67`，未推送） | 见 `docs/poc/evidence/wave-w1-record.md`；T02 PASS / T14 PASS(限域) / T09 PARTIAL |
+| **执行前沿** | **W2** | **T03、T04** | **未启动（等用户授权）** | 建分支 `feature/w2-t03-t04`；`N = 2`；T03 独占 `contracts.py` 与迁移 `001`，T04 独占 `tests/phase0/conftest.py` 与 `fixtures/manifest.json` |
+| 未解锁 | W3–W11 | T05–T08、T10–T32（26 项） | 未解锁 | 前置未 `PASS`，不得派发，也不得预先建分支 |
 
 规则：**任何时刻只有「执行前沿」这一行允许创建分支与派发子 agent**；前沿推进的唯一判据是上一波次通过 §4.5.4 门禁且用户确认提交。表中未解锁任务即使看起来「文件不冲突」也不开工——依赖层未满足即不可并行。
 
@@ -108,8 +109,8 @@
 | 波次 | 可 ready 任务 | 状态 | 依赖层并行的实际含义 |
 | --- | --- | --- | --- |
 | W0 | T01 ✅ 已完成 | 已完成 | 唯一根任务 |
-| W1 | T02、T09、T14 | **◀ 执行前沿（待授权）** | 三者写入权互斥（环境 / 两份静态预检证据），理论可三线并行；T09/T14 需先初始化参考源码 |
-| W2 | T03、T04 | 未解锁 | 文件不重叠；都需 T02 的隔离环境 |
+| W1 | T02、T09、T14 | ✅ 已完成并提交 `08c3c67`（未推送） | 三者写入权互斥（环境 / 两份静态预检证据）；T02 PASS、T14 PASS(限域)、T09 PARTIAL |
+| W2 | T03、T04 | **◀ 执行前沿（等授权）** | 文件不重叠；都需 T02 的隔离环境 |
 | W3 | T05、T07、T10、T15、T19 | 未解锁 | 核心恢复 / 可靠作业 / 解析 / 浏览器 / 模型五线分叉 |
 | W4 | T06、T08、T11、T16、T20、T22 | 未解锁 | 最大波次，六项不相交 |
 | W5 | T12、T17、T21、T23 | 未解锁 | T12 是解析线与作业线的收敛点 |
@@ -122,8 +123,8 @@
 
 ```mermaid
 flowchart LR
-    W0["W0 · T01 ✅"] --> W1["W1 · T02·T09·T14 ◀ 执行前沿"]
-    W1 --> W2["W2 · T03·T04"]
+    W0["W0 · T01 ✅"] --> W1["W1 · T02·T09·T14 ✅ 08c3c67"]
+    W1 --> W2["W2 · T03·T04 ◀ 执行前沿"]
     W2 --> W3["W3 · T05·T07·T10·T15·T19"]
     W3 --> W4["W4 · T06·T08·T11·T16·T20·T22"]
     W4 --> W5["W5 · T12·T17·T21·T23"]
@@ -151,13 +152,13 @@ flowchart LR
 
 默认执行单元是**波次**：每波次先切分支、按可并行任务数分发 N 个子 agent、波次末进入放行门禁（§4.5）。当某波次判定为不可并行（依赖/写入权/资源冲突，或用户要求串行）时，退回本序列在波内逐项执行；两视图的任务集合与先后顺序完全一致。
 
-**执行前沿 = 第 1–3 项（W1：T02、T09、T14）**；第 4 项起全部「未解锁」，只有当前沿波次通过门禁后才逐项进入前沿，不允许提前预建分支或提前派发。
+**执行前沿 = 第 4–5 项（W2：T03、T04，未启动）**；第 1–3 项（W1）已通过门禁并以 `08c3c67` 提交（未推送），第 6 项起全部「未解锁」，只有当前沿波次通过门禁后才逐项进入前沿，不允许提前预建分支或提前派发。
 
-1. **T02**（W1）隔离实验环境与核心依赖清单 ◀ **执行前沿**
-2. **T09**（W1）DocReader proto/镜像/许可静态预检
-3. **T14**（W1）BrowserSkill 真源码/协议/许可静态预检
-4. **T03**（W2）合成身份、Scope 与最小 PG 契约
-5. **T04**（W2）可控下游、控制站与故障断点 fixture
+1. ~~**T02**（W1）隔离实验环境与核心依赖清单~~ ✅ PASS
+2. ~~**T09**（W1）DocReader proto/镜像/许可静态预检~~ ✅ PARTIAL（缺 SBOM/镜像 digest）
+3. ~~**T14**（W1）BrowserSkill 真源码/协议/许可静态预检~~ ✅ PASS（限域）
+4. **T03**（W2）合成身份、Scope 与最小 PG 契约 ◀ **执行前沿**
+5. **T04**（W2）可控下游、控制站与故障断点 fixture ◀ **执行前沿**
 6. **T05**（W3）原生 Checkpoint 单写者与并发恢复
 7. **T07**（W3）Outbox 生产事务与派发 lease
 8. **T10**（W3）DocReader Read/ReadStream 真实互通
@@ -285,7 +286,7 @@ per_task: id | 写入范围 | 资源槽 | agent 名 | 前置任务
 
 约定：`E/` = `experiments/phase0/`，`T/` = `tests/phase0/`，`V/` = `docs/poc/evidence/`。验收锚点为摘要，权威定义见 [03 Backlog](../poc/03_Phase0_Task_Backlog.md) 对应任务卡。共享写权列标 `是` 者见 §3.2。
 
-**执行前沿标记**：下表仅 **W1 的 T02、T09、T14**（第 1–3 行）处于「待授权、可派发」；第 4 行起共 28 项一律「未解锁」，不得写入任何派发声明、波次记录或分支名。
+**执行前沿标记**：第 1–3 行（W1）已通过门禁并随 `08c3c67` 提交；**当前前沿为第 4–5 行（W2 的 T03、T04）**，尚未启动；第 6 行起共 26 项一律「未解锁」，不得写入任何派发声明、波次记录或分支名。
 
 | # | ID | 波次 | 直接依赖 | 主要产物 | 量化验收锚点（摘要） | 共享写权 |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -451,7 +452,7 @@ terminal_send(sessionId, "<PowerShell 命令>")                  # 逐条执行�
 | 检查项 | 结果 |
 | --- | --- |
 | 32 任务覆盖（T01 标已完成，其余 31 项在序列与任务卡中） | 通过 |
-| 执行前沿唯一：§1.1 / §3.3 / §4.1 / §5 / §12 五处标注一致（均为 W1 · T02/T09/T14），其余 28 项标未解锁 | 通过 |
+| 执行前沿唯一：§1.1 / §3.3 / §4.1 / §5 / §12 五处标注一致（W1 已完成 → 前沿 W2 · T03/T04），其余 26 项标未解锁 | 通过 |
 | 波次表与 `docs/poc/04` §3 逐项一致 | 通过 |
 | 线性序列为 72 条依赖边的拓扑序 | 通过（违反 0 条） |
 | 共享写权互斥表覆盖 8 表 + 锁文件/Compose + fixture 契约 | 通过 |
@@ -464,25 +465,25 @@ terminal_send(sessionId, "<PowerShell 命令>")                  # 逐条执行�
 
 ---
 
-## 12. 执行前沿波次 W1（等待授权，不自动开始）
+## 12. 执行前沿波次 W2（未启动，等用户授权）
 
-**W1：T02 / T09 / T14**（依赖 T01 已完成）
+> W1 已收官：T02 PASS / T14 PASS(限域) / T09 PARTIAL，门禁于 2026-10-27T17:40 复跑通过，以 `08c3c67` 提交到 `feature/w1-t02-t09-t14`（**未推送、未合并 dev**）。执行记录见 [wave-w1-record.md](../poc/evidence/wave-w1-record.md)。
 
-- 分支：`feature/w1-t02-t09-t14`，基线 `dev@59d53ac`；创建前需用户授权。
-- 声明块（派发前写入 `docs/poc/evidence/wave-w1-record.md`）：
+**W2：T03 / T04**（依赖 T02 已 PASS）
+
+- 分支：`feature/w2-t03-t04`，基线 `dev`（W1 分支未合并时，需先确认 W2 从 `dev` 还是从 `feature/w1-…` 起：**默认从 `dev` 起，并在声明块记录该选择**）。
+- 声明块（派发前写入 `docs/poc/evidence/wave-w2-record.md`）：
 
 | 项 | 内容 |
 | --- | --- |
-| `parallel_tasks` | `[T02, T09, T14]` |
-| `N`（子 agent 数） | **3**（2026-10-27 用户确认 A 方案：授权初始化 `references/WeKnora` 后三项并行） |
-| `serial_tasks` | 无 |
-| 子 agent 名 | `w1-t02-env`、`w1-t09-docreader`、`w1-t14-browserskill` |
-| 各自写入范围 | T02：`experiments/phase0/{pyproject.toml,uv.lock,compose.yaml,.env.example}`、`tests/phase0/test_environment.py`、`docs/poc/evidence/environment.md`；T09：`docs/poc/evidence/docreader_manifest.md`、`docreader_fixture_plan.md`；T14：`docs/poc/evidence/browserskill_protocol_manifest.md` |
-| 资源槽 | PG schema `p0_t02`、Redis DB 0、端口 5400 起；T09/T14 为纯静态预检，不占容器 |
-| 前置 | 三者均只依赖 T01（已完成） |
+| `parallel_tasks` | `[T03, T04]` |
+| `N`（子 agent 数） | 待实测确认；按 §3.1 三层规则，两者写权互斥（`contracts.py`/迁移 001 vs `conftest.py`/`fixtures/manifest.json`），理论 `N = 2`；若 T04 需复用 T03 的 `workspace_id` 契约则下调为 1 |
+| `serial_tasks` | 视上一行裁定 |
+| 各自写入范围 | T03：`E/contracts.py`、`E/db/migrations/001_scope_core.sql`、`E/scope.py`、`T/test_scope.py`；T04：`E/control_site/`、`E/faults.py`、`T/conftest.py`、`E/fixtures/manifest.json` |
+| 资源槽 | PG schema `p0_t03`、`p0_t04`；Redis DB 1、2；端口 5400（T03 不占）、5500（T04 控制站）；T04 需独占容器端口段，不得与 W1 的 5433/6380 冲突 |
+| 前置 | 均只依赖 T02（PASS，`08c3c67`） |
+| 已知输入 | `docs/poc/07_Contract_Closure.md` 的 C-01/C-06/C-07/C-10 与 INV 映射；C-07（P0 来源审阅/身份域）仍为 **BLOCKED**，T03 只能按「最小保守口径」实现并在证据中标注待决策项 |
+| 停边界 | 两个 agent 各交四项报告 → Lead 执行 §4.5.4 门禁 → 停下询问「是否提交 `feature/w2-t03-t04`」 |
+| 不执行 | 根依赖改动、`push`/合并、C-07 相关身份域扩张、迁移编号复用 |
 
-- **波次启动前置动作**（只在获授权后执行）：`git submodule update --init references/WeKnora` 钉到 `662abaf9f944e37689d04c42160034b2cdec6829`；只读参考，不改 `.gitmodules`、不提交 gitlink。下载失败则 T09/T14 记 `BLOCKED` 并把 N 回退为 1。
-- 停边界：三个 agent 各交四项报告 → Lead 执行 §4.5.4 门禁 → 停下询问「是否提交 `feature/w1-t02-t09-t14`」。
-- 不执行：T02 的根依赖改动、镜像退回 `latest`、任何 `push`/合并。
-
-用户已确认 A 方案（下载参考源码、N=3）与连字符分支名（2026-10-27），但**执行仍未授权**——用户正在继续完善计划，本波次不启动。
+状态：**未启动**。上一轮用户已明确「停在 W1」，因此本波次需新的授权口令才能开工。
