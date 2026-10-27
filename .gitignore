@@ -9,3 +9,13 @@ wheels/
 # Virtual environments
 .venv
 references/**
+
+# 本地实验秘密（T02 口径：只提交 .env.example，不提交真实 .env）
+.env
+.env.*
+!.env.example
+
+# 测试与 lint 缓存、pytest 临时目录
+.pytest_cache/
+.ruff_cache/
+pytest-of-*/
