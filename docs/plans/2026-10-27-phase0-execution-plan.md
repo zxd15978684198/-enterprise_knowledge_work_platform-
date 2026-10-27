@@ -25,10 +25,11 @@
 | 位置 | 波次 | 任务 | 状态 | 派发条件 |
 | --- | --- | --- | --- | --- |
 | 已完成 | W0 | T01 | ✅ 完成 | 产物 `docs/poc/07_Contract_Closure.md` |
-| 已完成 | W1 | T02、T09、T14 | ✅ 门禁通过并提交（`08c3c67`，未推送） | 见 `docs/poc/evidence/wave-w1-record.md`；T02 PASS / T14 PASS(限域) / T09 PARTIAL |
-| 已完成 | W2 | T03、T04 | ✅ 门禁通过（102 passed / ruff 通过 / 零越界），待提交 | 见 `docs/poc/evidence/wave-w2-record.md`；T03 PASS / T04 PASS(限域) |
-| **执行前沿** | **W3** | **T05、T07、T10、T15、T19** | **未启动（等用户授权）** | 建分支 `feature/w3-…`；`N` 待实测后声明；写权互斥：T05 checkpoint / T07 outbox / T10 docreader / T15 browser 契约 / T19 gateway |
-| 未解锁 | W4–W11 | T06、T08、T11、T12–T14、T16–T18、T20–T32（21 项） | 未解锁 | 前置未 `PASS`，不得派发，也不得预先建分支 |
+| 已完成 | W1 | T02、T09、T14 | ✅ 门禁通过并提交（`08c3c67`，已推送 origin） | 见 `docs/poc/evidence/wave-w1-record.md`；T02 PASS / T14 PASS(限域) / T09 PARTIAL |
+| 已完成 | W2 | T03、T04 | ✅ 门禁通过并提交（`94defe2`、`d36629a`、`9b88cc7`、`f86765e`，已推送 origin） | 见 `docs/poc/evidence/wave-w2-record.md`；T03 PASS / T04 PASS(限域) |
+| 已完成 | W3 | T05、T07、T10、T15、T19 | ✅ 门禁通过并提交（`ed669af` + `8239ab7`，未推送；全量 365 passed / ruff 通过 / 零越界） | 见 `docs/poc/evidence/wave-w3-record.md`；T05 PARTIAL（原生 saver 不可 fence → 单活 runner）/ T07·T10·T15·T19 PASS(限域) |
+| **执行前沿** | **W4** | **T06、T08、T11、T16、T20、T22** | **未启动（等用户授权）** | 建分支 `feature/w4-t06-t08-t11-t16-t20-t22`；N 待实测后声明；写权互斥：T06 审批账本+迁移 002 / T08 作业消费+死信 / T11 解析 golden / T16 Playwright+网络策略 / T20 Context+预算+迁移 005 / T22 Planner+DAG 校验 |
+| 未解锁 | W5–W11 | T12–T14、T17–T18、T21、T23–T32（15 项） | 未解锁 | 前置未 `PASS`，不得派发，也不得预先建分支 |
 
 规则：**任何时刻只有「执行前沿」这一行允许创建分支与派发子 agent**；前沿推进的唯一判据是上一波次通过 §4.5.4 门禁且用户确认提交。表中未解锁任务即使看起来「文件不冲突」也不开工——依赖层未满足即不可并行。
 
