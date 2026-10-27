@@ -1,6 +1,6 @@
 # Phase 0 依赖 DAG、执行顺序与并行约束
 
-日期：2026-10-27。任务为 [Backlog](03_Phase0_Task_Backlog.md) 的规划任务；不是产品运行态Task DAG。本轮未启动任何任务/PoC。表内为全部**硬前置**，状态均NOT_STARTED；同一行多个前置为AND关系，不能择一通过。
+日期：2026-10-27。任务为 [Backlog](03_Phase0_Task_Backlog.md) 的规划任务；不是产品运行态Task DAG。P0-T01 文档任务已完成，见 [契约闭合](07_Contract_Closure.md)；其余31任务及九项PoC均NOT_STARTED。表内为全部**硬前置**；同一行多个前置为AND关系，不能择一通过。
 
 ## 1. 权威依赖表
 

@@ -1,6 +1,6 @@
 # Phase 0 单会话开发任务 Backlog
 
-日期：2026-10-27。以下 **32项均为 NOT_STARTED**；是后续任务授权范围建议，本轮没有创建任何预计代码/依赖/测试文件。`P0-Txx` 是规划Task ID，不是产品UUID `task_id`。依赖唯一清单见 [04](04_Phase0_Dependency_DAG.md)，执行规则见 [06](06_Phase0_Execution_Guide.md)。
+日期：2026-10-27。P0-T01 已完成文档交付（见 [契约闭合](07_Contract_Closure.md)）；其余 **31项均为 NOT_STARTED**；是后续任务授权范围建议，本轮没有创建任何预计代码/依赖/测试文件。`P0-Txx` 是规划Task ID，不是产品UUID `task_id`。依赖唯一清单见 [04](04_Phase0_Dependency_DAG.md)，执行规则见 [06](06_Phase0_Execution_Guide.md)。
 
 ## 共同输入、粒度和 DoD
 
@@ -10,6 +10,8 @@
 - 每任务只有一个逻辑状态负责人；测试代码可注入故障但不绕过状态拥有者。`共享契约/DB/公共port：是` 表示需要集成审查和一次合入顺序，不能不同会话各自改同一权威schema。所有新文档/证据路径先定位既有文件，不能覆盖用户工作。
 
 ## P0-T01：闭合实验契约与设计缺口清单（首项，只写文档）
+
+状态：文档任务已完成，产物为 [07 契约闭合](07_Contract_Closure.md)。C-01–C-10 中 DEFINED 5、NEEDS_POC 4、BLOCKED 1；任务完成不等于生产决策或 PoC 通过。下列目标/步骤为本任务原验收定义，保留供追踪。
 
 - 关联：PoC-01/02/03/04/05/06/07/08/09；PRD F-01/03/04/06/09/10/11、AC-02/05/06/AC-E09；TDD [01 §4–6](../tdd/01_System_Architecture.md)、[07 §3–6](../tdd/07_Data_API_Security.md)。
 - 目标：将评审C-01–C-10变为明确的最小实验契约/待生产确认项，避免实现时暗改状态或字段。
