@@ -363,28 +363,29 @@ per_task: id | 写入范围 | 资源槽 | agent 名 | 前置任务
 
 ### 6.4 命令执行通道（本机约束）
 
-`pwsh` 一次性调用在本机失败（进程创建即 `0xC0000142` DLL 初始化失败，命令未执行）。**改用原生持久 PowerShell 会话**，不再使用 wsl：
+**首选：`pwsh` 工具（已恢复可用）**。2026-10-27T21:56 复测：PowerShell 7.6.0，`git`/`uv`/`docker` 均可直接调用，一条命令一次调用即返回。
 
 ```text
-terminal_open(type="shell", cwd="E:\project_month\pyknora")   # 得到原生 PowerShell 会话
-terminal_send(sessionId, "<PowerShell 命令>")                  # 逐条执行并读回输出
+pwsh → git status、uv run --project experiments/phase0 pytest ...、docker compose ps
 ```
 
-已在该会话实测通过（2026-10-27）：
+历史坑（若 `pwsh` 再次返回进程创建失败，按此回退）：
 
-| 项 | 实测 |
-| --- | --- |
-| PowerShell | 7.6.0 |
-| 当前分支 / HEAD | `dev` / `59d53ac` |
-| uv | `uv 0.12.24 (5411378eb 2026-10-08)` |
-| docker / compose | `Docker version 29.7.2`、`Docker Compose version v5.4.0` |
+| 通道 | 适用 | 说明 |
+| --- | --- | --- |
+| `pwsh` 工具 | 首选 | 2026-10-27 21:56 实测可用；直接给命令，不用脚手架 |
+| `terminal_open` + `terminal_send` | 次选 | 原生 PowerShell 7.6.0 会话，但**会串行阻塞**：上一条没回 prompt 时新命令静默排队 |
+| `wsl` + `cmd.exe /c "..."`（`translatePaths=false`） | 最后回退 | 只在 `pwsh` 失败时用；注意 WSL 会把 `E:\...` 改写成 `/mnt/e/...` |
+
+已实测工具链（2026-10-27）：PowerShell 7.6.0；uv `0.12.24`；docker `29.7.2`；compose `v5.4.0`。
 
 约定：
 
-- 桌面一切命令（git、uv、docker、pytest、ruff）走该持久会话；**不再使用 `wsl` 工具**。
-- 长驻进程（`docker compose up`、pytest 观察）用 `run_in_background` 或独立会话，避免占住主会话。
+- 桌面一切命令优先走 `pwsh`；`terminal_*` 只用于需要持久 cwd/长驻的场景；`wsl` 仅回退。
+- 长驻进程用 `run_in_background`，并用日志文件 + `read` 取结果，避免阻塞主流程。
 - 记录证据时写**实际执行的那条命令**与真实输出，不要把 `06` 指南里的 PowerShell 草案当作已运行命令。
 - 命令必须显式指定项目与配置（如 `--project experiments/phase0`、`ruff --config ...`），避免因根目录无配置而「无测试空跑绿」。
+- 全量 pytest 一律带 `-o addopts=` 才看得到汇总行（项目 `addopts="-q"` 会叠加成 `-qq`）。
 
 ### 6.5 测试与静态检查约定
 

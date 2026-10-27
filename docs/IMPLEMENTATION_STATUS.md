@@ -195,5 +195,24 @@
 - **P0-T22 PASS（限域）**：`dag_contracts.py`(799) + `planner_probe.py`(461) + `test_dag_validation.py`(501)。51 passed；32 节点/72 边/66 点、最长链 12 节点 11 跳 24 点、核心链 23 点与 `poc/04` 一致；28 个非法计划全拒且首错定位到节点/边；RAG 路径 planner 调用 0。**并澄清一处长期误报**：`poc/04` 的 Mermaid 并非缺 `T01-->T02`，是带节点标签导致旧正则漏解析，实际 72/72 一致（已加回归测试）。限域：真实模型 plan `NOT_RUN`；默认上限 32/64/8 与样例图 72 边口径冲突，待评审定 profile。
 - 门禁（`%TEMP%\w4_gate_out.txt` + `w4_close_out.txt`，21:29–21:36）：全量 ruff 首跑 1 个 `I001`（`job_reconciler.py:20`）→ 门禁 `--fix` 后全绿；**全量单进程 pytest 655 passed / 0 failed / 0 skipped in 233.77s**（365 既有 + 290 本轮）；5500/5501/5600/5610 无监听；仓库根无临时目录；秘密扫描 0 命中；Windows git 视角仅 `docs/IMPLEMENTATION_STATUS.md` 与计划被改，其余全部新增未跟踪。
 - 本轮新增：代码/测试 **15 733 行** + `network_policy/` **1 182 行**；19 份交付 sha256 记入波次记录 §3.3。
+- **已提交并推送**（用户 2026-10-27 21:45 选择「提交 + 推送 + 开 W5」）：`0a1ed5d` feat、`a2a7dfc` docs，均推到 `origin/feature/w4-t06-t08-t11-t16-t20-t22`；未合并 `dev`。提交前 `git diff --cached --check` 拦下 `network_policy/engine.py`、`flow.py` 的 EOF 空行并修净。
+- 已知缺陷（W5 待修）：`docreader_probe/wire_evidence.json` 会被 T10 的测试重写（gate 时用 `git stash` 暂存，未丢弃），应改为写 `.pytest_cache/`。
+- 下一前沿：**W5 = T12/T17/T21/T23**（T12 是解析线与作业线收敛点），已启动。
+
+## 本轮：W5 波次执行（2026-10-27，分支 `feature/w5-t12-t17-t21-t23`）
+
+- 分支基线：从 **W4 顶点 `a2a7dfc`** 拉出。声明见 `docs/poc/evidence/wave-w5-record.md`：**`N=3`**（T12/T21/T23），**T17 记 BLOCKED**（无 pinned upstream 源码/daemon/extension 产物、无真实设备；构建需 cargo+pnpm 且脚本无 windows 目标），按 §4.5.2 从并行集移出、N 由 4 下调为 3。执行通道自 21:56 起改为**原生 `pwsh`**（`0xC0000142` 已复测消失），`wsl` 仅回退。
+- **P0-T12 PASS（限域）**：`index_staging.py`(1106) + `004_version_index.sql`(413) + `test_index_staging.py`(642)。16 passed；staging 重放 `inserted=0/skipped=3`；旧 attempt `STALE_ATTEMPT`（API + DB 触发器双挡）；ready 后 `search_visible_chunks()==[]`、模拟 T13 激活才可见；manifest 缺项 `MANIFEST_INCOMPLETE`；`p0_t12` 零残留。限域：对象存储 `NOT_RUN`（假存储明标 `in-memory-fake`）、**pgvector 缺失 → 向量 ANN/召回 `NOT_RUN`**（`float8[] + embedding_dim`）。
+- **P0-T21 PASS（限域）**：`harness_graph.py`(845) + `safe_trace.py`(259) + 测试(476) + `harness-integration.md`(139)。14 passed；6 节点图复用 T05/T06/T08/T19/T20 公开 API；checkpoint 全删后 `recover_from_facts()` 得 `receipts==1`、节点返回 `replayed`、`applied_calls` 仍 1；取消/超时零副作用；canary 在 trace/State/checkpoint 三处为空。**T20 冲突已选定方案①**：`ProviderConfig(max_retries=0)` + Harness 逐 attempt `reserve_model_call`（`purpose_key=t21:{step}:attempt:{n}`），代价写入证据。限域：**`langgraph` 仅 namespace 包**（`graph`/`types` 均 `ModuleNotFoundError`）→ 原生 `StateGraph`/`interrupt` 未验，验收第 5 项 PARTIAL。
+- **P0-T23 PASS（限域）**：`task_scheduler.py`(1613) + `task_executor.py`(225) + `006_tasks.sql`(230) + 测试(1080)。28 passed；未满足依赖执行 0、required 失败递归 blocked、optional 不阻断；双 scheduler 30 轮 120 条 claim 无重复；旧 epoch 完成/引用均 `STALE_*`；事实先落库、checkpoint 失败只留 `state_ref_pending` 且重入不重跑；真实 T08 Job port 集成通过；迁移重复 apply 显式失败；静态守卫证明无跨域写。限域：单活前提、checkpoint 用端口替身、对账拉取式、30 轮非 100 轮。
+- **P0-T17 BLOCKED**：无 upstream 产物/真设备；解除条件写在波次记录 §1。
+- 门禁（pwsh，22:12–22:18）：ruff 首跑 1 个 `I001`（`index_staging.py:44`）→ `--fix` 后全绿；首次全量 **713 passed / 0 failed / 0 skipped in 319.70 s**（655 既有 + 58 本轮）；5610/5500/5600 无监听；无临时目录；秘密扫描 0 命中。
+- **缺口修复（用户选择「先修缺口再提交」）**：
+  - `langgraph` 仅 namespace → `uv add --dev langgraph` 装 **1.2.18**；T21 增加原生主路径 `NativeGraphRun`（`StateGraph` 6 节点 + `interrupt()` + `Command(resume=…)` + 原生 `PostgresSaver`），**19 passed**（14 既有 + 5 原生）；跨连接恢复 exactly-once、框架 `setup()` 建 checkpoint 表、代码零直写。证据 `harness-integration.md` 更新。
+  - `intent_key` 两套算法 → `tool_registry.compute_intent_key` 改为委托 `tool_ledger.intent_key`，`SCHEMA_VERSION` 统一为 int；新增 `test_cross_component_keys.py`（20 例），**98 + 20 = 118 passed**；旧算法分叉已复现并锁定。
+  - 无 `pgvector` → 独立探针 PASS（带门禁）：`pgvector/pgvector:pg17@sha256:ac08538c…`、PG 17.11 + pgvector 0.8.7，`hnsw`/`ivfflat`、三种距离算子、2000 维硬上限、迁移路径全部实测；**未动 core compose**（换镜像须单独立项，否则作废 T02 证据）。证据 `pgvector-probe.md`（333 行）。
+  - 附带修复：`test_docreader_wire.py` 的证据写入改到 `.pytest_cache/`，不再回写 tracked 的 `docreader_probe/wire_evidence.json`。
+- **缺口修复后复跑**：ruff `All checks passed!`；**738 passed / 0 failed / 0 skipped in 262.78 s**（junit `tests=738`）。
+- 本轮新增代码/测试/迁移约 **8 000+ 行**；关键交付 sha256 记入波次记录 §3.3 与 §3.6。
 - **未提交**：暂存区为空，等用户确认后按精确路径 `git add`（禁止 `git add .`）。
-- 下一前沿：**W5 = T12/T17/T21/T23**（T12 是解析线与作业线收敛点），未启动。
+- 下一前沿：**W6 = T13/T18/T24**（T13 原子发布是解析线收敛点；T18 依赖 T17 真设备 → 预计 BLOCKED），未启动。
