@@ -159,3 +159,14 @@
 - **已提交（用户 17:42 明确授权）**：`08c3c67` 于 `feature/w1-t02-t09-t14`，13 文件 / +2823 −1；未 push、未合并 `dev`。首提交 `e78a498` 因 `.gitignore` 的 `.env.*` 误伤 `.env.example` 而漏文件，加 `!.env.example` 例外后 `--amend` 修正。
 - 未提交：`.idea/`、`CLAUDE.md`、`docs/teacher/`、`experiments/phase0/.venv/`；`references/WeKnora` gitlink 保持 `662abaf9f944e37689d04c42160034b2cdec6829`。
 - 波次收官证据：`docs/poc/evidence/wave-w1-record.md`（声明块、素材阻塞与解除、§3 门禁、§4 提交结果）。下一前沿 **W2 = T03/T04**，未启动，等用户授权。
+
+## 本轮：W2 波次执行（2026-10-27，分支 `feature/w2-t03-t04`）
+
+- 前置收尾：`chore: update project author metadata` → `6c4f5b6`（`pyproject.toml` 作者改为 ZhangXianDa）；`feature/w1-t02-t09-t14` 以 `--no-ff` 合入 `dev` → `6ff7b72`；`dev`、`master`、`feature/w1-*`、`feature/w2-*` 已推送到 GitHub `origin`（该仓库原为零分支空仓）。
+- 分支：`feature/w2-t03-t04` 从 `dev@6ff7b72` 拉出；波次声明写入 `docs/poc/evidence/wave-w2-record.md`（`N=2`、两任务写权互斥、资源槽 `p0_t03`/`p0_t04` + Redis DB 1/2 + 端口 5500）。
+- **P0-T03 PASS**：`experiments/phase0/contracts.py`（800 行）+ `scope.py`（647 行）+ `db/migrations/001_scope_core.sql`（485 行）+ `tests/phase0/test_scope.py`（16 例，1144 行）。RLS 默认拒绝、`SET LOCAL` 不随连接池泄漏、复合 FK 跨工作区 100 轮全部拒绝、成员撤销即时生效、无 Run 作业重读当前 Principal（C-06）。证据 `docs/poc/evidence/poc01-scope.md`（389 行）。C-07「来源审阅/身份域」按约束记 **BLOCKED**、C-10 `asset_bindings` 只留位 **NOT_RUN**。
+- **P0-T04 PASS（限域）**：`experiments/phase0/control_site/`（7 文件 1820 行，纯标准库 `http.server`）+ `faults.py`（317 行 `FaultBarrier`，无固定 sleep）+ `fixtures/manifest.json`（33 向量：21 正 / 12 负，7 条真实响应 sha256）+ `tests/phase0/conftest.py`(206) + `test_control_site.py`(376) + `test_faults.py`(329)。证据 `docs/poc/evidence/control-site.md`（405 行）。F1–F18 场景本身属 T05–T30 **NOT_RUN**；F15 私网 IPv6/WebSocket/DNS rebinding、F16 提示注入页为**能力缺口 PARTIAL**。
+- 修掉两个真缺陷（T04 自查发现）：`ControlStore.reset()` 持非可重入锁再调 `snapshot()` 的自死锁；`server_close()` join 死线程导致的无界等待（改 `wait_for_completed` + `server_close(timeout)`）。
+- 门禁（`%TEMP%\w2_gate.log`，19:22:47→19:24:05）：`pytest -c experiments/phase0/pyproject.toml tests/phase0` **102 passed in 60.45s** exit 0；`ruff` All checks passed；`git diff --numstat` 合计 `added=0 deleted=0 files=0`（开工时 51 个 ` M` 系 CRLF 噪声，现已归零）；core 两容器仍 healthy；5500/5501 `listeners=0`；仓库根无残留临时目录；11 份新交付 sha256 已记入波次记录 §3.2；秘密扫描 0 命中。
+- **未提交**：工作树 14 条 `??` 全部为本波次交付与证据，暂存区为空；等用户确认后再 `git add` 具体路径（禁止 `git add .`）。
+- 波次记录：`docs/poc/evidence/wave-w2-record.md` §3/§3.1/§3.2/§3.3 已填；下一前沿 **W3 = T05/T07/T10/T15/T19**，未启动。
