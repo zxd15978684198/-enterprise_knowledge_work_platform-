@@ -1,0 +1,205 @@
+{
+  "task": "P0-T10",
+  "cases": [
+    {
+      "id": "test_00_proto_copy_matches_t09_anchor",
+      "outcome": "passed",
+      "duration_s": 0.002
+    },
+    {
+      "id": "test_01_generated_stubs_match_real_proto",
+      "outcome": "passed",
+      "duration_s": 0.055
+    },
+    {
+      "id": "test_02_schema_matches_proto_field_table",
+      "outcome": "passed",
+      "duration_s": 0.0009
+    },
+    {
+      "id": "test_03_unary_read_round_trip_fields",
+      "outcome": "passed",
+      "duration_s": 0.007
+    },
+    {
+      "id": "test_04_empty_parse_result_error_field_keeps_status_ok",
+      "outcome": "passed",
+      "duration_s": 0.0014
+    },
+    {
+      "id": "test_05_unsupported_file_type_error_field_keeps_status_ok",
+      "outcome": "passed",
+      "duration_s": 0.0015
+    },
+    {
+      "id": "test_06_read_stream_frame_order_and_termination",
+      "outcome": "passed",
+      "duration_s": 0.0046
+    },
+    {
+      "id": "test_07_read_stream_parse_failure_only_meta_error",
+      "outcome": "passed",
+      "duration_s": 0.0029
+    },
+    {
+      "id": "test_08_read_stream_send_phase_failure_is_not_ok",
+      "outcome": "passed",
+      "duration_s": 0.0097
+    },
+    {
+      "id": "test_09_read_stream_bypasses_unary_message_cap",
+      "outcome": "passed",
+      "duration_s": 0.0129
+    },
+    {
+      "id": "test_10_client_cancel_is_observed_by_server",
+      "outcome": "passed",
+      "duration_s": 0.003
+    },
+    {
+      "id": "test_11_deadline_exceeded_is_observed_by_server",
+      "outcome": "passed",
+      "duration_s": 0.5092
+    },
+    {
+      "id": "test_12_auth_token_required",
+      "outcome": "passed",
+      "duration_s": 0.0088
+    },
+    {
+      "id": "test_13_list_engines_round_trip",
+      "outcome": "passed",
+      "duration_s": 0.0012
+    },
+    {
+      "id": "test_14_preprocess_image_branches",
+      "outcome": "passed",
+      "duration_s": 0.0029
+    },
+    {
+      "id": "test_15_all_four_methods_over_real_tcp",
+      "outcome": "passed",
+      "duration_s": 0.0036
+    },
+    {
+      "id": "test_16_stream_without_meta_is_protocol_error",
+      "outcome": "passed",
+      "duration_s": 0.0025
+    }
+  ],
+  "secondary_servers": {
+    "message_cap": {
+      "bound_port": 51109,
+      "cap_bytes": 262144
+    },
+    "auth": {
+      "bound_port": 51111
+    }
+  },
+  "started_at": "2026-10-27T20:30:15+0800",
+  "proto": {
+    "path": "experiments/phase0/docreader_probe/proto/docreader.proto",
+    "sha256": "33d4135cfcd2ec95f8d160d6cefdd54be669167e8b8fb69ef81095d218a738d0",
+    "bytes": 4689,
+    "reference_commit": "662abaf9f944e37689d04c42160034b2cdec6829",
+    "source": "references/WeKnora/docreader/proto/docreader.proto"
+  },
+  "generated_stub": {
+    "pb2": "experiments\\phase0\\docreader_probe\\generated\\docreader_pb2.py",
+    "pb2_grpc": "experiments\\phase0\\docreader_probe\\generated\\docreader_pb2_grpc.py",
+    "descriptor_sha256": "5b7b25421bad6ee8129241c722a13f97af246c67cd71d97ef3694bdfb88ce5f6",
+    "regenerated_from_proto_equals_committed": true,
+    "equals_weknora_gencode": true
+  },
+  "server": {
+    "requested_port": 5600,
+    "bound_port": 5600
+  },
+  "parse_error_field": {
+    "unary_status": "OK",
+    "unary_error": "Failed to parse: empty.pdf",
+    "mechanism": "ReadResponse.error（不是 gRPC status）",
+    "stream_status": "OK",
+    "stream_frames": [
+      "meta(error)"
+    ],
+    "publishable": false
+  },
+  "stream_frames": {
+    "frames": 5,
+    "images": 4,
+    "image_count": 4,
+    "status": "OK"
+  },
+  "send_phase_failure": {
+    "status": "UNKNOWN",
+    "details_contains_message": true,
+    "frames_before_failure": 3,
+    "images_before_failure": 2,
+    "image_count_declared": 3,
+    "note": "T09 §9 中该 status 原为 UNKNOWN，此处为实测"
+  },
+  "message_cap": {
+    "cap_bytes": 262144,
+    "unary_read_status": "RESOURCE_EXHAUSTED",
+    "streamed_images": 8,
+    "streamed_payload_bytes": 1200000,
+    "largest_frame_bytes": 150000
+  },
+  "cancellation": {
+    "server_observed": true,
+    "server_is_active": false,
+    "server_waited_s": 0.0005,
+    "client_status": "CANCELLED",
+    "client_elapsed_s": 0.0006
+  },
+  "deadline": {
+    "client_status": "DEADLINE_EXCEEDED",
+    "timeout_s": 0.5,
+    "server_observed": true,
+    "client_elapsed_s": 0.5064
+  },
+  "auth": {
+    "missing_token_status": "UNAUTHENTICATED",
+    "wrong_token_status": "UNAUTHENTICATED",
+    "detail": "Invalid or missing authentication token",
+    "valid_token_works": true
+  },
+  "list_engines": {
+    "engines": [
+      "builtin",
+      "mineru"
+    ],
+    "overrides_over_wire": {
+      "probe_mode": "t10"
+    },
+    "note": "引擎值来自 shim fixture，不代表真实注册表"
+  },
+  "preprocess_image": {
+    "ok_status": "ok",
+    "fallback_status": "no_text",
+    "note": "数值与状态来自 shim fixture；真实服务的超时/超内存行为仍 UNKNOWN（T09 §9）"
+  },
+  "method_paths": [
+    "/docreader.DocReader/Read",
+    "/docreader.DocReader/ReadStream",
+    "/docreader.DocReader/ListEngines",
+    "/docreader.DocReader/PreprocessImage"
+  ],
+  "peer_prefixes": [
+    "ipv4"
+  ],
+  "missing_meta": {
+    "client_error": "DocReaderProtocolError",
+    "raw_frames": 2
+  },
+  "toolchain": {
+    "python": "3.12.13",
+    "grpcio": "1.85.0",
+    "protobuf": "7.36.2",
+    "grpcio-tools": "1.85.0",
+    "pytest": "9.1.1"
+  },
+  "finished_at": "2026-10-27T20:31:18+0800",
+  "real_docreader_service": "NOT_RUN (T09: image digest UNKNOWN, licenses UNKNOWN)"
+}

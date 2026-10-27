@@ -1,0 +1,20 @@
+{
+  "task": "P0-T10",
+  "source_repo": "references/WeKnora",
+  "source_commit": "662abaf9f944e37689d04c42160034b2cdec6829",
+  "source_path": "docreader/proto/docreader.proto",
+  "proto_sha256": "33d4135cfcd2ec95f8d160d6cefdd54be669167e8b8fb69ef81095d218a738d0",
+  "proto_bytes": 4689,
+  "generator": "grpc_tools.protoc",
+  "versions": {
+    "python": "3.12.13",
+    "grpcio": "1.85.0",
+    "grpcio-tools": "1.85.0",
+    "protobuf": "7.36.2"
+  },
+  "outputs": [
+    "docreader_pb2.py",
+    "docreader_pb2_grpc.py"
+  ],
+  "note": "stub 是 proto 的派生物；tests/phase0/test_docreader_wire.py 会从副本重新生成描述符并与之比对。真实 DocReader 服务未运行（T09：镜像 digest/许可 UNKNOWN）。"
+}
