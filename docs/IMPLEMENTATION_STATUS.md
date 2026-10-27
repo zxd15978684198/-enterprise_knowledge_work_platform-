@@ -143,7 +143,7 @@
 - 本轮**未执行任何 Backlog 任务**：未创建 `experiments/`、`tests/`、`docs/poc/evidence/`，未解析依赖、未拉取镜像、未运行测试或容器，未创建分支、未暂存、未提交。
 - 计划自检（只读脚本 + 原生 PowerShell）：Markdown 围栏成对（8 行 / 4 块）且含 1 个 mermaid 块、19 条相对链接全部可达、31 项任务全覆盖、计划依赖字段与 Backlog 32 卡/72 边逐项一致、序列对 72 边拓扑校验违反 0 条、11 条波次分支名合法、未发现疑似秘密。
 - 桌面执行通道变更：`pwsh` 一次性调用在本机持续失败（`0xC0000142`），改用原生持久 PowerShell 会话（PowerShell 7.6.0）；实测 git=`dev@59d53ac`、uv 0.12.24、docker 29.7.2、compose v5.4.0，wsl 通道停用。
-- 已知文档差异：`docs/poc/04` 的 Mermaid 片段少 `P0-T01 --> P0-T02` 一条边（渲染 71 条 vs 声明 72 条），按声明值校验，不建议以删依赖方式修正。
+- 已知文档差异（2026-10-27 已澄清）：早期记录「`docs/poc/04` Mermaid 少 `P0-T01 --> P0-T02` 一条边」**是误报**——第 48 行写成 `T01["T01 契约闭合"] --> T02["T02 环境"]`，带节点标签使朴素正则漏匹配。P0-T22 用结构化解析复核为 **72/72 边一致**，并加回归测试守护；`04` 文档本身无需修改。
 - 计划已标注**执行前沿**：唯一可开工位置为 W1（T02/T09/T14，分支 `feature/w1-t02-t09-t14`），其余 28 项在 §1.1、§3.3、§4.1、§5、§12 中统一标为「未解锁」。用户已于 2026-10-27 确认 A 方案（授权初始化 `references/WeKnora` 子模块、N=3）与连字符分支名格式；但用户要求继续完善计划，**执行尚未授权**，未建分支、未下载子模块、未派发子 agent。
 
 ## 本轮：W1 波次执行（2026-10-27，分支 `feature/w1-t02-t09-t14`）
@@ -183,3 +183,17 @@
 - **已知缺口（20:29 已解除两条，用户当轮授权测试依赖准入）**：① 全量单进程 pytest 原判 NOT_RUN（20:05 无输出、CPU 冻结）→ **已定位并复跑通过**：根因是 `--with` overlay 与模块级 side effect 交互，依赖进 venv 后 `tests=365 failures=0 errors=0 skipped=0 time=128.327`（junit，`experiments/phase0/.pytest_cache/junit.xml`，20:29）；② 测试依赖已准入 `experiments/phase0/pyproject.toml` dev 组：`grpcio>=1.85.0`、`grpcio-tools>=1.85.0`、`langgraph-checkpoint-postgres>=3.2.0`、`pytest-timeout>=2.4.0`（+4 行，`uv.lock` 同步重锁），`test_environment.py` 12 例在新 venv 下仍全绿；③ 仍开放：`--with` 不得用于跑全套（纪律写入 `wave-w3-record.md` §1.2），`p0_t07` 迁移前缀偏离待裁，T05 只能单活 runner。
 - **未提交**：暂存区为空，等用户确认后再按精确路径 `git add`（禁止 `git add .`）。
 - 波次记录：`docs/poc/evidence/wave-w3-record.md` §2/§3.1–§3.5/§4 已填；下一前沿 **W4 = T06/T08/T11/T16/T20/T22**，未启动。
+
+## 本轮：W4 波次执行（2026-10-27，分支 `feature/w4-t06-t08-t11-t16-t20-t22`）
+
+- 分支基线：从 **W3 顶点 `32f0035`** 拉出（`dev` 是其祖先，merge-base 校验通过）；声明见 `docs/poc/evidence/wave-w4-record.md`（`N=6`、六份写权互斥、资源槽 `p0_t06`/`p0_t08`/`p0_t20` + Redis 6/5 + 端口 5610）。六个任务复用 inactive 成员执行，未新增名额。
+- **P0-T06 PASS（限域）**：`approval_probe.py`(2073) + `tool_ledger.py`(551) + `002_approvals.sql`(455) + `test_approval_effects.py`(578)。20 passed；50 轮重放 `downstream_applied=1 / replayed=49`；过期/篡改/跨 workspace/撤销 4/4 拒绝且零下游调用；三崩溃窗口各 50 轮真实 `os._exit`，`violations=[]`（`after_executing_commit` 记 50 条 `unknown_outcome`，不伪称 0 次执行）；账本 append-only 由触发器强制。限域：`002` 落独立 schema `p0_t06`、未压测真并发执行者、`TRUNCATE` 边界待 `REVOKE`。
+- **P0-T08 PASS（限域）**：`job_probe.py`(1495) + `job_reconciler.py`(382) + `test_delivery_recovery.py`(903)。13 passed（48s）；100 Job×10 消息 → `applied=100 / duplicate=900`；旧 generation `STALE_EXECUTION_EPOCH`；退避 1/2/4s → `dead_letter`；对账 `repair_count=1` 且并发不双修；断 Redis 显式 `BROKER_UNAVAILABLE` 且 PEL 不丢；五态与 `003` 枚举逐字核对。限域：DDL 写在代码里（写权不能建 004）、真实 Celery `NOT_RUN`、未实现 `XAUTOCLAIM`。
+- **P0-T11 PASS（限域）**：`simple_reader.py`(859) + `locator_map.py`(311) + `parsing_assets.py`(925) + `test_parser_golden.py`(570)。70 passed；50/50 golden（每格式 10/10）、offset-free 定位 50/50（page/paragraph/heading/table_cell/code_block）、单字符插入 0 破损、19 例空/损坏/无可见文本显式失败、与 T10 `ReadResponse.error` 跨引用已测。限域：素材全为合成样本，真实样本与真实镜像 `NOT_RUN`。
+- **P0-T16 PASS（限域）**：`network_policy/`(8 文件 1182 行) + `playwright_probe.py`(354) + `test_playwright_security.py`(866)。109 passed；26 条 SSRF 向量、每跳重定向/协议/端口/DNS rebinding/体量/时长/重定向次数全覆盖、`navigate_back/forward/reload` 也过策略且 transport 零调用、限流并发可观测、5610 端口已释放。限域：**Playwright 未安装 → 真浏览器 `NOT_RUN`**（显式 `PlaywrightUnavailable`，未 skip）；`allow_loopback_endpoints` 测试逃生门需 T29 启动期断言为空。
+- **P0-T20 PASS（限域）**：`context_budget.py`(946) + `budget_ledger.py`(1288) + `005_budget.sql`(316) + `test_budget_context.py`(1100)。27 passed；四区段裁剪确定性（30 次同指纹）；无价格时 `settle_unavailable` 按 maximum 记 `provisional=true / zeroed=false`；100 轮双竞争 `winners=100 / rejected=100 / overdraft=0` 且有 DB CHECK 兜底；崩溃后从 PG 恢复。限域：`005` 落独立 schema、tokenizer 为启发式、真实价格 `NOT_RUN`、**「每 retry 费用可归集」需 T21 显式选择重试与预留的接口**。
+- **P0-T22 PASS（限域）**：`dag_contracts.py`(799) + `planner_probe.py`(461) + `test_dag_validation.py`(501)。51 passed；32 节点/72 边/66 点、最长链 12 节点 11 跳 24 点、核心链 23 点与 `poc/04` 一致；28 个非法计划全拒且首错定位到节点/边；RAG 路径 planner 调用 0。**并澄清一处长期误报**：`poc/04` 的 Mermaid 并非缺 `T01-->T02`，是带节点标签导致旧正则漏解析，实际 72/72 一致（已加回归测试）。限域：真实模型 plan `NOT_RUN`；默认上限 32/64/8 与样例图 72 边口径冲突，待评审定 profile。
+- 门禁（`%TEMP%\w4_gate_out.txt` + `w4_close_out.txt`，21:29–21:36）：全量 ruff 首跑 1 个 `I001`（`job_reconciler.py:20`）→ 门禁 `--fix` 后全绿；**全量单进程 pytest 655 passed / 0 failed / 0 skipped in 233.77s**（365 既有 + 290 本轮）；5500/5501/5600/5610 无监听；仓库根无临时目录；秘密扫描 0 命中；Windows git 视角仅 `docs/IMPLEMENTATION_STATUS.md` 与计划被改，其余全部新增未跟踪。
+- 本轮新增：代码/测试 **15 733 行** + `network_policy/` **1 182 行**；19 份交付 sha256 记入波次记录 §3.3。
+- **未提交**：暂存区为空，等用户确认后按精确路径 `git add`（禁止 `git add .`）。
+- 下一前沿：**W5 = T12/T17/T21/T23**（T12 是解析线与作业线收敛点），未启动。
