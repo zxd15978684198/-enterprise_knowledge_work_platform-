@@ -1,0 +1,64 @@
+{
+  "task": "P0-T05R",
+  "kind": "process_level_evidence",
+  "scope": "补 docs/poc/evidence/poc01-owner.md §6.1-E：进程存活 + 锁已释放",
+  "generated_at": "2026-10-28T11:56:02.232653+08:00",
+  "schema": "p0_t05",
+  "t05_verdict": "PASS（限域：单活）",
+  "verdict": {
+    "native_saver": "FAIL（进程存活且锁已释放，原生 put 仍被接受）",
+    "fenced_surrogate": "PASS（同进程同场景被 STALE_OWNER_EPOCH 拒绝）"
+  },
+  "child_process": {
+    "command": [
+      "E:\\project_month\\pyknora\\experiments\\phase0\\.venv\\Scripts\\python.exe",
+      "-c",
+      "<inline child script：DSN 与绑定经环境变量传入>"
+    ],
+    "popen_pid": 18824,
+    "reported_pid": 2012,
+    "launcher_indirection": true,
+    "nonce_proven": true,
+    "lock_backend_pid": 25503,
+    "saver_backend_pid": 25507,
+    "lock_backend_is_process_pid": false,
+    "lock_backend_is_saver_pid": false,
+    "invocation_id": "d5379ec5-a83f-44c1-9eda-2da32129ca60",
+    "owner_epoch_after_claim": 1,
+    "bootstrap_accepted": true,
+    "bootstrap_seq": 1,
+    "exit_code": 0,
+    "stderr_tail": []
+  },
+  "fault_injection": {
+    "sql": "SELECT pg_terminate_backend(<lock_backend_pid>)",
+    "lock_terminated_at": "2026-10-28T11:56:02.047012+08:00",
+    "takeover_proof": "阻塞 pg_advisory_lock 成功返回（非 pg_locks 快照）",
+    "takeover": {
+      "lock_wait_ms": 3.5099000015179627,
+      "lock_backend_pid": 25508,
+      "owner_epoch": 2,
+      "invocation_id": "cedd0d90-d1da-4dad-ad12-07b8eb596ba3"
+    }
+  },
+  "native_saver": {
+    "accepted": true,
+    "code": "ACCEPTED",
+    "checkpoint_id": "04fb250b-8410-4a0e-8249-881662ce6478",
+    "checkpoints_before": 1,
+    "checkpoints_after": 2,
+    "committed_row_found": true
+  },
+  "fenced_surrogate": {
+    "accepted": false,
+    "code": "STALE_OWNER_EPOCH",
+    "detail": "token epoch=1 已过期，当前=2",
+    "seq": null
+  },
+  "child_alive_at_native_put": true,
+  "timeline": {
+    "started_at": "2026-10-28T11:56:00.643829+08:00",
+    "lock_terminated_at": "2026-10-28T11:56:02.047012+08:00",
+    "native_put_at": "2026-10-28T11:56:02.124953+08:00"
+  }
+}

@@ -312,3 +312,386 @@ def test_single_live_writer_and_attempt_ledger_agree(harness: probe.Harness) -> 
     counts = harness.attempt_counts(report.binding)
     assert counts[f"fencing=True rejected:{probe.CODE_STALE_EPOCH}"] == 3
     assert counts[f"fencing=True accepted:{probe.CODE_ACCEPTED}"] == 4
+
+
+# ---------------------------------------------------------------------------
+# 验收 6（补 §6.1-E）：进程级反证——写进程还活着、锁已丢，原生 saver 仍在写
+# ---------------------------------------------------------------------------
+def test_process_level_native_saver_accepts_write_after_lock_loss_is_fail_evidence(
+    harness: probe.Harness,
+) -> None:
+    """进程级反证：写进程仍存活、锁 backend 已被终止，原生 saver 仍然写成功。
+
+    这是 ``poc01-owner.md`` §6.1-E 指出的**负面证据**：本用例“通过”的含义是
+    “已实测并记录原生 saver 在失锁后仍被接受”，**不是**“原生路径已经被 fence”。
+    同一存活进程内，替身（fenced）路径在同一故障场景下被 ``STALE_OWNER_EPOCH``
+    拒绝；两条事实并置，说明 P0-T05 只能落到“单活 runner”的限域结论。
+    证据写到 ``docs/poc/evidence/poc01_owner_process_level.json``。
+    """
+
+    import json
+    import os
+    import queue
+    import subprocess
+    import textwrap
+    import threading
+    from datetime import datetime
+
+    child_script = textwrap.dedent(
+        '''
+        import json
+        import os
+        import sys
+        import uuid
+        from datetime import datetime
+        from urllib.parse import quote
+        from uuid import UUID
+
+        sys.path.insert(0, os.environ["PYKNORA_PHASE0_DIR"])
+
+        import psycopg
+
+        import checkpoint_probe as probe
+
+
+        def emit(event, **fields):
+            fields["event"] = event
+            fields["ts"] = datetime.now().astimezone().isoformat()
+            print(json.dumps(fields, ensure_ascii=False, default=str), flush=True)
+
+
+        def native_checkpoint(step):
+            return {
+                "v": 1,
+                "id": str(uuid.uuid4()),
+                "ts": datetime.now().astimezone().isoformat(),
+                "channel_values": {
+                    "messages": [
+                        {"role": "user", "content": "p0-t05-r process level " + str(step)}
+                    ]
+                },
+                "channel_versions": {"messages": step},
+                "versions_seen": {"__start__": {"messages": step}},
+            }
+
+
+        dsn = os.environ["PYKNORA_P0_T05_DSN"]
+        binding = probe.RunBinding(
+            workspace_id=UUID(os.environ["PYKNORA_P0_T05_WORKSPACE"]),
+            run_id=UUID(os.environ["PYKNORA_P0_T05_RUN"]),
+            thread_id=UUID(os.environ["PYKNORA_P0_T05_THREAD"]),
+        )
+        option = "options=" + quote("-csearch_path=" + probe.SCHEMA, safe="")
+        search_path_dsn = dsn + ("&" if "?" in dsn else "?") + option
+        config = {"configurable": {"thread_id": str(binding.thread_id), "checkpoint_ns": ""}}
+        metadata = {"source": "input", "step": 0, "writes": None, "parents": {}}
+
+        try:
+            import langgraph.checkpoint.postgres as native_postgres
+        except Exception as exc:
+            emit("fatal", stage="import_native_saver", error=repr(exc))
+            raise SystemExit(2) from None
+
+        saver_conn = None
+        invocation = probe.Invocation(dsn, binding, fencing=True)
+        try:
+            invocation.acquire_lock()
+            claim = invocation.claim_owner(0)
+            bootstrap = invocation.write({"process": "child", "step": "bootstrap"})
+            saver_conn = psycopg.connect(search_path_dsn, autocommit=True)
+            saver = native_postgres.PostgresSaver(saver_conn)
+            saver.setup()
+            baseline = native_checkpoint(0)
+            saver.put(config, baseline, metadata, {})
+            saver_pid = int(saver_conn.execute("SELECT pg_backend_pid()").fetchone()[0])
+            emit(
+                "ready",
+                child_pid=os.getpid(),
+                nonce=os.environ["PYKNORA_P0_T05_NONCE"],
+                lock_backend_pid=invocation.lock_pid,
+                saver_backend_pid=saver_pid,
+                invocation_id=str(invocation.invocation_id),
+                owner_epoch=claim.owner_epoch,
+                bootstrap_accepted=bootstrap.accepted,
+                bootstrap_seq=bootstrap.seq,
+                baseline_native_checkpoint_id=baseline["id"],
+            )
+            for line in sys.stdin:
+                command = line.strip()
+                if not command:
+                    continue
+                if command == "native_put":
+                    checkpoint = native_checkpoint(1)
+                    try:
+                        saver.put(config, checkpoint, metadata, {})
+                    except Exception as exc:
+                        emit(
+                            "native_put",
+                            accepted=False,
+                            code="NATIVE_SAVER_ERROR",
+                            detail=repr(exc),
+                        )
+                    else:
+                        emit(
+                            "native_put",
+                            accepted=True,
+                            code=probe.CODE_ACCEPTED,
+                            checkpoint_id=checkpoint["id"],
+                        )
+                elif command == "surrogate_put":
+                    result = invocation.write({"process": "child", "step": "after_loss"})
+                    emit(
+                        "surrogate_put",
+                        accepted=result.accepted,
+                        code=result.code,
+                        seq=result.seq,
+                        checkpoint_id=(
+                            str(result.checkpoint_id) if result.checkpoint_id else None
+                        ),
+                        detail=result.detail,
+                    )
+                elif command == "exit":
+                    break
+                else:
+                    emit("unknown_command", command=command)
+            emit("bye", child_pid=os.getpid())
+        finally:
+            probe.close_quietly(saver_conn)
+            invocation.close()
+        '''
+    )
+
+    repo_root = PROJECT.parents[1]
+    evidence_path = repo_root / "docs" / "poc" / "evidence" / "poc01_owner_process_level.json"
+    binding = harness.create_run()
+    env = os.environ.copy()
+    env["PYTHONUTF8"] = "1"
+    env["PYKNORA_PHASE0_DIR"] = str(PROJECT)
+    # DSN 与绑定只走环境变量：既不进 argv，也不写进证据文件（口令不落盘）
+    env["PYKNORA_P0_T05_DSN"] = harness.dsn
+    env["PYKNORA_P0_T05_WORKSPACE"] = str(binding.workspace_id)
+    env["PYKNORA_P0_T05_RUN"] = str(binding.run_id)
+    env["PYKNORA_P0_T05_THREAD"] = str(binding.thread_id)
+    env["PYKNORA_P0_T05_NONCE"] = os.urandom(8).hex()
+    nonce = env["PYKNORA_P0_T05_NONCE"]
+    command = [sys.executable, "-c", child_script]
+    child = subprocess.Popen(
+        command,
+        cwd=str(repo_root),
+        env=env,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        encoding="utf-8",
+    )
+    events: queue.Queue[str | None] = queue.Queue()
+    stderr_lines: list[str] = []
+
+    def pump_stdout() -> None:
+        assert child.stdout is not None
+        for line in iter(child.stdout.readline, ""):
+            events.put(line)
+        events.put(None)
+
+    def pump_stderr() -> None:
+        assert child.stderr is not None
+        for line in iter(child.stderr.readline, ""):
+            stderr_lines.append(line.rstrip())
+
+    stdout_thread = threading.Thread(target=pump_stdout, daemon=True)
+    stderr_thread = threading.Thread(target=pump_stderr, daemon=True)
+    stdout_thread.start()
+    stderr_thread.start()
+
+    def child_stderr() -> str:
+        return "\n".join(stderr_lines[-20:])
+
+    def read_event(timeout: float = 60.0) -> dict[str, object]:
+        try:
+            line = events.get(timeout=timeout)
+        except queue.Empty:
+            raise AssertionError(f"子进程 {timeout}s 无回报；stderr={child_stderr()}") from None
+        assert line is not None, f"子进程 stdout 已关闭；stderr={child_stderr()}"
+        return json.loads(line)
+
+    def send(text: str) -> None:
+        assert child.stdin is not None
+        child.stdin.write(text + "\n")
+        child.stdin.flush()
+
+    record: dict[str, object] = {
+        "ready": None,
+        "child_exit_code": None,
+        "child_alive_at_native_put": None,
+        "lock_terminated_at": None,
+        "takeover": {},
+        "native_saver": None,
+        "fenced_surrogate": None,
+        "timeline": {},
+    }
+    successor: probe.Invocation | None = None
+    started_at = datetime.now().astimezone().isoformat()
+    try:
+        ready = read_event()
+        record["ready"] = ready
+        assert ready["event"] == "ready", f"子进程未就绪：{ready}"
+        # Windows venv 的 python.exe 是转启动器：Popen.pid 是启动器，实际执行 probe 的
+        # 是它的子进程。用一次性 nonce 证明“回报事件的进程就是我们拉起的进程”。
+        assert ready["nonce"] == nonce, "nonce 不匹配，无法确认这是本次拉起的进程"
+        assert child.poll() is None, "子进程回报 ready 后立即退出"
+        lock_pid = int(ready["lock_backend_pid"])
+        saver_pid = int(ready["saver_backend_pid"])
+        assert lock_pid != saver_pid, "锁连接与 saver 连接必须是不同的 backend"
+        assert ready["bootstrap_accepted"] is True
+        assert int(ready["owner_epoch"]) == 1
+        thread_key = str(binding.thread_id)
+        native_before = int(
+            harness.admin.execute(
+                f"SELECT count(*) FROM {probe.SCHEMA}.checkpoints WHERE thread_id = %s",
+                (thread_key,),
+            ).fetchone()[0]
+        )
+        assert native_before >= 1, "子进程的基线原生 checkpoint 没有落库"
+
+        # 故障注入：只终止锁 backend，写进程本身不动——这正是进程级证据的前提
+        assert harness.terminate_backend(lock_pid) is True
+        record["lock_terminated_at"] = datetime.now().astimezone().isoformat()
+
+        # 接管判据：阻塞拿锁成功返回，而不是采信 pg_locks 快照（§6.1-A）
+        successor = harness.new_invocation(binding)
+        lock_wait_ms = successor.acquire_lock()
+        assert successor.holds_lock()
+        assert successor.lock_pid != lock_pid
+        new_claim = successor.claim_owner(int(ready["owner_epoch"]))
+        assert new_claim.owner_epoch == int(ready["owner_epoch"]) + 1
+        record["takeover"] = {
+            "lock_wait_ms": lock_wait_ms,
+            "lock_backend_pid": successor.lock_pid,
+            "owner_epoch": new_claim.owner_epoch,
+            "invocation_id": str(new_claim.invocation_id),
+        }
+
+        assert child.poll() is None, "原生写入前子进程已退出，进程级证据不成立"
+        record["child_alive_at_native_put"] = True
+        send("native_put")
+        native_event = read_event()
+        native_put_at = datetime.now().astimezone().isoformat()
+        assert native_event["event"] == "native_put", native_event
+        assert native_event["accepted"] is True, (
+            "原生 saver 在失锁后被拒，C-03 缺口未复现；证据链需重查"
+        )
+        native_after = int(
+            harness.admin.execute(
+                f"SELECT count(*) FROM {probe.SCHEMA}.checkpoints WHERE thread_id = %s",
+                (thread_key,),
+            ).fetchone()[0]
+        )
+        assert native_after == native_before + 1
+        committed = harness.admin.execute(
+            f"SELECT checkpoint FROM {probe.SCHEMA}.checkpoints "
+            "WHERE thread_id = %s AND checkpoint_id = %s",
+            (thread_key, str(native_event["checkpoint_id"])),
+        ).fetchone()
+        assert committed is not None
+        assert committed[0]["id"] == native_event["checkpoint_id"]
+        record["native_saver"] = {
+            "accepted": native_event["accepted"],
+            "code": native_event["code"],
+            "checkpoint_id": native_event["checkpoint_id"],
+            "checkpoints_before": native_before,
+            "checkpoints_after": native_after,
+            "committed_row_found": True,
+        }
+
+        # 同一存活进程、同一故障场景：替身 fenced 路径必须被 STALE_OWNER_EPOCH 拒绝
+        send("surrogate_put")
+        surrogate_event = read_event()
+        assert surrogate_event["event"] == "surrogate_put", surrogate_event
+        assert surrogate_event["accepted"] is False
+        assert surrogate_event["code"] == probe.CODE_STALE_EPOCH
+        record["fenced_surrogate"] = {
+            "accepted": surrogate_event["accepted"],
+            "code": surrogate_event["code"],
+            "detail": surrogate_event["detail"],
+            "seq": surrogate_event["seq"],
+        }
+
+        send("exit")
+        bye = read_event()
+        assert bye["event"] == "bye", bye
+        assert child.wait(timeout=60) == 0
+        record["child_exit_code"] = 0
+        record["timeline"] = {
+            "started_at": started_at,
+            "lock_terminated_at": record["lock_terminated_at"],
+            "native_put_at": native_put_at,
+        }
+    finally:
+        if child.poll() is None:
+            child.kill()
+        if record["child_exit_code"] is None:
+            try:
+                record["child_exit_code"] = child.wait(timeout=30)
+            except subprocess.TimeoutExpired:
+                record["child_exit_code"] = "TIMEOUT"
+        stderr_thread.join(timeout=10)
+        stdout_thread.join(timeout=10)
+        for stream in (child.stdin, child.stdout, child.stderr):
+            if stream is not None:
+                stream.close()
+        if successor is not None:
+            successor.close()
+        ready = record["ready"]
+        if isinstance(ready, dict):
+            evidence = {
+                "task": "P0-T05R",
+                "kind": "process_level_evidence",
+                "scope": "补 docs/poc/evidence/poc01-owner.md §6.1-E：进程存活 + 锁已释放",
+                "generated_at": datetime.now().astimezone().isoformat(),
+                "schema": probe.SCHEMA,
+                "t05_verdict": "PASS（限域：单活）",
+                "verdict": {
+                    "native_saver": "FAIL（进程存活且锁已释放，原生 put 仍被接受）",
+                    "fenced_surrogate": "PASS（同进程同场景被 STALE_OWNER_EPOCH 拒绝）",
+                },
+                "child_process": {
+                    "command": [
+                        sys.executable,
+                        "-c",
+                        "<inline child script：DSN 与绑定经环境变量传入>",
+                    ],
+                    "popen_pid": child.pid,
+                    "reported_pid": ready.get("child_pid"),
+                    "launcher_indirection": child.pid != ready.get("child_pid"),
+                    "nonce_proven": True,
+                    "lock_backend_pid": ready.get("lock_backend_pid"),
+                    "saver_backend_pid": ready.get("saver_backend_pid"),
+                    "lock_backend_is_process_pid": (
+                        ready.get("lock_backend_pid") == ready.get("child_pid")
+                    ),
+                    "lock_backend_is_saver_pid": (
+                        ready.get("lock_backend_pid") == ready.get("saver_backend_pid")
+                    ),
+                    "invocation_id": ready.get("invocation_id"),
+                    "owner_epoch_after_claim": ready.get("owner_epoch"),
+                    "bootstrap_accepted": ready.get("bootstrap_accepted"),
+                    "bootstrap_seq": ready.get("bootstrap_seq"),
+                    "exit_code": record["child_exit_code"],
+                    "stderr_tail": stderr_lines[-20:],
+                },
+                "fault_injection": {
+                    "sql": "SELECT pg_terminate_backend(<lock_backend_pid>)",
+                    "lock_terminated_at": record["lock_terminated_at"],
+                    "takeover_proof": "阻塞 pg_advisory_lock 成功返回（非 pg_locks 快照）",
+                    "takeover": record["takeover"],
+                },
+                "native_saver": record["native_saver"],
+                "fenced_surrogate": record["fenced_surrogate"],
+                "child_alive_at_native_put": record["child_alive_at_native_put"],
+                "timeline": record["timeline"],
+            }
+            evidence_path.write_text(
+                json.dumps(evidence, indent=2, ensure_ascii=False) + "\n",
+                encoding="utf-8",
+            )
