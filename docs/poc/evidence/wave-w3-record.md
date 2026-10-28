@@ -201,10 +201,11 @@ junit: tests="365" failures="0" errors="0" skipped="0" time="128.327" timestamp=
 - 20:26 与 20:27 两次尝试把 `--junitxml` 指向 `%TEMP%` 均报 `PermissionError: [Errno 13]`（pytest 子进程无该目录写权），不影响用例结果；改到仓库内 gitignored 目录后一次成功。
 - 结论：**W3 全量 365 用例单进程通过**，此前「挂起」不再复现；「不能用 `--with` 跑全套」升级为纪律写入 §1.2。
 
-## 4. 提交决策
+## 4. 提交决策与结果
 
-- 用户答复：**待询问**（按计划 §4.5.4，门禁跑完后停下问是否提交）
-- 提交内容（待用户确认后执行）：
-  1. `feat(phase0): add W3 probes - checkpoint owner (T05), outbox (T07), docreader wire (T10), browser contracts (T15), model gateway (T19)`
-  2. `docs(phase0): record W3 gate result`
-- 禁止：未经确认不 `git add` / `commit` / `push`；不合入 `dev`
+- 用户答复（2026-10-27 ask_user_question）：**提交 W3 两笔 + 由我决定是否推送**；随后用户明确「推送并开启 W4」。
+- 实际提交：
+  1. `ed669af` `feat(phase0): add W3 probes - checkpoint owner (T05), outbox (T07), docreader wire (T10), browser contracts (T15), model gateway (T19)`（24 文件 / +14336）
+  2. `32f0035` `docs(phase0): record W3 gate result and full-suite rerun`（amend 两次：补 `.env.example` 例外、删计划文件 EOF 空行）
+- 推送结果（2026-10-27 20:39）：`git push -u origin feature/w3-t05-t07-t10-t15-t19` → 远端顶点 **`32f0035`**；**未合并 `dev`**。
+- 未提交项：`.idea/`、`CLAUDE.md`、`docs/plans/README.md`、`docs/teacher/`（开工前既有未跟踪）。

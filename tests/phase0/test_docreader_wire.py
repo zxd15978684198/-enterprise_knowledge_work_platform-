@@ -58,7 +58,9 @@ PROTO_COPY = PROBE_DIR / "proto" / "docreader.proto"
 REF_PROTO = REPO_ROOT / "references" / "WeKnora" / "docreader" / "proto" / "docreader.proto"
 REF_PB2 = REPO_ROOT / "references" / "WeKnora" / "docreader" / "proto" / "docreader_pb2.py"
 PROVENANCE = PROBE_DIR / "generated" / "PROVENANCE.json"
-EVIDENCE_PATH = PROBE_DIR / "wire_evidence.json"
+EVIDENCE_PATH = REPO_ROOT / "experiments" / "phase0" / ".pytest_cache" / "wire_evidence.json"
+# 2026-10-27 W5 门禁修复：该证据原先直接写回 `docreader_probe/wire_evidence.json`（tracked 文件），
+# 每次跑测试都会把工作树弄脏。现在改写 gitignored 的 `.pytest_cache/`，仓库里的那份作为静态快照保留。
 
 #: P0-T09 ``docs/poc/evidence/docreader_manifest.md`` §1.1 锚点。
 PROTO_SHA256 = "33d4135cfcd2ec95f8d160d6cefdd54be669167e8b8fb69ef81095d218a738d0"
@@ -111,6 +113,7 @@ def _evidence_writer() -> Iterator[None]:
     }
     _EVIDENCE["finished_at"] = time.strftime("%Y-%m-%dT%H:%M:%S%z")
     _EVIDENCE["real_docreader_service"] = "NOT_RUN (T09: image digest UNKNOWN, licenses UNKNOWN)"
+    EVIDENCE_PATH.parent.mkdir(parents=True, exist_ok=True)
     EVIDENCE_PATH.write_text(
         json.dumps(_EVIDENCE, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )

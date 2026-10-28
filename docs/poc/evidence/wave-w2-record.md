@@ -107,7 +107,12 @@ per_task:
 | P0-T03 | **PASS** | `test_scope.py` 16 例全绿；复合 FK 跨工作区 100 轮拒绝；RLS 默认拒绝（无 scope 非超管零行）；`test_pooled_connection_does_not_retain_scope`、`test_scoped_connection_rejects_autocommit` 证明 `SET LOCAL` 不泄漏；`test_authorize_job_without_run_reads_current_principal` 覆盖 C-06；迁移记录 sha256 可核 | C-07「来源审阅 / 身份域」子域按约束 **BLOCKED**（不自创域模型）；C-10 `asset_bindings` 只留位 **NOT_RUN** |
 | P0-T04 | **PASS（限域）** | 控制站 21 向量 + 12 负向 = 33 条 manifest；内容 sha256 7 条真字节校验；`applied_calls`/`X-Idempotent-Replayed` 幂等可验；fault 双门禁（默认 404 / 缺 env exit 2 / flag+env 200 / production exit 2）；10 轮起停 `ALL_PORT_FREE=True LISTEN_AFTER_TOTAL=0`；`FaultBarrier` 无固定 sleep | F1–F18 故障矩阵场景本身属 T05–T30，**NOT_RUN**；F15 私网 IPv6 / WebSocket / DNS rebinding 与 F16 提示注入页为**能力缺口 PARTIAL**（未造假通过） |
 
-## 4. 提交决策
+## 4. 提交决策与结果
 
-- 用户答复：待询问（门禁已通过，等用户确认是否提交）
-- 提交内容：待定（预计 2 个提交：`feat(phase0): W2 T03 scope/identity contracts`、`feat(phase0): W2 T04 control site & fault barrier` + 1 个 `docs(phase0): record W2 gate result`）
+- 用户答复（2026-10-27，ask_user_question）：**「提交（3 笔）」**，随后在 W3 启动时追加选择「推送 W2 + 开 W3」。
+- 实际提交（4 笔，均本地后推送）：
+  1. `94defe2` `feat(phase0): W2 T03 scope/identity contracts`（5 文件 / +3465）
+  2. `d36629a` `feat(phase0): W2 T04 control site & fault barrier`（13 文件 / +4311）
+  3. `9b88cc7` `docs(phase0): record W2 gate result and move frontier to W3`（3 文件 / +156 −31）
+  4. `f86765e` `style(phase0): drop trailing blank line in poc01-scope.md`（1 文件 / −1，因 `git diff --cached --check` 报 `new blank line at EOF`）
+- 推送结果（2026-10-27 19:29）：`git push -u origin feature/w2-t03-t04` → `6ff7b72..f86765e`，远端顶点 **`f86765e`**；**未合并 `dev`**。

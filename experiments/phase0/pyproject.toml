@@ -19,6 +19,7 @@ dev = [
     "grpcio-tools>=1.85.0",
     "langgraph-checkpoint-postgres>=3.2.0",
     "pytest-timeout>=2.4.0",
+    "langgraph>=1.2.18",
 ]
 
 [tool.uv]

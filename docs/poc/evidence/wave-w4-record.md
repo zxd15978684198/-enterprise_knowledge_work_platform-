@@ -158,10 +158,12 @@ fdb15ae4af5fd0b9a2301e88c9d42e1bbd565766de0306ca87d4ebec46a109c1  experiments/ph
 | P0-T20 | **PASS（限域）** | 27 passed；四区段裁剪确定性（30 次同指纹）；无价格 `settle_unavailable` 按 maximum 记账 `provisional=true / zeroed=false`；100 轮双竞争 `winners=100 / rejected=100 / overdraft=0`；DB CHECK 兜底；崩溃后从 PG 恢复 | `005` 落独立 schema；tokenizer 是启发式（CJK 1 字/token）；真实价格快照 `NOT_RUN`；「每 retry 费用可归集」需 T21 决定 gateway 重试与预留的接口 |
 | P0-T22 | **PASS（限域）** | 51 passed；32 节点/72 边/66 点、最长链 12 节点 11 跳 24 点、核心链 23 点与 `poc/04` 一致；28 个非法计划全拒且首错可定位；RAG 路径 planner 调用 0；**澄清 Mermaid 缺边为误报（72/72 一致）** | 真实模型 plan `NOT_RUN`（本任务不需联网）；默认上限 32/64/8 与 Phase 0 样例图 72 边口径冲突，需评审定 profile 名 |
 
-## 4. 提交决策
+## 4. 提交决策与结果
 
-- 用户答复：**待询问**
-- 拟提交（待确认后执行，仅本地）：
-  1. `feat(phase0): add W4 probes - approvals (T06), delivery recovery (T08), parser golden (T11), network policy (T16), budget ledger (T20), dag validation (T22)`
-  2. `docs(phase0): record W4 gate result`
-- 不提交：`.idea/`、`CLAUDE.md`、`docs/plans/README.md`、`docs/teacher/`
+- 用户答复（2026-10-27 21:45 ask_user_question）：**「提交 + 推送 + 开 W5」**。
+- 实际提交（2 笔，提交后推送）：
+  1. `0a1ed5d` `feat(phase0): add W4 probes - approvals (T06), delivery recovery (T08), parser golden (T11), network policy (T16), budget ledger (T20), dag validation (T22)`
+  2. `a2a7dfc` `docs(phase0): record W4 gate result`
+- 提交前修正：`network_policy/engine.py`、`flow.py` 的 EOF 空行被 `git diff --cached --check` 拦下，已剥掉后重跑；`docreader_probe/wire_evidence.json` 的测试回归改写在 W5 修复（改为写 `.pytest_cache/`）。
+- 推送结果：`git push -u origin feature/w4-t06-t08-t11-t16-t20-t22` → 远端顶点 **`a2a7dfc`**；**未合并 `dev`**。
+- 未提交：`.idea/`、`CLAUDE.md`、`docs/plans/README.md`、`docs/teacher/`（开工前既有未跟踪）。
