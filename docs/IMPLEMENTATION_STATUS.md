@@ -1,6 +1,6 @@
 # PyKnora 实施状态
 
-更新日期：2026-10-28（Asia/Shanghai）。当前为 **Phase 0 实验阶段**：W1–W5 五个波次已执行完成并全部合入 `dev`；21 个任务已产出实验代码与证据（其中 T05/T09 为 PARTIAL、T17 为 BLOCKED），**T13、T18、T24、T25–T32 共 10 项仍为 NOT_STARTED**。所有结果仅是实验环境内的验证结论，不代表 ADR 已接受或 Phase 0 工程验证通过。
+更新日期：2026-10-28（Asia/Shanghai）。当前为 **Phase 0 实验阶段**：W1–W5 五个波次已执行完成并全部合入 `dev`；21 个任务已产出实验代码与证据（其中 T05/T09 为 PARTIAL）；**T17 已于 2026-10-28 由修复分支 `fix/w5-t17` 解除并转 PASS（限域）**，T18 随之解除原料阻塞但仍未执行；T13/T18/T24/T25–T32 仍为 NOT_STARTED。所有结果仅是实验环境内的验证结论，不代表 ADR 已接受或 Phase 0 工程验证通过。
 
 ## 阶段收口：W1–W5 全部合入 dev（2026-10-28）
 
@@ -218,7 +218,7 @@
 - **P0-T12 PASS（限域）**：`index_staging.py`(1106) + `004_version_index.sql`(413) + `test_index_staging.py`(642)。16 passed；staging 重放 `inserted=0/skipped=3`；旧 attempt `STALE_ATTEMPT`（API + DB 触发器双挡）；ready 后 `search_visible_chunks()==[]`、模拟 T13 激活才可见；manifest 缺项 `MANIFEST_INCOMPLETE`；`p0_t12` 零残留。限域：对象存储 `NOT_RUN`（假存储明标 `in-memory-fake`）、**pgvector 缺失 → 向量 ANN/召回 `NOT_RUN`**（`float8[] + embedding_dim`）。
 - **P0-T21 PASS（限域）**：`harness_graph.py`(845) + `safe_trace.py`(259) + 测试(476) + `harness-integration.md`(139)。14 passed；6 节点图复用 T05/T06/T08/T19/T20 公开 API；checkpoint 全删后 `recover_from_facts()` 得 `receipts==1`、节点返回 `replayed`、`applied_calls` 仍 1；取消/超时零副作用；canary 在 trace/State/checkpoint 三处为空。**T20 冲突已选定方案①**：`ProviderConfig(max_retries=0)` + Harness 逐 attempt `reserve_model_call`（`purpose_key=t21:{step}:attempt:{n}`），代价写入证据。限域：**`langgraph` 仅 namespace 包**（`graph`/`types` 均 `ModuleNotFoundError`）→ 原生 `StateGraph`/`interrupt` 未验，验收第 5 项 PARTIAL。
 - **P0-T23 PASS（限域）**：`task_scheduler.py`(1613) + `task_executor.py`(225) + `006_tasks.sql`(230) + 测试(1080)。28 passed；未满足依赖执行 0、required 失败递归 blocked、optional 不阻断；双 scheduler 30 轮 120 条 claim 无重复；旧 epoch 完成/引用均 `STALE_*`；事实先落库、checkpoint 失败只留 `state_ref_pending` 且重入不重跑；真实 T08 Job port 集成通过；迁移重复 apply 显式失败；静态守卫证明无跨域写。限域：单活前提、checkpoint 用端口替身、对账拉取式、30 轮非 100 轮。
-- **P0-T17 BLOCKED**：无 upstream 产物/真设备；解除条件写在波次记录 §1。
+- **P0-T17 原记 BLOCKED**：无 upstream 产物/真设备（解除条件写在波次记录 §1）；**已于 2026-10-28 由 `fix/w5-t17` 解除**，详见本文件「本轮：T17 真配对修复」与 `docs/poc/evidence/poc05-browserskill-live.md`。
 - 门禁（pwsh，22:12–22:18）：ruff 首跑 1 个 `I001`（`index_staging.py:44`）→ `--fix` 后全绿；首次全量 **713 passed / 0 failed / 0 skipped in 319.70 s**（655 既有 + 58 本轮）；5610/5500/5600 无监听；无临时目录；秘密扫描 0 命中。
 - **缺口修复（用户选择「先修缺口再提交」）**：
   - `langgraph` 仅 namespace → `uv add --dev langgraph` 装 **1.2.18**；T21 增加原生主路径 `NativeGraphRun`（`StateGraph` 6 节点 + `interrupt()` + `Command(resume=…)` + 原生 `PostgresSaver`），**19 passed**（14 既有 + 5 原生）；跨连接恢复 exactly-once、框架 `setup()` 建 checkpoint 表、代码零直写。证据 `harness-integration.md` 更新。
@@ -229,7 +229,7 @@
 - 本轮新增代码/测试/迁移约 **8 000+ 行**；关键交付 sha256 记入波次记录 §3.3 与 §3.6。
 - **已提交并推送（用户「先修缺口再提交」→ 22:56 提交）**：`f0cf3e1`（feat W5 + 缺口修复）、`8cfd3bc`（docs: W5 门禁/缺口/pgvector 探针）→ `origin/feature/w5-t12-t17-t21-t23` 顶点 **`8cfd3bc`**；**未合并 `dev`**。
 - **波次状态回填（2026-10-28）**：W1–W5 的 `wave-*-record.md` §4 与本节各波次小节的「未提交/待询问」旧说法已统一回填真实 SHA 与推送结果；W1 的 §3 门禁复选框补勾。
-- 下一前沿：**W7 = T25/T27/T30**（T25 依赖 T13+T19 已就绪；T27 依赖 T11/T16/T24/T03 已就绪；T30 依赖 T05(PARTIAL)/T08/T13/T21，只能做不依赖多实例假设的限域实验）；W6 已收口，T18 仍 BLOCKED。
+- 下一前沿：**W7 = T25/T27/T30**（三份交付 `retrieval_probe.py` / `candidate_review.py` + `007_candidates.sql` / `restore_probe/` 及对应测试仍为工作树未跟踪文件，**尚未提交**；`feature/w7-t25-t27-t30` 目前只含波次声明）。T18 仍 BLOCKED（依赖 T17 真设备）；T17 已在 `fix/w5-t17` 收口为 **PASS（限域）** 并合入 `dev`。
 
 ## 本轮：W6 波次执行（P0-T13 / P0-T24）
 
@@ -240,3 +240,20 @@
 - 门禁实跑（日志 `%TEMP%\w6_gate.log` / `w6_gate_junit.log`，junit `experiments/phase0/.pytest_cache/w6_gate.xml`）：ruff 首跑命中 1 个 `I001`（`index_publication.py:45`，T13 用显式 `--config` 自测与根级扫描口径不同）→ `--fix` 后 `All checks passed!`；修复后 T13 复验 `18 passed`；T24 `22 passed`；**全量 tests=778 / failures=0 / errors=0 / skipped=0 / time=209.289s**；秘密扫描 0 命中；5500/5501/5600/5610 无监听；仓库根无临时目录；core 容器 healthy。
 - 已知契约偏离（写入 `poc03-publication.md` §7，未改 ADR/`poc/00–07`）：schema 落独立 `p0_t13` + 只读 `p0_t12`；跨 schema 无 FK；回滚以新版本行重放（消耗一次 generation）；发布内 Job 仅最小事实；无 DB 级「每文档单 active」唯一约束（靠行锁+状态机+提交前自检）；被拒尝试审计随事务回滚。
 - 状态：**已过门禁，未提交**（等用户裁决）；`dev` 未变动。
+
+## 本轮：T17 真配对修复（2026-10-28，独立修复分支 `fix/w5-t17`）
+
+- 分支：`fix/w5-t17`，基线 `dev@cc4a475`；**不并入 W6/W7 的线性链**（用户明确「不用移到 W7」）。
+- 交付：`experiments/phase0/browserskill_probe/`（`cli.py` / `adapter.py` / `live_run.py` / `__init__.py`）、
+  `tests/phase0/test_bsk_live.py`（35 例 = 34 单测 + 1 真机门控用例）、
+  `docs/poc/evidence/poc05-browserskill-live.md`、`docs/poc/evidence/p0-t17-live-run.json`。
+- 真机证据：daemon `0.3.1` / protocol `1.3`；Chrome 147 + 扩展 `0.3.1`（unpacked）；
+  `session ivff` → `tab 270464479` → `snapshot` / `evaluate` / `screenshot`（56,940 B，`sha256=BE95C974…`）/
+  `console` / `tab close` / `session stop` 全链路走通，未使用 mock。
+- 门禁实跑（`%TEMP%\fix_t17_gate2.log`）：`ruff check experiments/phase0 tests/phase0` → **All checks passed!**（exit 0）；
+  `pytest -c experiments/phase0/pyproject.toml tests/phase0`（排除 worktree 中 W7 未跟踪的三份测试）→
+  **774 passed / 1 skipped / 0 failed，355.56s**（junit `experiments/phase0/.pytest_cache/fix_t17.xml`）；
+  唯一 skip 为真机用例的 3.12 环境门控，真机结果由 3.13 的 `live_run.py` 提供，不是跳过验证。
+- 判定：**P0-T17 PASS（限域）**。限域与 NOT_RUN 清单见证据 §6：动作覆盖 13/31、交互类动作仅单测、
+  `owner`/撤销属 T18、网络策略属 T16、多浏览器/跨平台未测。
+- 未改动：`dev` 与 W6/W7 分支及其未跟踪产物未触碰；未执行 `git add .`。
