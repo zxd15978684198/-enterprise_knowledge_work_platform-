@@ -115,7 +115,10 @@ per_task:
 
 ## 4. 提交决策与结果
 
-- 用户答复：待询问
-- 实际提交：待定
-- 推送：待定
-- 未提交清单：待定
+- 用户答复：**提交 + 推送 + 开 W7**（2026-10-28 09:35，ask_user_question `w6_commit` 选第 1 项）
+- 实际提交（本地，均 `git diff --cached --check` = 0）：
+  - `8911608` `feat(phase0): close W6 - atomic publication (T13) and evaluator/replanning (T24)` — 7 文件 / +5088 −0
+  - `8f82061` `docs(phase0): record W6 gate result and W7 frontier` — 3 文件 / +229 −96（含本记录、计划前沿、状态文件）
+- 推送：`git push -u origin feature/w6-t13-t24` → exit 0，远端新建 `feature/w6-t13-t24`，顶点 **`8f82061`**（GitHub 侧提示可开 PR）
+- 未提交清单：仅开工前既有未跟踪项 `.idea/`、`CLAUDE.md`、`docs/plans/README.md`、`docs/teacher/`（按规矩不入库）
+- 合并：**未合并 `dev`**（`dev` 仍 `cc4a475`）；W7 分支将以本波次顶点 `8f82061` 为基线
