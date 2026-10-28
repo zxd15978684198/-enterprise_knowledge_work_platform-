@@ -1,6 +1,6 @@
 # PyKnora 实施状态
 
-更新日期：2026-10-28（Asia/Shanghai）。当前为 **Phase 0 实验阶段**：W1–W6 六个波次已执行完成并全部合入 `dev`；**W7R 补口波次同日完成（未提交，待授权）**——P0-T05 由 PARTIAL 转 **PASS（限域：单活）**（新增 ADR-0006 提议），P0-T09 由 PARTIAL 转 **PASS（限域）**（镜像 digest 与 OCR 权重闭合，pip 11 项 / apt 227 项许可仍 unknown 且已逐项列阻断）；**T17 已于 2026-10-28 由修复分支 `fix/w5-t17` 解除并转 PASS（限域）**；T13/T24 为 PASS（限域），T18、T25–T32 仍 NOT_STARTED。九项 PoC 无整体 PASS，五份 ADR 仍为 Proposed，所有结果仅是实验环境内的验证结论，不代表 ADR 已接受或 Phase 0 工程验证通过。
+更新日期：2026-10-28（Asia/Shanghai）。当前为 **Phase 0 实验阶段**：W1–W7 七个波次已执行完成，并连同两条修复分支（`fix/w5-t17`、`fix/w7r-t05-t09`）按序合入 `dev`。判定现状：P0-T05、P0-T09、P0-T13、P0-T17、P0-T24、P0-T25、P0-T27、P0-T30 为 **PASS（限域）**；P0-T18、P0-T26、P0-T28、P0-T29、P0-T31、P0-T32 仍 NOT_STARTED。九项 PoC 无整体 PASS；六份 ADR 仍为 Proposed（`0006` 已登记为提议）；所有结果仅是实验环境内的验证结论，不代表 ADR 已接受或 Phase 0 工程验证通过。
 
 ## 阶段收口：W1–W5 全部合入 dev（2026-10-28）
 
@@ -295,4 +295,18 @@
 - W7R 产物**未提交**（波次内禁 git）；待用户授权后按 `fix:W7R-T05R-…` / `fix:W7R-T09R-…` 各自分支提交。
 - 多实例横扩仍 FAIL/PARTIAL：仅当明确要求多实例时才做 `poc01b`（持锁代理 + lease/fencing），成本约 1.5 点。
 - 许可 unknown 项不阻塞 T05/T09 的限域判定，但阻塞「发布候选」门槛；要转全量 PASS 需 PyPI 许可元数据或上游声明，本机直连 PyPI 不通。
-- 本轮未跑 W7（T25/T27/T30）；状态文件抬头已修正为「W1–W6 合入 dev、W7R 完成待提交」。
+- 本轮未跑 W7（T25/T27/T30）；状态文件抬头已修正为「W1–W7 合入 dev」。
+- 全量 `pytest` 已于本轮在合入后的 `dev` 上重跑并通过（见下节），自 W3 起记录的「全量无输出挂起」不再复现——当时根因是 `--with` overlay 环境，依赖入 venv 后消失。
+
+## 本轮：W7 交付落库 + 五个分支按序合入 dev（2026-10-28）
+
+- **W7 交付落库**：`feature/w7-t25-t27-t30` 由 `047b7a8` 推进到 `cbf7b7f`——`4ebdf46` feat（15 文件 +9813：`retrieval_probe.py` 1792 行、`candidate_review.py` 2106、`db/migrations/007_candidates.sql` 709、`restore_probe/` 7 文件 2437、三份测试 2053、`retrieval-baseline.json` 399、`restore-runbook.md` 317）、`cbf7b7f` docs（`wave-w7-record.md` §2–§4 回填，含 16 份交付 sha256）。已推送 `origin/feature/w7-t25-t27-t30`。
+- **W7 门禁（Lead 独立复跑）**：`ruff` → `All checks passed!`；T25 `12 passed`、T27 `66 passed`、T30 `21 passed`、三文件合计 `99 passed`，均 exit 0。限域口径：T25 的 ANN/召回 **NOT_RUN**（本机 PG 无 pgvector）、T30 的 RPO/RTO **NOT_RUN**（未校准）、T18 仍 BLOCKED（依赖 T17 真设备，T17 已在 `fix/w5-t17` 单独收口）。
+- **dev 按序合入（全部 `--no-ff`，保留波次边界，不删改任何分支）**：
+  - `c037614` Merge `feature/w6-t13-t24`（W6：T13 原子发布 / T24 评估重规划）
+  - `b5d8cce` Merge `feature/w7-t25-t27-t30`（W7 声明）
+  - `7d40c7b` Merge `fix/w5-t17`（T17 真配对；唯一冲突 `IMPLEMENTATION_STATUS.md`，解法=两侧「本轮」段并存 + 重写前沿行）
+  - `027c5b5` Merge `fix/w7r-t05-t09`（W7R：T05R 单活正式化 / T09R 镜像许可）
+  - `63cee71` Merge `feature/w7-t25-t27-t30`（W7 交付，16 文件 +9862）
+- **修复满套件偶发失败**：`tests/phase0/test_control_site.py::test_arrival_log_gives_final_endpoint_for_outbound_vector` 原断言「最后两条到达记录」，全量并发落盘时会被其它用例请求插入而偶发变红（W2 起潜伏，913 用例规模下暴露）；改为以 path 唯一的 `/js/beacon` 为锚点、回看其之前是否存在 `/static/iframe.html`，证明的仍是「顺序保留」原命题。
+- **已知遗留（不阻塞）**：`tests/phase0/test_checkpoint_owner.py` 的进程级用例会重写 tracked 证据 `docs/poc/evidence/poc01_owner_process_level.json`（时间戳/PID 抖动），本轮以 stash `regen-poc01-owner-evidence-T05R-run` 暂存未入库；后续应改为写临时路径。
