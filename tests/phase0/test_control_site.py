@@ -289,10 +289,20 @@ def test_arrival_log_gives_final_endpoint_for_outbound_vector(site: ControlSite)
 
     # 到达记录在**进站**时就落一条（status=None），最终状态由 finish() 补齐；
     # 这里等"已完成"的记录，避免读到半成品——这是禁止 sleep 猜时序在状态维度的体现。
-    arrivals = site.wait_for_completed(baseline + 2)[-2:]
-    assert [item["path"] for item in arrivals] == ["/static/iframe.html", "/js/beacon"]
-    assert arrivals[-1]["key"] == "iframe-frame"
-    assert arrivals[-1]["status"] == 200
+    # 全量套件里其它用例的请求可能在本用例两次请求之间落盘完成，
+    # 所以不能断言「最后两条」正好是这两条；改为以 path 唯一的 beacon 记录为锚点，
+    # 再回看它之前是否存在 iframe 页面记录——这仍是本用例要证明的「顺序保留」。
+    arrivals = site.wait_for_completed(baseline + 2)
+    beacon_at = max(i for i, item in enumerate(arrivals) if item["path"] == "/js/beacon")
+    page_before = [
+        item for item in arrivals[:beacon_at] if item["path"] == "/static/iframe.html"
+    ]
+    assert page_before, (
+        "到达日志里 /js/beacon 之前没有 /static/iframe.html；"
+        f"末尾记录={[item['path'] for item in arrivals[-6:]]}"
+    )
+    assert arrivals[beacon_at]["key"] == "iframe-frame"
+    assert arrivals[beacon_at]["status"] == 200
 
 
 def test_arrival_log_never_stores_credential_values(site: ControlSite) -> None:
