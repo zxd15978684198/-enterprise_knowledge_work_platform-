@@ -65,7 +65,7 @@ per_task:
   - `docker compose ... --profile core ps` → postgres / redis 均 `Up 42 minutes (healthy)`，端口 `127.0.0.1:5433`、`127.0.0.1:6380`
 - [x] **`git status` / `git diff` 审阅**：`HEAD=59d53ac`、`branch=feature/w1-t02-t09-t14`、`ahead_of_dev=0`；已跟踪文件仅 ` M .gitignore`（+11/−1）、` M docs/IMPLEMENTATION_STATUS.md`（+30）；未跟踪 `.idea/ CLAUDE.md docs/plans/ docs/poc/evidence/ docs/teacher/ experiments/ tests/`；**暂存区为空**
 - [x] **追加 `docs/IMPLEMENTATION_STATUS.md` 小节**：已加「本轮：W1 波次执行（2026-10-27）」
-- [ ] **询问用户是否提交分支**：见 §4
+- [x] **询问用户是否提交分支**：见 §4（用户 2026-10-27 17:42 答「提交到当前分支，不推送」；20:39 随后推送 `origin/feature/w1-t02-t09-t14`）
 
 ### 3.1 交付哈希（门禁时实测）
 
@@ -92,7 +92,8 @@ per_task:
 ## 4. 提交决策与结果
 
 - 用户答复（2026-10-27 17:42）：**「提交到当前分支，不推送」**。
-- 实际提交：`08c3c67`（`feature/w1-t02-t09-t14`，`ahead_of_dev=1`，**未 push、未合并 dev**）。
+- 实际提交：`08c3c67`（feat，`feature/w1-t02-t09-t14`）+ `6c4f5b6`（chore: 作者元数据，W2 启动时单独提交）。
+- 推送结果（2026-10-27 20:39 补记）：**已推送 `origin/feature/w1-t02-t09-t14`，顶点 `6c4f5b6`**；`git ls-remote --heads origin` 实测可见；**未合并 `dev`**。
   - 13 文件 / +2823 −1：`.gitignore`、`docs/IMPLEMENTATION_STATUS.md`、`docs/plans/2026-10-27-phase0-execution-plan.md`、`docs/poc/evidence/{environment,wave-w1-record,docreader_manifest,docreader_fixture_plan,browserskill_protocol_manifest}.md`、`experiments/phase0/{pyproject.toml,uv.lock,compose.yaml,.env.example}`、`tests/phase0/test_environment.py`。
   - 提交前校验：`git diff --cached --check` exit 0；暂存区无 `.env` / `.venv` / `.idea` / `references`；`user.name=zxd15978684198`、`user.email=zxd15978684198@163.com`（沿用本机既有配置）。
   - 首次 commit `e78a498` 漏了 `.env.example`：新加的 `.gitignore` 规则 `.env.*` 把它一并忽略（`add` 报 `paths are ignored`，add_exit=1）。修正方式 = 在 `.gitignore` 加 `!.env.example` 例外后 `git commit --amend`，得 `08c3c67`；实测 `git check-ignore -v` 显示 `.env.example` 命中 `!.env.example`（不被忽略）、`.env` 命中 `.env`（被忽略）。

@@ -156,9 +156,10 @@
 - 依赖口径变更：PG 驱动由 Lead 底稿 `asyncpg` 改为 `psycopg[binary]>=3.1`（TDD01 §7），并修 CVE 升级 `pytest 9.1.1` / `pytest-asyncio 1.4.1`；现装 `sqlalchemy 2.1.6`、`redis 8.1.0`、`pyyaml 6.0.3`、`ruff 0.12.12`。
 - 根 `.gitignore` 追加 `.env`、`.env.*` + `!.env.example`、`.pytest_cache/`、`.ruff_cache/`、`pytest-of-*/`（既防止真实 `.env` 与 pytest 临时目录误入库，又保留 `.env.example` 可提交）。
 - 门禁检查（`%TEMP%\w1_gate2.log`，17:40:34 复跑）：`pytest -c experiments/phase0/pyproject.toml tests/phase0 -q` 12 passed exit 0、`ruff` exit 0、仓库自有 12 文件秘密扫描 `no_high_risk_secret_hits`、compose core 两容器 `Up (healthy)`、已跟踪差异仅 `.gitignore` 与 `.env.example` 相关、**暂存区为空**。
-- **已提交（用户 17:42 明确授权）**：`08c3c67` 于 `feature/w1-t02-t09-t14`，13 文件 / +2823 −1；未 push、未合并 `dev`。首提交 `e78a498` 因 `.gitignore` 的 `.env.*` 误伤 `.env.example` 而漏文件，加 `!.env.example` 例外后 `--amend` 修正。
+- **已提交（用户 17:42 明确授权）**：`08c3c67` 于 `feature/w1-t02-t09-t14`，13 文件 / +2823 −1；随后 `6c4f5b6`（chore: 作者元数据）。首提交 `e78a498` 因 `.gitignore` 的 `.env.*` 误伤 `.env.example` 而漏文件，加 `!.env.example` 例外后 `--amend` 修正。
+- **已推送（2026-10-27 20:39 补记）**：`origin/feature/w1-t02-t09-t14` 顶点 `6c4f5b6`；**未合并 `dev`**。
 - 未提交：`.idea/`、`CLAUDE.md`、`docs/teacher/`、`experiments/phase0/.venv/`；`references/WeKnora` gitlink 保持 `662abaf9f944e37689d04c42160034b2cdec6829`。
-- 波次收官证据：`docs/poc/evidence/wave-w1-record.md`（声明块、素材阻塞与解除、§3 门禁、§4 提交结果）。下一前沿 **W2 = T03/T04**，未启动，等用户授权。
+- 波次收官证据：`docs/poc/evidence/wave-w1-record.md`（声明块、素材阻塞与解除、§3 门禁、§4 提交结果）。**W2 已启动**（见下节）。
 
 ## 本轮：W2 波次执行（2026-10-27，分支 `feature/w2-t03-t04`）
 
@@ -168,8 +169,8 @@
 - **P0-T04 PASS（限域）**：`experiments/phase0/control_site/`（7 文件 1820 行，纯标准库 `http.server`）+ `faults.py`（317 行 `FaultBarrier`，无固定 sleep）+ `fixtures/manifest.json`（33 向量：21 正 / 12 负，7 条真实响应 sha256）+ `tests/phase0/conftest.py`(206) + `test_control_site.py`(376) + `test_faults.py`(329)。证据 `docs/poc/evidence/control-site.md`（405 行）。F1–F18 场景本身属 T05–T30 **NOT_RUN**；F15 私网 IPv6/WebSocket/DNS rebinding、F16 提示注入页为**能力缺口 PARTIAL**。
 - 修掉两个真缺陷（T04 自查发现）：`ControlStore.reset()` 持非可重入锁再调 `snapshot()` 的自死锁；`server_close()` join 死线程导致的无界等待（改 `wait_for_completed` + `server_close(timeout)`）。
 - 门禁（`%TEMP%\w2_gate.log`，19:22:47→19:24:05）：`pytest -c experiments/phase0/pyproject.toml tests/phase0` **102 passed in 60.45s** exit 0；`ruff` All checks passed；`git diff --numstat` 合计 `added=0 deleted=0 files=0`（开工时 51 个 ` M` 系 CRLF 噪声，现已归零）；core 两容器仍 healthy；5500/5501 `listeners=0`；仓库根无残留临时目录；11 份新交付 sha256 已记入波次记录 §3.2；秘密扫描 0 命中。
-- **未提交**：工作树 14 条 `??` 全部为本波次交付与证据，暂存区为空；等用户确认后再 `git add` 具体路径（禁止 `git add .`）。
-- 波次记录：`docs/poc/evidence/wave-w2-record.md` §3/§3.1/§3.2/§3.3 已填；下一前沿 **W3 = T05/T07/T10/T15/T19**，未启动。
+- **已提交并推送（用户「提交 3 笔」+「推送 W2」）**：`94defe2`（T03）、`d36629a`（T04）、`9b88cc7`（docs）、`f86765e`（style，EOF 空行）→ `origin/feature/w2-t03-t04` 顶点 **`f86765e`**；**未合并 `dev`**。
+- 波次记录：`docs/poc/evidence/wave-w2-record.md` §4 已回填真实 SHA 与推送结果；**W3 已启动**（见下节）。
 
 ## 本轮：W3 波次执行（2026-10-27，分支 `feature/w3-t05-t07-t10-t15-t19`）
 
@@ -181,8 +182,8 @@
 - **P0-T19 PASS（限域）**：`model_gateway.py`（926 行）+ `tool_registry.py`（734 行）+ `test_gateway_registry.py`（992 行，98 例）。`ProviderConfig` 全显式；退避 `min(base*2**i, cap)` 且 `Retry-After` 封顶；`redact_secrets`/`Secret.__repr__` 防泄漏；`compute_intent_key` 按 C-04 八字段并 `verify()`；`assert_executable` 保留审批门。**NOT_RUN**：真实厂商 API、`stream()`（实现为同步 `call()`，T21 前须先定 port）。
 - 门禁（`%TEMP%\w3_gate.log` / `w3_gate2.log` / `w3_close.log` / `envclean.log`，20:05–20:12）：全量 ruff 首跑 1 个 `I001`（`outbox_probe.py:62`）→ `--fix` 后 `All checks passed!`；**逐文件 pytest 合计 365 passed / 0 failed**（environment 12、control_site 49、faults 25、scope 16、checkpoint_owner 11、outbox 20、docreader_wire 17、browser_contracts 117、gateway 98）；5500/5501/5600 `listeners=0`；`git diff --numstat` = `added=0 deleted=0 files=0`（无 tracked 改动，18 条 `??`）；秘密扫描 0 命中；12 份交付 sha256 见波次记录 §3.4。
 - **已知缺口（20:29 已解除两条，用户当轮授权测试依赖准入）**：① 全量单进程 pytest 原判 NOT_RUN（20:05 无输出、CPU 冻结）→ **已定位并复跑通过**：根因是 `--with` overlay 与模块级 side effect 交互，依赖进 venv 后 `tests=365 failures=0 errors=0 skipped=0 time=128.327`（junit，`experiments/phase0/.pytest_cache/junit.xml`，20:29）；② 测试依赖已准入 `experiments/phase0/pyproject.toml` dev 组：`grpcio>=1.85.0`、`grpcio-tools>=1.85.0`、`langgraph-checkpoint-postgres>=3.2.0`、`pytest-timeout>=2.4.0`（+4 行，`uv.lock` 同步重锁），`test_environment.py` 12 例在新 venv 下仍全绿；③ 仍开放：`--with` 不得用于跑全套（纪律写入 `wave-w3-record.md` §1.2），`p0_t07` 迁移前缀偏离待裁，T05 只能单活 runner。
-- **未提交**：暂存区为空，等用户确认后再按精确路径 `git add`（禁止 `git add .`）。
-- 波次记录：`docs/poc/evidence/wave-w3-record.md` §2/§3.1–§3.5/§4 已填；下一前沿 **W4 = T06/T08/T11/T16/T20/T22**，未启动。
+- **已提交并推送（用户「提交 W3 两笔」+「推送并开启 W4」）**：`ed669af`（feat W3，24 文件 / +14336）、`32f0035`（docs: W3 门禁 + 全量复跑）→ `origin/feature/w3-t05-t07-t10-t15-t19` 顶点 **`32f0035`**；**未合并 `dev`**。
+- 波次记录：`docs/poc/evidence/wave-w3-record.md` §4 已回填真实 SHA 与推送结果；**W4 已启动**（见下节）。
 
 ## 本轮：W4 波次执行（2026-10-27，分支 `feature/w4-t06-t08-t11-t16-t20-t22`）
 
@@ -214,5 +215,6 @@
   - 附带修复：`test_docreader_wire.py` 的证据写入改到 `.pytest_cache/`，不再回写 tracked 的 `docreader_probe/wire_evidence.json`。
 - **缺口修复后复跑**：ruff `All checks passed!`；**738 passed / 0 failed / 0 skipped in 262.78 s**（junit `tests=738`）。
 - 本轮新增代码/测试/迁移约 **8 000+ 行**；关键交付 sha256 记入波次记录 §3.3 与 §3.6。
-- **未提交**：暂存区为空，等用户确认后按精确路径 `git add`（禁止 `git add .`）。
-- 下一前沿：**W6 = T13/T18/T24**（T13 原子发布是解析线收敛点；T18 依赖 T17 真设备 → 预计 BLOCKED），未启动。
+- **已提交并推送（用户「先修缺口再提交」→ 22:56 提交）**：`f0cf3e1`（feat W5 + 缺口修复）、`8cfd3bc`（docs: W5 门禁/缺口/pgvector 探针）→ `origin/feature/w5-t12-t17-t21-t23` 顶点 **`8cfd3bc`**；**未合并 `dev`**。
+- **波次状态回填（2026-10-28）**：W1–W5 的 `wave-*-record.md` §4 与本节各波次小节的「未提交/待询问」旧说法已统一回填真实 SHA 与推送结果；W1 的 §3 门禁复选框补勾。
+- 下一前沿：**W6 = T13/T18/T24**（T13 原子发布是解析线收敛点；T18 依赖 T17 真设备 → 预计 BLOCKED，实际 N=2），未启动。

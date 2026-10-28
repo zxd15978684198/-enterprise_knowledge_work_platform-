@@ -151,10 +151,12 @@ ad4a1b089fc504e9e86192971c1a1a034ed9e0cdc2c303e8c43b02539f3066c4  experiments/ph
 | `docreader_probe/wire_evidence.json` 被测试回写 | `tests/phase0/test_docreader_wire.py` 的证据写入改到 **`.pytest_cache/wire_evidence.json`**（gitignored），仓库内那份作为静态快照 | `test_docreader_wire.py + test_parser_golden.py` **87 passed**；跑完后 `docreader_probe/` 不再新增改动 | 仓库快照的 `duration_s`/时间戳与最新一次运行不同，随本次提交刷新一次（只差 24 行计时字段） |
 | 无 `pgvector` 扩展 | 独立探针：`docker pull pgvector/pgvector:pg17` → **digest `sha256:ac08538c6f8b9904c33c8224c5e5706dbe760aca29db1d096972b4052c22a75d`**（PG 17.11 + pgvector 0.8.7），一次性容器在 5434 端口验证后已删除；**未动 core compose** | **PASS（带门禁）**：`CREATE EXTENSION vector` OK、`hnsw`/`ivfflat` 均可建并可被 `EXPLAIN` 走 Index Scan、`<->`/`<=>`/`<#>` 距离算子可用、跨维比较报错；5000×128 HNSW 建 1289.7 ms、IVFFlat 115.8 ms、查询 0.94–1.48 ms、top-5 与精确扫描 5/5 一致；**2000 维硬上限**实测（`vector(2001)` 拒、`halfvec` 到 4000、3072 维需 halfvec 表达式索引）；非超级用户 `CREATE EXTENSION` 被拒 | core profile 换镜像会作废 T02 的 digest/E1/E2 证据，须单独立项授权；musl→glibc 基底切换需备份演练；该 digest 来自镜像源（`docker.1ms.run`），需在直连环境复核；真实 recall/10 万级容量 `NOT_RUN` |
 
-## 4. 提交决策
+## 4. 提交决策与结果
 
-- 用户答复：**待询问**
-- 拟提交（待确认，仅本地）：
-  1. `feat(phase0): add W5 probes - index staging (T12), harness integration (T21), task scheduler (T23)`
-  2. `docs(phase0): record W5 gate result`
-- 不提交：`.idea/`、`CLAUDE.md`、`docs/plans/README.md`、`docs/teacher/`
+- 用户答复（2026-10-27 22:20 ask_user_question）：**「先修缺口再提交」** → 三处缺口修完后于 22:56 提交。
+- 实际提交（2 笔，提交后推送）：
+  1. `f0cf3e1` `feat(phase0): add W5 probes - index staging (T12), harness integration (T21), task scheduler (T23) + gap fixes`
+  2. `8cfd3bc` `docs(phase0): record W5 gate, gap fixes and pgvector probe`
+- 推送结果：`git push -u origin feature/w5-t12-t17-t21-t23` → 远端顶点 **`8cfd3bc`**；**未合并 `dev`**。
+- 未提交：`.idea/`、`CLAUDE.md`、`docs/plans/README.md`、`docs/teacher/`（开工前既有未跟踪）。
+- 提交后补记（2026-10-28）：W1–W4 的 `wave-*-record.md` §4 与本文档旧版先前停留在「待询问」，已在 `docs(phase0): backfill wave commit outcomes` 中统一回填真实 SHA 与推送状态。
