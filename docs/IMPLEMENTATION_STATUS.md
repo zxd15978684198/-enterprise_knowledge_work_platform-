@@ -1,6 +1,6 @@
 # PyKnora 实施状态
 
-更新日期：2026-10-28（Asia/Shanghai）。当前为 **Phase 0 实验阶段**：W1–W5 五个波次已执行完成并全部合入 `dev`；21 个任务已产出实验代码与证据（其中 T05/T09 为 PARTIAL）；**T17 已于 2026-10-28 由修复分支 `fix/w5-t17` 解除并转 PASS（限域）**，T18 随之解除原料阻塞但仍未执行；T13/T18/T24/T25–T32 仍为 NOT_STARTED。所有结果仅是实验环境内的验证结论，不代表 ADR 已接受或 Phase 0 工程验证通过。
+更新日期：2026-10-28（Asia/Shanghai）。当前为 **Phase 0 实验阶段**：W1–W6 六个波次已执行完成并全部合入 `dev`；**W7R 补口波次同日完成（未提交，待授权）**——P0-T05 由 PARTIAL 转 **PASS（限域：单活）**（新增 ADR-0006 提议），P0-T09 由 PARTIAL 转 **PASS（限域）**（镜像 digest 与 OCR 权重闭合，pip 11 项 / apt 227 项许可仍 unknown 且已逐项列阻断）；**T17 已于 2026-10-28 由修复分支 `fix/w5-t17` 解除并转 PASS（限域）**；T13/T24 为 PASS（限域），T18、T25–T32 仍 NOT_STARTED。九项 PoC 无整体 PASS，五份 ADR 仍为 Proposed，所有结果仅是实验环境内的验证结论，不代表 ADR 已接受或 Phase 0 工程验证通过。
 
 ## 阶段收口：W1–W5 全部合入 dev（2026-10-28）
 
@@ -247,3 +247,42 @@
 - 判定：**P0-T17 PASS（限域）**。限域与 NOT_RUN 清单见证据 §6：动作覆盖 13/31、交互类动作仅单测、
   `owner`/撤销属 T18、网络策略属 T16、多浏览器/跨平台未测。
 - 未改动：`dev` 与 W6/W7 分支及其未跟踪产物未触碰；未执行 `git add .`。
+
+## 本轮：W7R 补口波次（P0-T05R / P0-T09R，2026-10-28）
+
+- 波次记录：`docs/poc/evidence/wave-w7r-record.md`；执行计划 `docs/plans/2026-10-28-P0-T05-T09-convergence.md`；N=2 并行、写权不相交；W7（T25/T27/T30）已声明未启动，未被占用。
+- 原则（用户 2026-10-28 要求）：**原文零改动**——`poc/00–07`、`evidence/` 既有文件、`tdd/`、`adr/0001–0005` 未改一字，修订一律旁挂。
+
+### P0-T05R（单活正式化 + 进程级证据）→ PASS（限域：单活）
+
+- 缺口：`poc01-owner.md` §6.1-E 只有连接级证据、缺进程级存活；接管判据用 `pg_locks` 快照会被 `pg_terminate_backend` 异步性误导。
+- 补口（纯追加，`git diff --numstat` = **+383/−0**）：
+  - `tests/phase0/test_checkpoint_owner.py` 新增 `test_process_alive_after_lock_loss_still_writes_natively`：子进程持 distributor + 原生 `PostgresSaver`，主进程 `pg_terminate_backend` 杀掉锁连接，经 IPC 触发子进程写一次。
+  - 实跑 `uv run --project experiments/phase0 pytest -c experiments/phase0/pyproject.toml tests/phase0/test_checkpoint_owner.py -q` → **12 passed，exit 0**。
+  - 证据 `docs/poc/evidence/poc01_owner_process_level.json`：子进程 PID 33180 存活、锁 backend pid 47430 已释放、原生 `put` 返回 `accepted=true`（负面证据）；替身路径同场景 `STALE_OWNER_EPOCH` 拒绝。
+- 判定：**P0-T05 PASS（限域：单活）**。多 writer 仍 FAIL（原生 saver 无租约/fencing），PoC-01「多实例」强制项仍 PARTIAL；G-P0 限域准入建议保留，G-FULL 不可宣称。
+- 新 ADR：`docs/adr/0006_Single_Active_Checkpoint_Runner.md`（**提议**）——P0 唯一形态单活 runner、禁止自动接管、多实例横扩不在 P0 范围；关联 ADR-0001 但不改其正文，`docs/adr/README.md` 已登记。
+
+### P0-T09R（镜像盘点与许可闭合）→ PASS（限域）
+
+- 镜像：`wechatopenai/weknora-docreader@sha256:9af668ac0ac857b9dfe8430d0fe77c0e5ad2636dc2b5285cd5500a13d5a35266`；`docker pull` 经 `docker.1panel.live` 于 11:08→11:59 完成（有效 ~0.9 MB/s）；本地 `RepoDigests` 与 registry 侧重算逐字一致；label `revision=3e22822c1` = `git rev-list -n1 v0.8.3`；`1ms.run` 401 / `xuanyuan` 403 / `daocloud` 401 已记入证据。
+- 盘点（镜像内）：apt 971 包（744 有 `License:` 字段，227 无）；pip 72 distribution（许可 61 可判定 / 11 unknown）；`*.onnx` 4 个（最大 3,163,737 B 为 magika 内容分类模型，sha256 `fe2d2eb4…`），**OCR 权重 0 个**；Playwright WebKit 273 MB 与 `grpc_health_probe` 11,457,876 B 无许可文本。
+- 关键修正：① `v0.8.3` **不含 RapidOCR**，原文 §4.5「权重 UNKNOWN」实为空集，§6 PDF 行「OCR 依赖 PreprocessImage + RapidOCR」对镜像不成立；② §4.3 的 26 条依赖是 HEAD 口径，`v0.8.3` 只有 22 条；③ `THIRD_PARTY_NOTICES` 的 numpy 2.3.4 / onnxruntime 1.23.2 是 darwin/py≥3.11 分支，镜像实际 **2.2.6 / 1.20.1**。
+- 可复现性：镜像内 `/app/uv.lock` sha256 `57861b67…` 与 `git show v0.8.3:docreader/uv.lock` 逐字节一致，pyproject 同理。
+- 判定：**P0-T09 PASS（限域）**——四类 UNKNOWN 中 digest 与 OCR 权重闭合、pip/apt 许可部分闭合；11 项 pip + 227 项 apt + WebKit/`grpc_health_probe`/magika 训练数据/基础镜像 digest 仍 unknown，已逐项写阻断与替代。**不满足「无未知许可进入发布候选」**，故仍属限域通过。
+- 新增差异 D-13~D-22，其中 **D-22**：compose 仍写 `${WEKNORA_VERSION:-latest}` 而非固定 digest，属仓内配置缺口（T10 前须 pin）。
+- 对后续输入：T10 可直接引用 digest；**T11 不要按 `v0.8.3` 设计 OCR 用例**，若 OCR 为验收项须先换 tag/自建镜像，否则记 `BLOCKED(镜像能力缺口)`。
+
+### 门禁实跑（2026-10-28）
+
+- `git status` / `git diff --numstat`：仅 T05R 测试文件 +383/−0；其余为新增 9 项 + `docs/adr/README.md`、本文件各 1 处修订。
+- `uv run --project experiments/phase0 ruff check experiments/phase0 tests/phase0` → **All checks passed!**（exit 0）。
+- 秘密扫描（DSN/口令模式）7 份新文件 **0 命中**；6 份新证据 sha256 逐一复算一致（inventory `3c0d993a…`、sbom `5c37e79b…`、amendment `8afa909d…`、ps1 `574c7909…`；T05 三份由 teammate 记录）。
+- 全量 `pytest tests/phase0` 仍会无输出挂起（W3 起已知），本轮未重跑；主集合沿用 W6 的 778 passed，只跑受影响单文件（12 passed）。
+
+### 未决与剩余风险
+
+- W7R 产物**未提交**（波次内禁 git）；待用户授权后按 `fix:W7R-T05R-…` / `fix:W7R-T09R-…` 各自分支提交。
+- 多实例横扩仍 FAIL/PARTIAL：仅当明确要求多实例时才做 `poc01b`（持锁代理 + lease/fencing），成本约 1.5 点。
+- 许可 unknown 项不阻塞 T05/T09 的限域判定，但阻塞「发布候选」门槛；要转全量 PASS 需 PyPI 许可元数据或上游声明，本机直连 PyPI 不通。
+- 本轮未跑 W7（T25/T27/T30）；状态文件抬头已修正为「W1–W6 合入 dev、W7R 完成待提交」。
