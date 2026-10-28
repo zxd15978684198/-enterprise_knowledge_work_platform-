@@ -1,6 +1,18 @@
 # PyKnora 实施状态
 
-更新日期：2026-10-27（Asia/Shanghai）。当前为 **Phase 0 / P0-T01 契约闭合文档已完成，其余31任务及全部九项 PoC 为 NOT_STARTED**。本轮只分析/评审/规划与静态文档检查，不实现代码、不安装或修改依赖、不启动容器/PoC、不改参考源码，不代表 ADR 已接受或 Phase 0 工程验证完成。
+更新日期：2026-10-28（Asia/Shanghai）。当前为 **Phase 0 实验阶段**：W1–W5 五个波次已执行完成并全部合入 `dev`；21 个任务已产出实验代码与证据（其中 T05/T09 为 PARTIAL、T17 为 BLOCKED），**T13、T18、T24、T25–T32 共 10 项仍为 NOT_STARTED**。所有结果仅是实验环境内的验证结论，不代表 ADR 已接受或 Phase 0 工程验证通过。
+
+## 阶段收口：W1–W5 全部合入 dev（2026-10-28）
+
+- `dev` 由 `6ff7b72` 推进到 **`d9eb02c`**，已推送 `origin/dev`（`6ff7b72..d9eb02c`）。
+- 采用逐波次 `--no-ff` 合并（用户选 B），四个合并提交保留波次边界、可单独回滚：
+  - `94e8a62` Merge `feature/w2-t03-t04`（W2：T03 PASS、T04 PASS 限域）
+  - `9b4c9ff` Merge `feature/w3-t05-t07-t10-t15-t19`（W3：T05 PARTIAL、T07/T10/T15/T19 PASS 限域）
+  - `10c1f5b` Merge `feature/w4-t06-t08-t11-t16-t20-t22`（W4：六项均 PASS 限域）
+  - `d9eb02c` Merge `feature/w5-t12-t17-t21-t23`（W5：T12/T21/T23 PASS 限域，T17 BLOCKED）
+- 合并前已验证 `git diff --stat dev fb4d64e` 为空：`dev` 合并后的**树与 W5 门禁通过的 `fb4d64e` 完全一致**，因此 W5 的 `738 passed / 0 failed / 0 skipped in 262.78s` 结论对 `dev` 直接成立，无需重跑。
+- 未合并入 `dev` 的内容：无（五个波次分支均已并入）。`refs/stash` 内仍留 W4 的 `w4-gate-regenerated-wire-evidence` 暂存记录（`fec4144`），内容已被后续提交覆盖，尚未丢弃。
+- 下一步前沿 **W6 = T13（原子发布）+ T24（Evaluator/重规划）**，`N=2`（T18 依赖 T17 真设备/真协议，T17 为 BLOCKED，故不派）。
 
 ## 本轮：Claude Code 指引与计划目录（2026-10-27）
 
