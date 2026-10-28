@@ -229,4 +229,14 @@
 - 本轮新增代码/测试/迁移约 **8 000+ 行**；关键交付 sha256 记入波次记录 §3.3 与 §3.6。
 - **已提交并推送（用户「先修缺口再提交」→ 22:56 提交）**：`f0cf3e1`（feat W5 + 缺口修复）、`8cfd3bc`（docs: W5 门禁/缺口/pgvector 探针）→ `origin/feature/w5-t12-t17-t21-t23` 顶点 **`8cfd3bc`**；**未合并 `dev`**。
 - **波次状态回填（2026-10-28）**：W1–W5 的 `wave-*-record.md` §4 与本节各波次小节的「未提交/待询问」旧说法已统一回填真实 SHA 与推送结果；W1 的 §3 门禁复选框补勾。
-- 下一前沿：**W6 = T13/T18/T24**（T13 原子发布是解析线收敛点；T18 依赖 T17 真设备 → 预计 BLOCKED，实际 N=2），未启动。
+- 下一前沿：**W7 = T25/T27/T30**（T25 依赖 T13+T19 已就绪；T27 依赖 T11/T16/T24/T03 已就绪；T30 依赖 T05(PARTIAL)/T08/T13/T21，只能做不依赖多实例假设的限域实验）；W6 已收口，T18 仍 BLOCKED。
+
+## 本轮：W6 波次执行（P0-T13 / P0-T24）
+
+- 分支 `feature/w6-t13-t24`，基线 **`dev@cc4a475`**（W1–W5 全部合入 dev 后的首个波次）；声明见 `docs/poc/evidence/wave-w6-record.md`：`N=2`，**T18 移出并行集**（依赖 T17 真设备/真协议，T17 BLOCKED）。
+- 迁移编号裁定：`001`–`006` 已占、`007` 留 T27 → **`008` 归 T13**（`008_publication.sql`）；T24 不新建编号迁移，`p0_t24` 内联 DDL。
+- **P0-T13 PASS（限域）**：`experiments/phase0/index_publication.py`（1130 行）+ `db/migrations/008_publication.sql`（271）+ `tests/phase0/test_publication_faults.py`（1062，18 例）+ `docs/poc/evidence/poc03-publication.md`（208）。单事务完成「旧 active→retired / ready→active / documents.active_version CAS」三件事并与发布事实、发布内 Job、审计同提交；锁顺序 `documents FOR UPDATE → 版本行`，与 T12 staging 共用行锁；幂等键 `(workspace, document, idempotency_key)` 唯一，复放不写指针不写 Job；100 轮×100 读 = **10 000 次采样零混版本、零跨空间命中**，每次切换 `row_version` 恰 +1；8 类故障注入后可见版本不变；旧 attempt `STALE_ATTEMPT`、旧版本晚到 `STALE_GENERATION`（沿用 T12 口径）；回滚 5 轮（publications=11、jobs=11）。**NOT_RUN**：删除/取消/重建、对象丢失注入（假对象存储）、真实 MinIO/pgvector/Redis 运行；**PARTIAL**：真实重试器（归 T08/T25）、DoD 对象引用未实现。
+- **P0-T24 PASS（限域）**：`experiments/phase0/evaluator_replanner.py`（1622）+ `tests/phase0/test_replanning.py`（665，22 例）+ `docs/poc/evidence/poc02-replanning.md`（130）。评估只认事实与工具回执（无回执的自述 → `partial` + `RECEIPT_MISSING`）；最多 2 次重规划，第 3 次 `limit_exceeded` + 终态 `failed`；只替换未完成节点、已完成节点按指纹复用且已确认副作用重做 0；环在登记前被 T22 `validate_graph` 拒绝；并发同请求单胜者（`created True→False`）、过期 revision 抛 `REPLAN_REVISION_CONFLICT`；超预算 `blocked` 且 `release_calls==0`。**PARTIAL**：T20 真实 `BudgetLedger` 未接线（`BudgetPort` + `StaticBudget`）；**NOT_RUN**：kill 打断、旧 revision 晚到回放、HTTP 接口层。
+- 门禁实跑（日志 `%TEMP%\w6_gate.log` / `w6_gate_junit.log`，junit `experiments/phase0/.pytest_cache/w6_gate.xml`）：ruff 首跑命中 1 个 `I001`（`index_publication.py:45`，T13 用显式 `--config` 自测与根级扫描口径不同）→ `--fix` 后 `All checks passed!`；修复后 T13 复验 `18 passed`；T24 `22 passed`；**全量 tests=778 / failures=0 / errors=0 / skipped=0 / time=209.289s**；秘密扫描 0 命中；5500/5501/5600/5610 无监听；仓库根无临时目录；core 容器 healthy。
+- 已知契约偏离（写入 `poc03-publication.md` §7，未改 ADR/`poc/00–07`）：schema 落独立 `p0_t13` + 只读 `p0_t12`；跨 schema 无 FK；回滚以新版本行重放（消耗一次 generation）；发布内 Job 仅最小事实；无 DB 级「每文档单 active」唯一约束（靠行锁+状态机+提交前自检）；被拒尝试审计随事务回滚。
+- 状态：**已过门禁，未提交**（等用户裁决）；`dev` 未变动。
