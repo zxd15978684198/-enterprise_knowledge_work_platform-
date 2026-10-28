@@ -15,6 +15,10 @@ dev = [
     "pytest>=9.0.3",
     "pytest-asyncio>=1.0",
     "ruff>=0.9,<0.13",
+    "grpcio>=1.85.0",
+    "grpcio-tools>=1.85.0",
+    "langgraph-checkpoint-postgres>=3.2.0",
+    "pytest-timeout>=2.4.0",
 ]
 
 [tool.uv]
