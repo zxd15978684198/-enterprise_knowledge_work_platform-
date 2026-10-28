@@ -83,7 +83,7 @@ blocked_reason_P0-T17: >-
 | 任务 | 状态 | 负责人 | 备注 |
 | --- | --- | --- | --- |
 | P0-T12 | 已交报告（待门禁） | w3-t07-outbox | `index_staging.py`(1262) + `004_version_index.sql`(452) + 测试(741，16 例)，共 2455 行；**16 passed（11.97s）/ ruff 通过**（已改用 pwsh）；staging 重放 `inserted=0/skipped=3` 行数不增；旧 attempt `STALE_ATTEMPT` 且 DB 触发器兜底 0 行；ready 后 `search_visible_chunks()==[]`、模拟 T13 激活才可见；manifest 缺项 `MANIFEST_INCOMPLETE`（API+DB 双层）；重复 apply `DuplicateSchema`；`p0_t12` 零残留。**新发现**：本机 PG **无 `vector` 扩展**（实测），向量列用 `float8[] + embedding_dim`，pgvector ANN/召回/延迟全部 `NOT_RUN` → **T25 的前置阻断项** |
-| P0-T17 | **BLOCKED** | — | 无 upstream 源码/产物、无真实设备；解除条件见 §1 声明 |
+| P0-T17 | **PASS（限域）** | 2026-10-28 解除，见 §5 与 `poc05-browserskill-live.md` | 原记录为 BLOCKED（无 upstream 源码/产物、无真实设备） |
 | P0-T21 | 已交报告（待门禁） | w3-t05-checkpoint | `harness_graph.py`(948) + `safe_trace.py`(310) + 测试(544，14 例) + 证据 md(174)，共 1976 行；**14 passed（10.83–21.94s）/ ruff 通过**；6 节点图复用 T05/T06/T08/T19/T20 公开 API；checkpoint 删除后 `recover_from_facts()` 得到 `receipts==1` 且节点返回 `replayed`、`applied_calls` 仍 1；取消/超时零副作用；canary 在 trace/State/checkpoint 全空。**T20 冲突已选方案①**：`max_retries=0` + Harness 逐 attempt `reserve_model_call`（`purpose_key=t21:{step}:attempt:{n}`），代价记入证据。**关键缺口**：`langgraph.graph`/`langgraph.types` 未安装 → 只在「节点驱动 + 持久等待事实」层验证，**原生 StateGraph/interrupt 未验**（验收第 5 项记 PARTIAL） |
 | P0-T23 | 已交报告（待门禁） | w1-t02-env | `task_scheduler.py`(1613) + `task_executor.py`(225) + `006_tasks.sql`(230) + 测试(1080，28 例)，共 3148 行；**28 passed（15.23s）/ ruff 通过**（第 40 步起改用 pwsh）；未满足依赖执行 0、required 失败递归 blocked、optional 不阻断；双 scheduler 30 轮×2 线程×4 节点 120 条 claim 无重复；旧 epoch 完成/引用均 `STALE_*` 拒绝；事实先落库、checkpoint 失败只留 `state_ref_pending` 且重入不重跑；真实 T08 Job port 集成通过；迁移重复 apply `MIGRATION_ALREADY_APPLIED`；静态守卫证明无跨域写。限域：单活前提、checkpoint 用端口替身、对账为拉取式、30 轮非 100 轮 |
 
@@ -140,7 +140,7 @@ ad4a1b089fc504e9e86192971c1a1a034ed9e0cdc2c303e8c43b02539f3066c4  experiments/ph
 | P0-T12 | **PASS（限域）** | staging 不可见、attempt/generation fencing、manifest 缺项双层拒绝、空库重建全过 | 对象存储 `NOT_RUN`（`InMemoryObjectStore.backend` 明标 fake）；**pgvector 缺失 → ANN/召回 `NOT_RUN`**（向量用 `float8[]`）；chunk 唯一键不含 `attempt_id`（串行 staging 前提），并行 staging 需契约修订 |
 | P0-T21 | **PASS（限域，缺口已修）** | 6 节点图、checkpoint 删除后 `replayed` 且副作用仍 1、取消/超时零副作用、canary 三处为空、T20 冲突选定方案①（`max_retries=0` + 逐 attempt 预留） | **原生主路径已补**：langgraph 1.2.18 下 `StateGraph` + `interrupt()` + `Command(resume=…)` + 原生 `PostgresSaver` 实测通过（新对象+新连接恢复 exactly-once、框架建表、代码零直写）；仍限域：跨连接≠跨进程、原生取消/超时未接、`interrupt` 的 response_schema/time-travel/prune 未用 |
 | P0-T23 | **PASS（限域）** | ready 判定、依赖传播、双调度 CAS、事实先于引用、真实 T08 Job 集成、迁移约束全过 | 单活前提；checkpoint 用端口替身（真实 saver 故障未注入）；对账拉取式；30 轮非 100 轮；无 `retry_wait`/`dead_letter`（属 T24/后续） |
-| P0-T17 | **BLOCKED** | 无 upstream 源码/产物、无真实设备；解除条件见 §1 | 不冒充真配对 |
+| P0-T17 | **PASS（限域）** | 2026-10-28 修复分支 `fix/w5-t17` 解除；限域项见证据 §6 | 不冒充 31 动作全覆盖 |
 
 ## 3.6 门禁后修缺口（用户 2026-10-27 选择「先修缺口再提交」）
 
@@ -160,3 +160,30 @@ ad4a1b089fc504e9e86192971c1a1a034ed9e0cdc2c303e8c43b02539f3066c4  experiments/ph
 - 推送结果：`git push -u origin feature/w5-t12-t17-t21-t23` → 远端顶点 **`8cfd3bc`**；**未合并 `dev`**。
 - 未提交：`.idea/`、`CLAUDE.md`、`docs/plans/README.md`、`docs/teacher/`（开工前既有未跟踪）。
 - 提交后补记（2026-10-28）：W1–W4 的 `wave-*-record.md` §4 与本文档旧版先前停留在「待询问」，已在 `docs(phase0): backfill wave commit outcomes` 中统一回填真实 SHA 与推送状态。
+
+## 5. 解除记录（2026-10-28，独立修复分支 `fix/w5-t17`，基线 `dev@cc4a475`）
+
+用户指示「开启一个修复分支，命名为 `fix:{波次名-任务名列表}`，不用移到 W7，完成修复并收敛提交这个分支然后更新任务状态」。
+`:` 在 git ref 中非法（`git check-ref-format --branch` 实测拒绝），沿用既有约定改为 `/` → `fix/w5-t17`。
+
+三条阻塞的解除方式与真实取证：
+
+1. **上游源码**：`github.com:443` 仍间歇不可达；经 `ghfast.top` 镜像 `git fetch --depth 1` 取得
+   `Tencent/BrowserSkill@da6bf4eed2dd7256567e152df8c903c87f6598c3`（release/0.3.1，907 tracked files，`LICENSE` = MIT）。
+2. **构建**：`cargo build --locked --release -p bsk`（rustc 1.99.1，13m13s）→ `bsk.exe` **15,925,760 B**，
+   `sha256=DE16E23C30FACD36AF7FC54244DC6E9EFFC69253F13CCB5A3F23C80842412C64`；
+   `pnpm ext:build:zip` → 扩展 zip **860,920 B**，`sha256=050211FDE1827E332F23DBA54F0BDF970C2C1ED0D1AD6E4939CCE394716839DB`。
+   官方 `scripts/build_browserskill.sh` 平台白名单确实无 windows 目标、daemon 亦硬编码 `/tmp`，
+   但 BrowserSkill 的 Rust 工程本身支持 Windows（命名管道实现 + `tests/windows_parent_cancel.rs`）。
+3. **真设备/配对**：用户在 Chrome 147 加载未打包扩展（ID `ipodpljpdchoicenpokpiakgdjafjimn`），
+   daemon `0.3.1` / protocol `1.3`，`doctor` 6 项全 ok。真机动作链与截图哈希见
+   `docs/poc/evidence/poc05-browserskill-live.md`。
+
+判定修正：**P0-T17 `BLOCKED` → `PASS（限域）`**（13/31 动作映射；交互类动作仅单测；`owner`/撤销属 T18；网络策略属 T16）。
+
+新增约束（写入后续任务前提）：
+
+- uv 托管 CPython **3.12.13** 无法与 daemon 的 Windows 命名管道通信（`PermissionError 13`；其派生的 `bsk.exe` 亦
+  `connect IPC named pipe ... 拒绝访问 (os error 5)`），真机取证必须用系统 CPython 3.13。
+- session 由 daemon 持有、跨进程可见，但会被 `--daemon-idle` 或用户关闭 Agent Window 回收
+  → 驱动脚本必须一次跑完整条动作链（`browserskill_probe/live_run.py` 即此形态）。

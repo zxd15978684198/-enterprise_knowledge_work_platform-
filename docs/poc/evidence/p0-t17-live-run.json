@@ -1,0 +1,241 @@
+{
+  "task": "P0-T17",
+  "collected_at": "2026-10-28T11:44:41+0800",
+  "python": "3.13.3",
+  "python_executable": "C:\\Python313\\python.exe",
+  "bsk_binary": "D:\\PyKnora\\bsk\\bsk.exe",
+  "steps": {
+    "doctor": [
+      {
+        "name": "bsk home writable",
+        "ok": true,
+        "status": "ok",
+        "detail": "C:\\Users\\Administrator\\.bsk",
+        "hint": null
+      },
+      {
+        "name": "agent skill up to date",
+        "ok": true,
+        "status": "na",
+        "detail": "no agent skill installed",
+        "hint": null
+      },
+      {
+        "name": "daemon running",
+        "ok": true,
+        "status": "ok",
+        "detail": "pid 1768 at ws://127.0.0.1:52800 (sock \\\\.\\pipe\\bsk-daemon-e974436b93237db7)",
+        "hint": null
+      },
+      {
+        "name": "daemon local process identity",
+        "ok": true,
+        "status": "ok",
+        "detail": "IPC peer PID matches daemon identity",
+        "hint": null
+      },
+      {
+        "name": "protocol compatible",
+        "ok": true,
+        "status": "ok",
+        "detail": "daemon protocol 1.3 (app 0.3.1)",
+        "hint": null
+      },
+      {
+        "name": "extension connected",
+        "ok": true,
+        "status": "ok",
+        "detail": "1 browser(s) connected",
+        "hint": null
+      },
+      {
+        "name": "browser protocol compatible",
+        "ok": true,
+        "status": "ok",
+        "detail": "all 1 online browser(s) are compatible with the daemon",
+        "hint": null
+      }
+    ],
+    "browsers": [
+      {
+        "instance_id": "dc8a279d",
+        "browser_name": "chrome",
+        "browser_version": "147.0.0.0",
+        "extension_version": "0.3.1",
+        "label": "",
+        "session_count": 0,
+        "connected_at_ms": 1793158140636,
+        "version_skew": false,
+        "extension_protocol_version": "1.3"
+      }
+    ],
+    "session_start": {
+      "session_id": "ivff"
+    },
+    "tab_create": {
+      "tab_id": 270464479,
+      "window_id": 270464474,
+      "url": "https://example.com"
+    },
+    "tab_list_agent": [
+      {
+        "tab_id": 270464475,
+        "title": "about:blank",
+        "url": "about:blank",
+        "window_id": 270464474,
+        "active": false,
+        "scope": "agent"
+      },
+      {
+        "tab_id": 270464479,
+        "title": "Example Domain",
+        "url": "https://example.com/",
+        "window_id": 270464474,
+        "active": true,
+        "scope": "agent"
+      }
+    ],
+    "snapshot": {
+      "text": "@vom 1\n@view 1507x640\n@layers 1 focus=L1\nL1 page\n  RootWebArea \"Example Domain\"\n    paragraph \"该域名仅用于文档示例，无需获得许可。这并非一项服务，请勿将其用于测试和监控目的。\"\n      StaticText \"该域名仅用于文档示例，无需获得许可。这并非一项服务，请勿将其用于测试和监控目的。\"\n    paragraph \"This domain is for use in documentation examples without needing permission. This is not a service; avoid relying on it for testing and monitoring purposes.\"\n      StaticText \"This domain is for use in documentation examples without needing permission. This is not a service; avoid relying on it for testing and monitoring purposes.\"\n    paragraph \"هذا النطاق مُخصص للاستخدام في أمثلة التوثيق دون الحاجة إلى إذن. هذه ليست خدمة، يُرجى تجنب الاعتماد عليها لأغراض الاختبار والمراقبة.\"\n      StaticText \"هذا النطاق مُخصص للاستخدام في أمثلة التوثيق دون الحاجة إلى إذن. هذه ليست خدمة، يُرجى تجنب الاعتماد عليها لأغراض الاختبار والمراقبة.\"\n    paragraph \"L’usage de ce domaine est réservé à des exemples de documentation, sans autorisation préalable. Il ne s’agit pas d’un service ; son utilisation à des fins de test ou de surveillance est à éviter.\"\n      StaticText \"L’usage de ce domaine est réservé à des exemples de documentation, sans autorisation préalable. Il ne s’agit pas d’un service ; son utilisation à des fins de test ou de surveillance est à éviter.\"\n    paragraph \"Данный домен предназначен для использования в примерах документации без необходимости получения предварительного разрешения. Это не сервис; не рекомендуется его использование для тестирования и мониторинга.\"\n      StaticText \"Данный домен предназначен для использования в примерах документации без необходимости получения предварительного разрешения. Это не сервис; не рекомендуется его использование для тестирования и мониторинга.\"\n    paragraph \"Este dominio está destinado al uso en ejemplos de documentación sin necesidad de permiso. Esto no es un servicio; evitar utilizarlo para realizar pruebas o monitoreos.\"\n      StaticText \"Este dominio está destinado al uso en ejemplos de documentación sin necesidad de permiso. Esto no es un servicio; evitar utilizarlo para realizar pruebas o monitoreos.\"\n    @e1 link \"Learn more\" [→ iana.org]",
+      "ref_count": 1,
+      "tab_id": 270464479,
+      "truncated": false
+    },
+    "evaluate": {
+      "ok": true,
+      "tab_id": 270464479,
+      "value": {
+        "href": "https://example.com/",
+        "title": "Example Domain"
+      }
+    },
+    "screenshot": {
+      "byte_size": 56940,
+      "format": "png",
+      "height": 800,
+      "path": "E:\\project_month\\pyknora\\experiments\\phase0\\.pytest_cache\\p0-t17-live.png",
+      "tab_id": 270464479,
+      "width": 1903
+    },
+    "screenshot_artifact": {
+      "path": "E:\\project_month\\pyknora\\experiments\\phase0\\.pytest_cache\\p0-t17-live.png",
+      "bytes": 56940,
+      "sha256": "BE95C974110DCA9F9E0755A019A1B22C8EB911F8731EBB2EFF7104D8CA599476"
+    },
+    "console": {
+      "tab_id": 270464479,
+      "entries": [
+        {
+          "sequence": 1,
+          "kind": "log",
+          "level": "error",
+          "text": "Failed to load resource: net::ERR_FAILED",
+          "url": "chrome-extension://invalid/",
+          "timestamp": 1793159085700.479,
+          "truncated": false
+        }
+      ],
+      "next_since": 1,
+      "truncated": false
+    },
+    "tab_close": {
+      "tab_id": 270464479
+    },
+    "session_stop": {
+      "failed": [],
+      "return_failures": [],
+      "returned_tab_ids": [],
+      "stopped": [
+        "ivff"
+      ]
+    }
+  },
+  "calls": [
+    {
+      "action": "tab_create",
+      "argv": [
+        "tab",
+        "create",
+        "--session",
+        "ivff",
+        "--url",
+        "https://example.com"
+      ],
+      "session": "ivff",
+      "ok": true,
+      "tab_id": null
+    },
+    {
+      "action": "snapshot",
+      "argv": [
+        "snapshot",
+        "--session",
+        "ivff",
+        "--tab-id",
+        "270464479",
+        "--max-depth",
+        "6"
+      ],
+      "session": "ivff",
+      "ok": true,
+      "tab_id": "270464479"
+    },
+    {
+      "action": "evaluate",
+      "argv": [
+        "evaluate",
+        "({title: document.title, href: location.href})",
+        "--session",
+        "ivff",
+        "--tab-id",
+        "270464479"
+      ],
+      "session": "ivff",
+      "ok": true,
+      "tab_id": "270464479"
+    },
+    {
+      "action": "screenshot",
+      "argv": [
+        "screenshot",
+        "--session",
+        "ivff",
+        "--tab-id",
+        "270464479",
+        "--out",
+        "E:\\project_month\\pyknora\\experiments\\phase0\\.pytest_cache\\p0-t17-live.png"
+      ],
+      "session": "ivff",
+      "ok": true,
+      "tab_id": "270464479"
+    },
+    {
+      "action": "console",
+      "argv": [
+        "console",
+        "--session",
+        "ivff",
+        "--tab-id",
+        "270464479",
+        "--limit",
+        "20"
+      ],
+      "session": "ivff",
+      "ok": true,
+      "tab_id": "270464479"
+    },
+    {
+      "action": "tab_close",
+      "argv": [
+        "tab",
+        "close",
+        "--session",
+        "ivff",
+        "270464479"
+      ],
+      "session": "ivff",
+      "ok": true,
+      "tab_id": "270464479"
+    }
+  ]
+}
