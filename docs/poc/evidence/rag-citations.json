@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-29T04:44:24.616125+00:00",
+  "generated_at": "2026-10-29T05:38:26.852753+00:00",
   "by_kind": {
     "answerable": {
       "cases": 40,
@@ -44,9 +44,9 @@
   "completed_runs": 100,
   "refused_runs": 60,
   "latency_ms": {
-    "p50": 819.646,
-    "p95": 1121.59,
-    "max": 1690.027
+    "p50": 395.478,
+    "p95": 521.634,
+    "max": 611.181
   },
   "cases": [
     {
@@ -62,7 +62,7 @@
         "enough=True top_score=0.032787",
         "citations_valid=1 rejected=0"
       ],
-      "latency_ms": 1111.448
+      "latency_ms": 600.872
     },
     {
       "case_id": "answerable-001",
@@ -77,7 +77,7 @@
         "enough=True top_score=0.032787",
         "citations_valid=1 rejected=0"
       ],
-      "latency_ms": 891.147
+      "latency_ms": 503.05
     },
     {
       "case_id": "answerable-002",
@@ -92,7 +92,7 @@
         "enough=True top_score=0.032787",
         "citations_valid=1 rejected=0"
       ],
-      "latency_ms": 883.45
+      "latency_ms": 391.431
     },
     {
       "case_id": "answerable-003",
@@ -107,7 +107,7 @@
         "enough=True top_score=0.032787",
         "citations_valid=1 rejected=0"
       ],
-      "latency_ms": 886.072
+      "latency_ms": 363.439
     },
     {
       "case_id": "answerable-004",
@@ -122,7 +122,7 @@
         "enough=True top_score=0.032787",
         "citations_valid=1 rejected=0"
       ],
-      "latency_ms": 873.187
+      "latency_ms": 425.342
     },
     {
       "case_id": "answerable-005",
@@ -137,7 +137,7 @@
         "enough=True top_score=0.032787",
         "citations_valid=1 rejected=0"
       ],
-      "latency_ms": 1149.969
+      "latency_ms": 524.965
     },
     {
       "case_id": "answerable-006",
@@ -152,7 +152,7 @@
         "enough=True top_score=0.032787",
         "citations_valid=1 rejected=0"
       ],
-      "latency_ms": 896.385
+      "latency_ms": 511.414
     },
     {
       "case_id": "answerable-007",
@@ -167,7 +167,7 @@
         "enough=True top_score=0.032787",
         "citations_valid=1 rejected=0"
       ],
-      "latency_ms": 1261.174
+      "latency_ms": 488.218
     },
     {
       "case_id": "answerable-008",
@@ -182,7 +182,7 @@
         "enough=True top_score=0.032787",
         "citations_valid=1 rejected=0"
       ],
-      "latency_ms": 1050.185
+      "latency_ms": 426.318
     },
     {
       "case_id": "answerable-009",
@@ -197,7 +197,7 @@
         "enough=True top_score=0.032787",
         "citations_valid=1 rejected=0"
       ],
-      "latency_ms": 1033.417
+      "latency_ms": 456.414
     },
     {
       "case_id": "answerable-010",
@@ -212,7 +212,7 @@
         "enough=True top_score=0.032787",
         "citations_valid=1 rejected=0"
       ],
-      "latency_ms": 1037.938
+      "latency_ms": 611.181
     },
     {
       "case_id": "answerable-011",
@@ -227,7 +227,7 @@
         "enough=True top_score=0.032787",
         "citations_valid=1 rejected=0"
       ],
-      "latency_ms": 890.251
+      "latency_ms": 478.802
     },
     {
       "case_id": "answerable-012",
@@ -242,7 +242,7 @@
         "enough=True top_score=0.032787",
         "citations_valid=1 rejected=0"
       ],
-      "latency_ms": 895.05
+      "latency_ms": 403.565
     },
     {
       "case_id": "answerable-013",
@@ -257,7 +257,7 @@
         "enough=True top_score=0.032787",
         "citations_valid=1 rejected=0"
       ],
-      "latency_ms": 928.278
+      "latency_ms": 479.132
     },
     {
       "case_id": "answerable-014",
@@ -272,7 +272,7 @@
         "enough=True top_score=0.032787",
         "citations_valid=1 rejected=0"
       ],
-      "latency_ms": 1032.899
+      "latency_ms": 345.327
     },
     {
       "case_id": "answerable-015",
@@ -287,7 +287,7 @@
         "enough=True top_score=0.032787",
         "citations_valid=1 rejected=0"
       ],
-      "latency_ms": 1114.13
+      "latency_ms": 455.088
     },
     {
       "case_id": "answerable-016",
@@ -302,7 +302,7 @@
         "enough=True top_score=0.032787",
         "citations_valid=1 rejected=0"
       ],
-      "latency_ms": 919.744
+      "latency_ms": 432.237
     },
     {
       "case_id": "answerable-017",
@@ -317,7 +317,7 @@
         "enough=True top_score=0.032787",
         "citations_valid=1 rejected=0"
       ],
-      "latency_ms": 875.049
+      "latency_ms": 420.204
     },
     {
       "case_id": "answerable-018",
@@ -332,7 +332,7 @@
         "enough=True top_score=0.032787",
         "citations_valid=1 rejected=0"
       ],
-      "latency_ms": 948.3
+      "latency_ms": 473.603
     },
     {
       "case_id": "answerable-019",
@@ -347,7 +347,7 @@
         "enough=True top_score=0.032787",
         "citations_valid=1 rejected=0"
       ],
-      "latency_ms": 957.435
+      "latency_ms": 456.673
     }
   ]
 }

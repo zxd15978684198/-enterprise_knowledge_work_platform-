@@ -86,7 +86,7 @@
 | ruff 全仓（`experiments tests docs` + phase0 配置） | **76 条既有告警，非本波引入** | 逐文件核对：分布在 `test_task_coordination.py`(9)、`test_bsk_recovery.py`(9) 等 W1–W7 旧文件；**T26 三个文件 0 错**。与前几波「只扫本波改动文件」的门禁口径一致，作为既有债务记入 `IMPLEMENTATION_STATUS.md` |
 | T25 ANN 结论 | **不改判** | T25 在 pgvector 修复前跑，ANN 仍为 NOT_RUN；pgvector 0.8.7 现已可用，属**可补做**项（已记入状态文件待办） |
 
-## 4. 提交决策（2026-10-29 13:0x 回填）
+## 4. 提交决策（2026-10-29 12:52 回填）
 
 用户选择：**提交 + 推送 + 开 W9**（不合入 `dev`）。
 

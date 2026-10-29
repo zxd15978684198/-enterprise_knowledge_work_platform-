@@ -115,13 +115,13 @@
       "rolsuper": false
     }
   },
-  "generated_at": "2026-10-29T04:45:51+00:00",
+  "generated_at": "2026-10-29T05:40:32+00:00",
   "git": {
     "available": true,
-    "branch": "feature/w8-t26",
+    "branch": "feature/w9-t28-t29",
     "dirty": true,
-    "dirty_sha256": "0d17d0a74c3e4e615757818e7bfccefca772db932fc6d29de9d72804e8d84763",
-    "head": "9d3252ab3ba31a3701d78a0ebe6f05b7ace0f6ee"
+    "dirty_sha256": "d7ad4d937d72243facc76bd3580dde1f07c231d3ca552b90c601c0421b82665c",
+    "head": "f7b96760cea986ee1d39f84e9a5b5c28dfc2d14c"
   },
   "metrics": {
     "answerable": 88,
@@ -135,45 +135,45 @@
     "modes": {
       "bm25": {
         "answerable": 88,
-        "avg_latency_ms": 38.0581,
+        "avg_latency_ms": 25.866455,
         "hit_rate_at_10": 0.965909,
         "mrr_at_10": 0.698652,
         "ndcg_at_5": 0.701368,
         "no_answer_false_positives": 0,
-        "p50_latency_ms": 28.5487,
+        "p50_latency_ms": 25.25285,
         "recall_at_5": 0.784091,
         "superseded_hits": 0
       },
       "fts": {
         "answerable": 88,
-        "avg_latency_ms": 47.714576,
+        "avg_latency_ms": 32.030269,
         "hit_rate_at_10": 0.920455,
         "mrr_at_10": 0.706417,
         "ndcg_at_5": 0.716138,
         "no_answer_false_positives": 0,
-        "p50_latency_ms": 36.93205,
+        "p50_latency_ms": 30.26455,
         "recall_at_5": 0.795455,
         "superseded_hits": 0
       },
       "rrf": {
         "answerable": 88,
-        "avg_latency_ms": 85.846889,
+        "avg_latency_ms": 63.756689,
         "hit_rate_at_10": 0.965909,
         "mrr_at_10": 0.705907,
         "ndcg_at_5": 0.710315,
         "no_answer_false_positives": 0,
-        "p50_latency_ms": 71.5202,
+        "p50_latency_ms": 57.5903,
         "recall_at_5": 0.795455,
         "superseded_hits": 0
       },
       "vector": {
         "answerable": 88,
-        "avg_latency_ms": 37.713683,
+        "avg_latency_ms": 28.508074,
         "hit_rate_at_10": 0.965909,
         "mrr_at_10": 0.715318,
         "ndcg_at_5": 0.726081,
         "no_answer_false_positives": 0,
-        "p50_latency_ms": 34.411,
+        "p50_latency_ms": 26.80895,
         "recall_at_5": 0.818182,
         "superseded_hits": 0
       }
