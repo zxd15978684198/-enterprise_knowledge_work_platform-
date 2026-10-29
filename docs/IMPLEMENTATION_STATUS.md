@@ -317,5 +317,5 @@
 - **交付**：`experiments/phase0/browserskill_probe/recovery.py`（900 行）、`tests/phase0/test_bsk_recovery.py`（738 行）、`docs/poc/evidence/poc05-recovery.md`（266 行），sha256 见 `fix-w5-t18-record.md` §7。
 - **门禁（Lead 独立复跑）**：单测 `45 用例 / 7 skipped（BSK_LIVE 门控，带 NOT_RUN 理由）`；真机（`BSK_LIVE=1` + CPython 3.13）`44 passed / 1 skipped`；全量 `958 tests / 0 failed / 0 errors / 8 skipped / 458.707s`；`ruff` `All checks passed!`；秘密扫描 0；越界检查仅计划状态刷新 + 本记录 + 两处回归重生成证据。
 - **判定**：**PASS（限域）**——真机 `tab borrow` 需人工确认记 `NOT_RUN`；`LeaseRegistry` 仍是进程内状态（多副本不可用）、网关重启 epoch 归零；`bsk` 自身无 fencing，唯一性由网关单点保证。
-- **提交状态**：feat 交付提交 `cfdc99c`（3 文件 +1904）；本记录 + 计划状态刷新 + 两处回归重生成证据随其后一笔 docs 提交；分支 `fix/w5-t18` 已推送，并以 `--no-ff` 合入 `dev`（合并 SHA 见本节末尾回填）。
+- **提交状态**：feat 交付提交 `cfdc99c`（3 文件 +1904）；本记录 + 计划状态刷新 + 两处回归重生成证据随其后一笔 docs 提交；分支 `fix/w5-t18` 已推送（远端顶点 `fd19151`），并以 `--no-ff` 合入 `dev`（合并提交 `f35443c`，父 `34337c8` + `fd19151`），`origin/dev` 已更新到 `f35443c`。
 - **下一步**：仅剩 **5 项未开始**（T26、T28、T29、T31、T32）。T26 的直接前置（T25/T05/T21）均已 PASS（限域），是下一个可开工项；但本机 PostgreSQL 无 `vector` 扩展（T25 已记 ANN `NOT_RUN`），开工前需先定限域口径。

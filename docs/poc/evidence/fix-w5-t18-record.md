@@ -101,3 +101,17 @@ Start-Process -FilePath 'D:\PyKnora\bsk\bsk.exe' `
 - `bsk` daemon 默认 `--daemon-idle` 会自动退出，CI 需显式拉起；本机需用 CPython ≥ 3.13 才能打开命名管道（uv 托管 3.12 报 `os error 5`）。
 
 **与既有记录的关系**：T18 在 `wave-w6-record.md` 中记为 `⊘ BLOCKED`（当时依赖 T17 真设备/真协议）；T17 于 `fix/w5-t17` 真机跑通后阻塞解除，本分支补齐 T18。W6 的历史记录**不改写**，只在计划 §5 与 `docs/IMPLEMENTATION_STATUS.md` 标注最新状态。
+
+## 8. 提交与合并结果（2026-10-29，真实 git 输出）
+
+| 项 | 值 |
+| --- | --- |
+| feat 提交 | `cfdc99c` `feat(phase0): close T18 - browser session owner/revoke/recovery`（3 文件 +1904） |
+| docs 提交 | `fd19151` `docs(phase0): record T18 gate result and plan status refresh`（5 文件 +168 −59） |
+| 分支推送 | `git push -u origin fix/w5-t18` → `* [new branch] fix/w5-t18 -> fix/w5-t18`，exit 0；`refs/heads/fix/w5-t18 = fd191511c4da9c7c8054f49ba7e855ee2c7d2c1c` |
+| 合入 dev | `git merge --no-ff fix/w5-t18` → `Merge made by the 'ort' strategy`，合并提交 `f35443c`（父提交 `34337c8` + `fd19151`），8 文件 +2072 −59 |
+| dev 推送 | `git push origin dev` → `34337c8..f35443c  dev -> dev`，exit 0 |
+| 合并后 dev | `f35443ccfa7c1de5a567b5397dc96eb23106be8a`（`refs/heads/dev` 实测一致） |
+| 未合入项 | `feature/*` 与 `fix/w5-t17`、`fix/w7r-t05-t09` 仍保留，未删除、未改写历史 |
+
+**证据文件说明**：`poc01_owner_process_level.json`、`retrieval-baseline.json` 为回归跑动时由用例重生成（时间戳/PID/`branch`/`head` 元数据变化），随 `fd19151` 一并刷新，断言语义未变。
