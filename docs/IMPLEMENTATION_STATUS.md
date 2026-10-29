@@ -1,6 +1,6 @@
 # PyKnora 实施状态
 
-更新日期：2026-10-28（Asia/Shanghai）。当前为 **Phase 0 实验阶段**：W1–W7 七个波次已执行完成，并连同两条修复分支（`fix/w5-t17`、`fix/w7r-t05-t09`）按序合入 `dev`。判定现状：P0-T05、P0-T09、P0-T13、P0-T17、P0-T24、P0-T25、P0-T27、P0-T30 为 **PASS（限域）**；P0-T18、P0-T26、P0-T28、P0-T29、P0-T31、P0-T32 仍 NOT_STARTED。九项 PoC 无整体 PASS；六份 ADR 仍为 Proposed（`0006` 已登记为提议）；所有结果仅是实验环境内的验证结论，不代表 ADR 已接受或 Phase 0 工程验证通过。
+更新日期：2026-10-29（Asia/Shanghai）。当前为 **Phase 0 实验阶段**：W1–W9 九个波次已执行完成，并连同四条修复分支（`fix/w5-t17`、`fix/w5-t18`、`fix/w7r-t05-t09`、`fix/w1-t02-pgvector`）按序合入 `dev`（顶点 `ae0a5ae`）。判定现状：P0-T01–P0-T30 共 30 项中 28 项任务级成立（绝大多数为 **PASS（限域）**，T01 为文档交付、T17/T18 经修复分支收口），P0-T31 已完成核心出口评审，**P0-T32 仍 NOT_STARTED**。**G-P0 核心出口不成立：5 门 0 门 PASS（G1–G4 = PARTIAL，G5 = NOT_RUN）**，详见 `docs/poc/evidence/P0_Core_Gate_Review.md`。九项 PoC 无整体 PASS；ADR 仍为 Proposed；所有结果仅是实验环境内的验证结论，不代表 ADR 已接受或 Phase 0 工程验证通过。
 
 ## 阶段收口：W1–W5 全部合入 dev（2026-10-28）
 
@@ -357,5 +357,22 @@
 - **判定**：两项均 **PASS（限域）**。限域与 `NOT_RUN`：T28——真实 chat 模型链路（`ModelPort` 确定性替身）、BSK 真机、旧版本晚到竞态、Redis 故障、预算并发抢占（`PARTIAL`）；T29——真实 IdP 登录（C-07 BLOCKED）、真实 MinIO/S3 签名、真实 DNS 重绑定、pgvector ANN 越权（属 T25）。**不得据此宣称生产安全或真模型链路已验收。**
 - **偏差与纠错（`wave-w9-record.md` §3.2）**：D1 派发分配的 Redis DB16 超出容器 `databases=16`（0–15），T29 改用 DB15 并记录 `RESOURCE_DEVIATION`，后续波次固定 DB≤15；D2 T29 汇报误称「6 项 NOT_RUN」，实为 5 项 NOT_RUN + 1 项资源偏差；D3 T28 声明「Redis DB15 未使用」与 T29 占用声明字面冲突，复核无并发冲突但槽位声明应标 `optional`；D4 T28 的两份证据文件未列入派发写权，判定为声明缺口已补登。
 - **残余风险**：T29 探针基于自建合成模型（镜像 T12/T13/T06/T08/T21/T26 语义，未复用其真实 DB 链路）；`SECURITY DEFINER` 函数 owner 仍是超级用户；T12/T13 真表当前无 RLS（RLS 只在 `p0_t29` 内证明）；T28 的 `succeeded + published=0` 终态口径待评审、`intent_key` 需纳入 candidate 版本号防「审 A 发 B」。
-- **提交状态**：**待用户确认**（分支 `feature/w9-t28-t29` HEAD 仍 `f7b9676`，9 份交付均未 `git add`）。
-- **下一步**：确认提交后可开 W10 = T31（P0 贯通验收），其后 W11 = T32（收口/交付评审）。两波次串行（T32 依赖 T31）。
+- **提交状态**：**已提交、已推送、已合入 `dev`**。`feature/w9-t28-t29`：feat `bdc4b10`（9 份交付 +5893）、docs `0652474`、style `e3fda1d`、回填 `6bcdefd`（顶点）；`git push` 后远端逐位一致；`--no-ff` 合入 `dev` → `ae0a5ae`，`dev` 已推送。
+- **下一步**：W10 = T31 已完成（见下节）；剩余 W11 = T32（全量评审/收口），待用户授权后执行。
+
+## 本轮：W10 波次执行（P0-T31 核心出口评审，2026-10-29）
+
+- **为什么 `N=1`**：T31 是**纯评审与文档**任务，无代码/无新增测试，单独一波即可；且它是 T32 的前置（T32 需引用 T31 结论与门级判定）。分支 `feature/w10-t31` 从 `dev`（`ae0a5ae`）拉出；声明见 `docs/poc/evidence/wave-w10-record.md` §1。
+- **执行方式（两次派发失败后由 Lead 接管）**：`w1-t09-docreader` 静默无产出（15 分钟无文件无消息）；二派 `w2-t04-controlsite` 在 14:49 完成 §1 输入清单后于约 14:55 异常退出（`failed before it finished`），遗留仓库根 `.t31_tmp/` 23 个中间文件。Lead 复用其 §1 与 `t31_digest.txt`，自写 §2–§9 并真跑门禁与注入测试。方法学结论：此类"跨 12 份波次记录的全量对账 + 长文写作"应拆为"脚本化证据提取 → 人工判定 → 文档写作"三段。
+- **交付（2 份新增 + 1 份修改）**：
+  - `docs/poc/evidence/P0_Core_Gate_Review.md`（**425 行，新增**）：§1 输入清单、§2.1 方法、§2.2 六项 PoC 对齐、§2.3 **hash 漂移量化**、§2.4 不一致 D1–D7、§3.1–§3.5 五门判定 + §3.6 逐任务汇总、§4 FAIL/BLOCKED/PARTIAL/缺陷、§5 未执行清单（19 项）、§6 ADR×5 + TDD×4 + 机制缺口 M1–M3、§7 生产前待办、§8 **注入测试**、§9 准入建议。
+  - `docs/poc/evidence/wave-w10-record.md`（88 行，新增，含 §2 派发/§3 门禁/§4 提交决策）。
+  - 本文件。
+- **五门判定**：**G-P0 不成立 —— 0/5 PASS**。G1 任务覆盖 = PARTIAL（28/30 成立，T32 未做）；G2 契约与安全 = PARTIAL（C-07 身份域 BLOCKED、C-10 NOT_RUN）；G3 可恢复性 = PARTIAL（单活、多实例/RPO/RTO NOT_RUN）；G4 可观测与审计 = PARTIAL（Langfuse 未接线、脱敏仅以正则证明）；G5 生产准入 = **NOT_RUN**（无生产环境、`sbom.md` 不存在）。**"任务级限域成立"不能折算为"门级通过"**——这是本次评审最重要的结构性结论。
+- **量化证据**：`hash 对账` 34 份 md → `MATCH=31 / DRIFT=119 / cited_path_missing=0`（证据路径可定位，但 hash 只能作记录时点，不可逐字节复算）；`引用一致性` 16 条路径引用 → `exists=12 / missing=4`，4 条全为已登记缺口 D5；`安全侧` 549 probes / 536 refused / **0 breaches**；`口径 linter` 基线 `violations=2`（`wave-w1-record.md:88`、`wave-w2-record.md:107` 记 PASS 实为限域 → 应下调，登记为 D4）。
+- **门禁（Lead 实跑）**：全量 **1006 passed / 0 failed / 0 errors / 8 skipped in 690.20s**（与 W9 基线一致）；本波次无 `.py` 改动故 ruff 仅查存量——**4 条 `I001` 未清**（`rag_probe.py:18`、`research_flow.py:19`、`research_probe.py:26`、`security_probe.py:26`，均 W8/W9 引入）；秘密扫描 0 命中；注入测试 6 例全部符合预期。
+- **环境漂移（本波次真实发现）**：全量首跑出 15 个 `E`，根因是 core `postgres` 容器 `Exited (255)`（非代码回归）；同时发现陌生容器 `pyknora-pg-p0`（`pgvector/pgvector:pg16`，5434，非本项目 compose 管理）。修复后实测 `PostgreSQL 17.11` / `vector 0.8.7` / schema 基线 `p0_t02_probe,p0_t05,p0_t27` 干净。**环境可复现性未纳入 G-P0**，已作为 §7 生产前待办一条。
+- **副作用与债务**：全量 pytest 会重写 6 份 tracked 证据（时间戳/PID/计数抖动），已 `git stash`（`stash@{0}`）隔离不入提交；证据产物应改写入临时目录，登记为测试侧债务。
+- **判定**：**G-P0 不成立**；任务级 28/30 成立。**不得据此宣称 Phase 0 通过或可进入 Phase 1。**
+- **提交状态**：待用户裁决（见 `wave-w10-record.md` §4）。
+- **下一步**：W11 = T32（全量评审/收口），依赖 T31 结论；此外三件可补做项——清 4 条 `I001` 存量、补跑 T25 ANN 对照（pgvector 已可用）、按 §7 处理 5 条 ADR 建议。
