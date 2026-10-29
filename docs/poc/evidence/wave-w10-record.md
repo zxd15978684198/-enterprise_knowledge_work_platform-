@@ -95,7 +95,10 @@ T31 声明的三项依赖：
 
 ## 4. 提交决策
 
-- **待提交（3 个文件）**：`docs/poc/evidence/P0_Core_Gate_Review.md`（新，425 行）、`docs/poc/evidence/wave-w10-record.md`（本文件）、`docs/IMPLEMENTATION_STATUS.md`（改）。
+- **已提交（用户裁决「提交 + 推送 + 合入 dev」）**：
+  - `44cc5eb` docs(poc)：`P0_Core_Gate_Review.md`（新，424 行）+ 本文件 + `IMPLEMENTATION_STATUS.md`（3 文件 +530/−3）。
+  - `5ca0659` style(T26/T28/T29)：4 个文件只做 import 排序（+12/−8），清掉本轮发现的 4 条 `I001` 存量告警，复检 `All checks passed` exit 0。
 - **不提交**：`.t31_tmp/`（已删）、`tmp*/`（已删）、6 份重生成证据（已 stash）。`docs/plans/README.md` 为既有未跟踪文件，不属本波次写权。
 - **核心结论**：**G-P0 不成立 —— 5 门 0 门 PASS（G1/G2/G3/G4 = PARTIAL，G5 = NOT_RUN）**；任务级 28/30 成立。出口建议见评审文档 §9。
-- **等待用户裁决**：是否提交、是否推送、是否开 W11（P0-T32 全量评审）。
+- **推送状态**：`feature/w10-t31` 已推送（`* [new branch] feature/w10-t31 -> feature/w10-t31`），随后以 `--no-ff` 合入 `dev` 并推送。
+- **下一步**：W11 = P0-T32（全量评审 / 收口），待用户授权后开工；三件可补做项见 `IMPLEMENTATION_STATUS.md` W10 段。
