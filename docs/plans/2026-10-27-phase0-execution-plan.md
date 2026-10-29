@@ -34,8 +34,9 @@
 | 已完成 | W7 | T25、T27、T30 | ✅ 门禁通过（913 passed）、提交、已推送、已合入 `dev`（合并点 `63cee71`） | [wave-w7-record](../poc/evidence/wave-w7-record.md)：三项 PASS(限域) |
 | 已完成（修复分支） | — | T17 / T05·T09 / T18 | ✅ `fix/w5-t17`（T17 真机配对，合并 `7d40c7b`）、`fix/w7r-t05-t09`（T05 单活正式化 / T09 镜像许可，合并 `027c5b5`）、`fix/w5-t18`（T18，合并 `f35443c`）均已合入 `dev` | 证据：[poc05-browserskill-live](../poc/evidence/poc05-browserskill-live.md)（T17）、[wave-w7r-record](../poc/evidence/wave-w7r-record.md)（T05R/T09R）、[fix-w5-t18-record](../poc/evidence/fix-w5-t18-record.md)（T18） |
 | 已完成（修复分支） | — | T02 环境（pgvector） | ✅ 门禁通过（959 tests / 0 failed / 8 skipped）、提交 `c44ce5d`+`7c8a585`、已合入 `dev`（合并 `cc45265`，回填 `9d3252a`） | [fix-w1-t02-pgvector-record](../poc/evidence/fix-w1-t02-pgvector-record.md)：镜像升级 `pgvector/pgvector:pg17`，`vector` 0.8.7 可用 |
-| **门禁通过待提交** | **W8** | **T26**（`N=1`） | 🟡 **21 用例通过 / 全量 980 tests（972 passed·8 skipped·0 failed）/ ruff 干净 / 零越界；等用户确认提交** | [wave-w8-record](../poc/evidence/wave-w8-record.md)：PASS（限域）；真实 chat 模型、真实 MinIO、pgvector ANN、Redis 事件投递等 8 类 `NOT_RUN` 已逐项列明 |
-| 未解锁 | W9–W11 | T28、T29、T31、T32（4 项） | 未解锁 | W9 的 T28/T29 以 T26 `PASS` 且 W8 提交为前提；未满足前不得派发，也不得预先建分支 |
+| 已完成 | W8 | T26（`N=1`） | ✅ 门禁通过（21 用例 / 全量 972 passed·8 skipped·0 failed / ruff 干净 / 零越界）、提交 `cf3b498`+`047a856`+`f7b9676`、已推送（`origin/feature/w8-t26` 顶点 `f7b9676`）；**未合入 `dev`** | [wave-w8-record](../poc/evidence/wave-w8-record.md)：PASS（限域）；真实 chat 模型、真实 MinIO、pgvector ANN、Redis 事件投递等 8 类 `NOT_RUN` 已逐项列明 |
+| **门禁通过待提交** | **W9** | **T28、T29**（`N=2`） | 🟡 **T28 20 用例 / T29 14 用例通过 / 全量 1006 passed·8 skipped·0 failed / ruff 干净 / 零越界 / 资源零残留；等用户确认提交** | [wave-w9-record](../poc/evidence/wave-w9-record.md)：两项均 PASS（限域）；D1 Redis DB16→DB15 偏差等 4 条已记 §3.2 |
+| 未解锁 | W10–W11 | T31、T32（2 项） | 未解锁 | W10 的 T31 以 W9 `PASS` 且 W9 提交为前提；T32 串行依赖 T31；未满足前不得派发，也不得预先建分支 |
 
 规则：**任何时刻只有「执行前沿」或「门禁通过待提交」这一行允许拥有分支与派发记录**；新前沿的开工条件是上一波次通过 §4.5.4 门禁**且**用户确认提交。表中未解锁任务即使看起来「文件不冲突」也不开工——依赖层未满足即不可并行。
 
@@ -124,9 +125,9 @@
 | W5 | T12、T17、T21、T23 | ✅ 已完成、已提交、已合入 `dev` | T12 是解析线与作业线的收敛点；T17 BLOCKED，其余三项 PASS(限域) |
 | W6 | T13、T24、T18 | ✅ 门禁通过、已合入 `dev` | T13 是解析线收敛点；T18 当时因 T17 材料缺失移出并行集（实际 `N=2`），T17 于 `fix/w5-t17` 解除后由 `fix/w5-t18` 单开补齐 |
 | W7 | T25、T27、T30 | ✅ 已完成、已提交、已合入 `dev`（合并 `63cee71`） | T25 检索三路对照（依赖 T13/T19）、T27 来源审阅（依赖 T11/T16/T24/T03）、T30 备份/迁移/回滚（依赖 T05 PARTIAL/T08/T13/T21，限域） |
-| W8 | T26 | **🟡 门禁通过（980 tests）、等用户确认提交** | 单任务波次（融合点）：T13/T19 的检索与 T21 的取消/恢复在此汇合 |
-| W9 | T28、T29 | 未解锁（等 W8 提交） | Research 全链与安全回归两路，写权互斥 |
-| W10 | T31 | 未解锁 | P0 核心门禁 |
+| W8 | T26 | **✅ 已完成、提交 `cf3b498`/`047a856`/`f7b9676`、已推送（未合入 `dev`）** | 单任务波次（融合点）：T13/T19 的检索与 T21 的取消/恢复在此汇合 |
+| W9 | T28、T29 | **🟡 门禁通过（1006 tests）、等用户确认提交** | Research 全链与安全回归两路，写权互斥 |
+| W10 | T31 | 未解锁（等 W9 提交） | P0 核心门禁 |
 | W11 | T32 | 未解锁 | 全量门禁 |
 
 ```mermaid
@@ -138,8 +139,8 @@ flowchart LR
     W4 --> W5["W5 · T12·T17·T21·T23 ✅ 已合入 dev（T17 BLOCKED）"]
     W5 --> W6["W6 · T13·T24 ✅ 已合入 dev；T18 由 fix/w5-t18 补齐"]
     W6 --> W7["W7 · T25·T27·T30 ✅ 已合入 dev"]
-    W7 --> W8["W8 · T26 ✅ 门禁通过待提交"]
-    W8 --> W9["W9 · T28·T29"]
+    W7 --> W8["W8 · T26 ✅ 已提交·已推送（未合入 dev）"]
+    W8 --> W9["W9 · T28·T29 门禁通过待提交"]
     W9 --> W10["W10 · T31"]
     W10 --> W11["W11 · T32"]
 ```
@@ -474,32 +475,32 @@ pwsh → git status、uv run --project experiments/phase0 pytest ...、docker co
 
 ---
 
-## 12. 当前前沿与下一步（2026-10-29 12:50 更新）
+## 12. 当前前沿与下一步（2026-10-29 13:55 更新）
 
 **已完成并合入 `dev`**：W1–W7 七个波次 + `fix/w5-t17`（T17 真机）+ `fix/w7r-t05-t09`（T05/T09 收口）+ `fix/w5-t18`（T18）+ `fix/w1-t02-pgvector`（pgvector 环境），`dev` 顶点 `9d3252a`，与 `origin/dev` 同步。
 
-**门禁通过、待用户确认提交**：W8 = T26（分支 `feature/w8-t26`，HEAD 仍 `9d3252a`）。证据见 [wave-w8-record](../poc/evidence/wave-w8-record.md) 与 [poc09-report](../poc/evidence/poc09-report.md)：
+**已完成并推送、但未合入 `dev`**：W8 = T26，分支 `feature/w8-t26` 顶点 `f7b9676`（feat `cf3b498` + docs `047a856` + 回填 `f7b9676`）。证据见 [wave-w8-record](../poc/evidence/wave-w8-record.md) 与 [poc09-report](../poc/evidence/poc09-report.md)。是否合入 `dev` 需单独授权。
+
+**门禁通过、待用户确认提交**：W9 = T28 + T29（分支 `feature/w9-t28-t29`，HEAD 仍 `f7b9676`）。证据见 [wave-w9-record](../poc/evidence/wave-w9-record.md)、[poc08-report](../poc/evidence/poc08-report.md)、[security-matrix](../poc/evidence/security-matrix.md)：
 
 | 门禁项 | 真实结果 |
 | --- | --- |
-| 任务级 pytest | 21 passed（Lead 独立复跑 157.18s，与子 agent 162.22s 一致） |
-| 全量 pytest | 980 tests / **972 passed** / 8 skipped / 0 failed，691.18s |
-| ruff（本波 3 个 .py） | `All checks passed!` |
-| 秘密扫描 | 0 命中 |
-| 越界写入 / 临时残留 / 端口 | 受跟踪改动 0；T26 仅写声明内 6 个文件；`p0_t26` 已 teardown；5500/5501/5600/5610 均 0 监听 |
-| 判定 | **PASS（限域）**：真实 chat 模型链路、真实 MinIO/S3、pgvector ANN、Redis 事件投递、删除/取消/重建、SSE 断网重连等 8 类 `NOT_RUN`；引用准确率 1.0 只是结构测量，不等于人工验收 |
+| 任务级 pytest | T28 **20 passed**（70.72s）、T29 **14 passed**（4.36s），均与子 agent 自报一致 |
+| 全量 pytest | **1006 passed** / 8 skipped / 0 failed，见 §12.1 |
+| ruff（本波 5 个 .py） | `All checks passed!` |
+| 秘密扫描 | 真实凭据形状 0 命中；T29 的 5 个 canary 为合成哨兵（用于验证脱敏 sink） |
+| 越界写入 / 资源残留 | 受跟踪改动仅 Lead 自修一处时间戳；新增 9 份均在本波写权内；`p0_t28`/`p0_t29` schema 与角色清零；Redis DB15 清空；5500/5501/5600/5610 全 free |
+| 判定 | 两项 **PASS（限域）**：T28 `NOT_RUN` 真实模型链路 / BSK 真机 / 旧版本晚到 / Redis 故障；T29 `NOT_RUN` 真实 IdP / MinIO 签名 / DNS 重绑定 / pgvector ANN；**不得据此宣称生产安全已验收** |
 
-**剩余 4 项（全部未开始）**：
+**剩余 2 项（全部未开始）**：
 
 | 任务 | 波次 | 直接依赖 | 现状 |
 | --- | --- | --- | --- |
-| T28 Research 全链 | W9 | T27、T18、T26、T13、T21 | 依赖已齐（T26 待提交），提交后可开工 |
-| T29 P0 安全回归 | W9 | T06、T08、T13、T21、T26 | 同上；可直接用 `rag-citations.json` 的 100 例做评测基线 |
-| T31 核心门禁评审 | W10 | T26、T29、T30 | 文档任务 |
-| T32 全量门禁评审 | W11 | T28、T18、T24、T31 | 文档任务；BSK/Research 段缺证据则整体不 PASS |
+| T31 核心门禁评审 | W10 | T26、T29、T30 | 文档任务；W9 提交后可开工，可直接复用 T29 的 549 条矩阵作回归门禁 |
+| T32 全量门禁评审 | W11 | T28、T18、T24、T31 | 文档任务；串行依赖 T31；BSK/Research 段缺证据则整体不 PASS |
 
-**下一执行单元（等用户确认 W8 提交后授权）**：W9 = T28 + T29，`N=2`，分支从 `dev` 的 W8 合并点拉出；按 §4.5 规程派发、门禁、询问提交。
+**下一执行单元（等用户确认 W9 提交后授权）**：W10 = T31，`N=1`。**注意**：T32 依赖 T28 证据，而 T28 现处 `feature/w9-t28-t29` 未提交分支，合入 `dev` 或至少可见是 T32 可开工的前提。
 
-**可补做项（不阻塞 W9）**：pgvector 0.8.7 已就绪，T25 的 ANN 对照可补跑并把 `NOT_RUN` 改判；T26 的真实模型链路可在拿到厂商 key 后用同一 100 例复跑。
+**可补做项（不阻塞 W10）**：pgvector 0.8.7 已就绪，T25 的 ANN 对照可补跑并把 `NOT_RUN` 改判；T26 的真实模型链路可在拿到厂商 key 后用同一 100 例复跑；`ruff` 全仓 76 条既有告警待决策是否清理。
 
 **本波次未启动**：不建 W9 分支、不派发子 agent、不写执行声明；等用户明确授权后再按 §4.5 规程启动。
