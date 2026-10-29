@@ -607,4 +607,3 @@
 - 复用本报告探测向量与「安全 = 拒绝」判定约定，构建 P0 回归门禁：跨空间矩阵、撤权窗口、载荷/审批篡改、SSRF 每跳校验、canary 全 sink、业务事实状态授权。
 - 固化两个判定助手：`_expect_denied`（系统抛拒绝 = 安全）与 `_citation_guard`（全量接受 = 越权），避免双向 raise 造成的假 PASS。
 - 生产化前置项：受限 worker 角色（SECURITY DEFINER owner 不得是超级用户）、T12/T13 真表 RLS、真实 IdP/MinIO/模型链路的端到端负例。
-
