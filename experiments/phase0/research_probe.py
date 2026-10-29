@@ -35,11 +35,12 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, Final
 
-import events_probe as ep
 import psycopg
-import scope as scope_module
 from psycopg.pq import TransactionStatus
 from psycopg.rows import dict_row
+
+import events_probe as ep
+import scope as scope_module
 
 SCHEMA: Final = "p0_t28"
 MIGRATION_ID: Final = "t28_research_inline"
