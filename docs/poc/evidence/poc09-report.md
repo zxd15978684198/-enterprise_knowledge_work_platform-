@@ -73,7 +73,7 @@ uv run --project experiments/phase0 python %TEMP%\t26_smoke2.py
 | A16 | 真实 chat 模型链路 | NOT_RUN | 环境无真实模型；替身 `ModelPort` 端口已就绪（`run_rag(model=...)` 可注入） |
 | A17 | 删除/取消/重建/源撤销 | NOT_RUN | T12 无删除/重建 API；assets 归属 D10（只读），本任务不越界 |
 | A18 | Redis DB 14 投递 | NOT_RUN | 本任务事件与终态走 PG 表（C-02 事实源），不经 broker；DB 14 未使用 |
-| A19 | 真实 MinIO / pgvector ANN | 不适用 | 与 T25 一致：T25 的 ANN NOT_RUN 结论不变；本任务检索为 FTS+向量(RRF)，嵌入为假替身 |
+| A19 | 真实 MinIO / pgvector ANN | PASS（限域）/ NOT_RUN | 拆分看：**pgvector ANN 已由 W13 补跑**（`ann-bench.json`：HNSW recall 0.998–1.000、IVFFlat 0.971–1.000，索引名与 `EXPLAIN` 已落盘），故「ANN 不可用」不再是阻塞项；**真实 MinIO** 仍 NOT_RUN；本任务的**语义召回质量**仍 NOT_RUN（检索用 FTS + 假替身向量，非真实 embedding） |
 
 ## 4. 引用准确率实测（100 例，实测非阈值推断）
 
@@ -157,7 +157,7 @@ uv run --project experiments/phase0 python %TEMP%\t26_smoke2.py
 
 1. **未复用 T25 的 `p0_t25` schema**：W8 要求独占 `p0_t26`，而 `retrieval_probe.SCHEMA` 为
    模块常量。做法：在 `p0_t26` 自建最小语料与检索，仅复用 T25 的纯函数（`tokenize`/
-   `embed`/`cosine`）与可见性口径。T25 的三路检索与 ANN NOT_RUN 结论不受影响。
+   `embed`/`cosine`）与可见性口径。T25 的三路检索未受影响；其 ANN 空结论已由 W13 补跑（见 §12）。
 2. **`phase0_publication` 类 Job 事实**：本任务的 Job 只是 `phase0_publication_jobs` 之外的
    最小事实（T26 未新建 Job 表）；发布/执行语义归 T13/T25，本任务只证明「终态不含 Job 伪写」。
 3. **gold 定义**：合成语料的「答案 chunk」由词面最匹配定义（见 §4 限制），不是人工标注。
@@ -167,8 +167,9 @@ uv run --project experiments/phase0 python %TEMP%\t26_smoke2.py
 
 ## 9. NOT_RUN / PARTIAL 汇总
 
-- NOT_RUN：真实 chat 模型；真实 MinIO/S3；pgvector ANN 检索；Redis DB 14 事件投递；
+- NOT_RUN：真实 chat 模型；真实 MinIO/S3；Redis DB 14 事件投递；
   删除/重建/源撤销场景；长时 soak 与并发压测；SSE 网络断开重连（P1）。
+  （原列的「pgvector ANN 检索」已于 W13 补跑并从本清单移除，见 §12。）
 - PARTIAL：引用人工核验（结构化校验已过，语义需真实模型 + 人工 gold）；RLS 跨空间
   （本任务用 SQL 过滤 + `chunk_visibility`，T03 的 RLS 在 `p0_t03` 未复用）；延迟指标
   （探针装置开销非生产值）。
@@ -186,7 +187,8 @@ uv run --project experiments/phase0 python %TEMP%\t26_smoke2.py
    接真实模型后只替换 `ModelPort` 即可复跑。
 4. **T29**：`citation_rejections` 表按 `(reason, run)` 可聚合出「伪引用/越权引用」告警；
    `generation_reset` 事件可作为模型崩溃率来源。
-5. **T25 交接**：本任务未改动 `retrieval_probe.py`；T25 的 ANN NOT_RUN 与 pgvector 结论保持。
+5. **T25 交接**：本任务未改动 `retrieval_probe.py`；ANN 的「索引不可用」阻塞已由 W13 补跑解除
+   （`ann-bench.json`），但**语义召回质量**仍未验证，DG-4 不解除。
    若 T25 后续把 schema 参数化，可把 `p0_t26` 检索切到 T25 三路实现。
 6. **索引/性能**：100 例 p95≈1.5s（装置开销为主）。真实模型接入后建议把 `TokenSink` 改为
    「同连接批量持久 + 心跳」，并保留「提交前不可见草稿」语义。
@@ -202,3 +204,20 @@ uv run --project experiments/phase0 ruff check --config experiments/phase0/pypro
 ```
 
 会话结束时 `p0_t26` schema 已被 DROP（测试 teardown），不污染其他波次槽位。
+
+## 12. 变更记录（W13，2026-10-29 追加）
+
+本报告 §3 的 A19、§8-1、§9、§10-5 已随 W13 更新，原因：ADR-0010 执行把它阻塞的 pgvector ANN 补跑了。
+
+- **新证据**：`docs/poc/evidence/ann-bench.json`（实验代码 `experiments/phase0/ann_bench.py`，
+  回归测试 `tests/phase0/test_ann_bench.py`，5 条断言全过，1.8s）。
+- **实测口径**：2 万行 × 128 维合成聚簇向量（100 个随机单位中心 + 按维度归一的高斯抖动，
+  确定性 seed），100 条查询落在同一批簇内，k=10，recall 对「精确全扫描」逐查询求交并取均值。
+- **结果**：HNSW `ef_search=40/64/128` → recall **0.998 / 0.999 / 1.000**（p50 4.8–13.2ms，
+  server 0.4–0.6ms）；IVFFlat `probes=1/8/32` → **0.971 / 1.000 / 1.000**；
+  精确全扫描 p50≈15ms。索引真的被用上（`index_used` 记录索引名，`EXPLAIN` 一并落盘）。
+- **新增限制（实现必读）**：带 `WHERE workspace_id = ...` 的 post-filter 变体在 50% 过滤率下
+  **只返回 5/10 行**（pgvector 0.8 未开 `hnsw.iterative_scan`），recall 恒 0.5 且调大 `ef_search`
+  无效。检索实现必须用「按工作区分区/子表的前置过滤」或显式开启迭代扫描。
+- **不解除的判定**：本基准只证明索引近似误差与延迟，向量是合成的不是真实 embedding，
+  故本报告的语义召回质量仍为 `NOT_RUN`，DG-4 仍有效。

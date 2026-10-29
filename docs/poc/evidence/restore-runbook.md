@@ -315,3 +315,64 @@ $env:PYTHONUTF8='1'
 3. **禁止对 COPY PROGRAM 后端发 SIGTERM**（§6）；把这条写进 `docs/poc/06` 的故障注入章节，避免后续任务重蹈。
 4. **多实例/RPO/RTO 保持 NOT_RUN**，除非先由 T05 的 ADR-0001 给出单活/多活结论。不要用本 runbook 的数字冒充 SLA。
 5. 迁移「只能前进一次」这一事实应进入升级策略 ADR：T31 需要选「迁移框架」还是「显式 up/down 脚本 + 版本目录」。
+
+## 11. ADR-0010 步骤 1：pg17 + pgvector 镜像下的复跑（2026-10-29）
+
+> 本节因 **ADR-0010**（`docs/adr/0010_Pgvector_Core_Profile.md`）重采：`postgres` 镜像已由 `postgres:17-alpine` 换为
+> `pgvector/pgvector:pg17@sha256:ac08538c…`。§1–§10 记录的是 W7 当时（alpine 镜像）的实测输出，**本节不改写历史**，
+> 只追加换镜后的复跑结果。ADR-0010 要求「备份演练 → 重采 T02 证据 → 补跑 T25 ANN」的固定顺序，本节即第 1 步。
+
+### 11.1 复跑环境（实测）
+
+| 项 | 值 |
+| --- | --- |
+| 镜像 | `pgvector/pgvector:pg17@sha256:ac08538c6f8b9904c33c8224c5e5706dbe760aca29db1d096972b4052c22a75d` |
+| 服务端 | `PostgreSQL 17.11 (Debian 17.11-1.pgdg12+2) on x86_64-pc-linux-gnu` |
+| `vector` 扩展 | `0.8.7` |
+| 数据卷 | `pyknora-phase0_phase0-pgdata`（`created=2026-10-27T08:57:53Z`，**早于换镜** → 原地复用，非新建卷） |
+| 宿主端口 | `127.0.0.1:5433->5432/tcp`（`Up 2 hours (healthy)`） |
+| 既有 `p0_*` schema | `p0_t02_probe`、`p0_t05`、`p0_t27` 三份，21 张表（换镜未丢数据） |
+
+### 11.2 命令（与 §7.2 相同，未改一字）
+
+```powershell
+cd E:\project_month\pyknora\experiments\phase0
+$env:PYTHONUTF8='1'
+.\.venv\Scripts\python.exe -X utf8 -m restore_probe
+```
+
+起跑 `2026-10-29T16:37:55+0800`，退出码 **0**，全程 `16:37:52 → 16:39:22`（≈90 秒，含启动与清理）。
+
+### 11.3 结果（原文提炼）
+
+| 项 | 结果 |
+| --- | --- |
+| `verdict.consistency` | **PASS** |
+| `verdict.rollback` | **PASS** |
+| `verdict.faults` | **PASS** |
+| `verdict.multi_instance` | `NOT_RUN`（不变，理由见 §8.1） |
+| `verdict.rpo_rto` | `NOT_RUN`（不变，理由见 §8.3） |
+| `verdict.object_storage` | `NOT_RUN`（不变，理由见 §8.2） |
+| 逐表摘要比对 | 63 张表 `to_jsonb` 全量摘要，`restore_diff.{missing,extra,row_mismatches,digest_mismatches}` **全为空** |
+| 故障注入 3/3 | `BACKUP_INTERRUPTED`、`RESTORE_INTERRUPTED`（`statement_timeout=250ms`）、`RESTORE_TARGET_OCCUPIED` 均按预期码显式失败 |
+| 清理 | `dropped_databases=[p0_t30_source,p0_t30_restore,p0_t30_rollback,p0_t30_fault]`、`remaining_databases=[postgres,pyknora]`、`workdir_state=removed`、`server_artifacts_purged=true` |
+| 分段耗时 | migrate+seed `12.813s`、backup `4.046s`、restore+verify `14.188s`、upgrade+rollback `14.828s`、faults `37.578s`、cleanup `3.344s` |
+
+### 11.4 新增专项：pgvector 数据与 HNSW 索引的备份/恢复存活（换镜引入的新风险面）
+
+换镜后「向量数据能否随备份恢复」是全新风险，T30 原演练未覆盖（原镜像无 `vector` 类型）。补做专项：
+
+| 步骤 | 实测 |
+| --- | --- |
+| 业务库 `pg_dump -Fc` | `108316` 字节，`pg_dump` exit 0 |
+| 恢复到新库 `pyknora_w13_drill` | `pg_restore` exit 0；schema 三份一致、表数 `21 == 21`、扩展 `plpgsql`+`vector` |
+| 建 `w13_vec(id int, emb vector(3))` + `hnsw (emb vector_cosine_ops)` | 5 行写入、HNSW 索引 `CREATE INDEX` 成功 |
+| 二次 dump（含 vector 表与 HNSW）→ 恢复到 `pyknora_w13_drill2` | `pg_restore` exit 0；`vector\|0.8.7` 存在；行数 `5`；`pg_indexes` 含 `w13_vec_hnsw`（索引定义随备份恢复） |
+| 恢复后近邻查询 | `select id, emb <=> '[1,0,0]' order by … limit 3` → `1\|0.0000`、`4\|0.0061`、`5\|0.8896`（与源库一致） |
+| 清理 | 两个演练库 `DROP DATABASE` 成功、容器内 `/tmp/w13_*.dump` 已删 |
+
+**结论**：`vector` 类型与 HNSW 索引在 `pg_dump`/`pg_restore` 下完整存活；但注意 **`vector` 是按库安装的扩展**，恢复到新库时若目标库未 `CREATE EXTENSION vector`，`pg_restore` 会因 `type "vector" does not exist` 失败——本专项的两次恢复之所以成功，是因为 dump 内含 `CREATE EXTENSION` 语句（业务库与演练库都带）。此条已写入 `environment.md` §14 的接口约定。
+
+### 11.5 本节结论
+
+ADR-0010 的「备份演练」步骤在 pg17 + pgvector 下**复现通过**（`consistency/rollback/faults` 三项 PASS，63 表逐表摘要零差异，3 类故障注入按预期显式失败，清理无残留）。§8 的 7 条残余风险**全部不变**：换镜像没有解锁多实例、RPO/RTO、对象存储三项，也没有改变「迁移只能前进一次」。

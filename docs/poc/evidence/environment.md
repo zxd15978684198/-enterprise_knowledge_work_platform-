@@ -425,6 +425,59 @@ T02 判定由 **PARTIAL → PASS**：DoD 三项（D0 可重建、E1/E2 真连通
 
 **给后续任务的接口约定**：`vector` 扩展是**按库**安装的，新库需自带 `CREATE EXTENSION vector`（本记录只在 `pyknora` 库建过探针并已清理），否则会报 `type "vector" does not exist`。
 
+## 15. ADR-0010 步骤 2：T02 环境证据重采（2026-10-29 16:40–16:42）
+
+> 本节因 **ADR-0010**（`docs/adr/0010_Pgvector_Core_Profile.md`）重采，执行者是 **Lead**（W13），不是原 W1 执行者。
+> §1/§5/§13/§14 的历史输出一律不改写；本节给出「换镜后」的完整重采结果，用于替代 W1 时点的 digest 与版本串。
+> 顺序依据 ADR-0010 第 3 条：备份演练（见 `restore-runbook.md` §11）→ **本节** → 补跑 T25 ANN。
+
+### 15.1 digest 与版本串（新口径，替代 §6/§13.4）
+
+| 项 | W1 时点（历史，勿引用） | 本次重采（2026-10-29） |
+| --- | --- | --- |
+| postgres 镜像 | `postgres:17-alpine@sha256:266d3c25…` | `pgvector/pgvector:pg17@sha256:ac08538c6f8b9904c33c8224c5e5706dbe760aca29db1d096972b4052c22a75d` |
+| redis 镜像 | `redis:7.4-alpine@sha256:6ba19c50…` | `redis:7.4-alpine@sha256:6ba19c50b56777f5c11c58eff8ddb69d0d5f27ba131cffb63f180ccfd43c66af`（未变） |
+| 服务端版本串 | `PostgreSQL 17.11 on x86_64-pc-linux-musl` | `PostgreSQL 17.11 (Debian 17.11-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit` |
+| 扩展清单 | `plpgsql` 1.0 | `plpgsql` 1.0、**`vector` 0.8.7** |
+| 数据卷 | `phase0-pgdata`（W1 创建） | `pyknora-phase0_phase0-pgdata`，`created=2026-10-27T08:57:53Z`（早于换镜 ⇒ **原地复用**） |
+
+`docker image inspect` 与 `compose.yaml` 的 pin **逐位一致**；`compose ps` 显示的 IMAGE 也是 digest 形态（非浮动 tag）。
+
+### 15.2 E1/E2 真连接（重采输出，替代 §13.4 的 alpine 版本）
+
+```text
+E1 version        = PostgreSQL 17.11 (Debian 17.11-1.pgdg12+2)
+E1 server_version = 17.11 (Debian 17.11-1.pgdg12+2)
+E1 extensions     = [('plpgsql', '1.0'), ('vector', '0.8.7')]
+E1 p0_schemas     = ['p0_t02_probe', 'p0_t05', 'p0_t27']
+E1 p0_tables      = 21
+E1 connect_sec    = 0.13
+E1 ddl_dml_rows   = [(1, Decimal('0.0000')), (2, Decimal('1.0000'))]
+E1 vector_probe_s = 0.34
+E1 probe_ok       = True
+
+E2 ping = True / set = True / get = b'ok' / server = 7.4.12 / sec = 0.214 / cleaned = 0
+```
+
+E1 探针不是只 ping：本轮在**临时表**上真建了 `vector(3)` 列 + `hnsw (emb vector_cosine_ops)` 索引并跑 `<=>` 排序（会话结束即消失，不污染 `pyknora` 库）。
+
+### 15.3 门禁与可重建性（重采同批）
+
+| 项 | 命令 | 结果 |
+| --- | --- | --- |
+| D0 环境单测 | `pytest -q tests/phase0/test_environment.py` | **13 passed in 2.76s** |
+| 锁文件冻结 | `uv sync --frozen --project experiments/phase0` | `Checked 58 packages`，exit 0 |
+| ruff | `python -m ruff check experiments/phase0 tests/phase0` | `All checks passed!` |
+| 端口监听 | `Get-NetTCPConnection -State Listen -LocalPort 5433,6380` | 仅 `127.0.0.1:5433`、`127.0.0.1:6380`（无 `0.0.0.0` 暴露） |
+| 容器健康 | `compose --profile core ps` | postgres `Up 2 hours (healthy)`、redis `Up 2 hours (healthy)` |
+
+工具链：`Python 3.12.13`、`psycopg 3.3.6`、`redis 8.1.0`、`sqlalchemy 2.1.6`、`pytest 9.1.1`、`uv 0.12.24`。
+
+### 15.4 与 §14 的关系
+
+§14 是「变更登记」（换镜事实与理由），§15 是「证据重采」（新 digest/版本串/连通性实测）。读者应把 **§15 当作 T02 的当前有效证据**，§1/§5/§13 的 alpine 输出仅作历史留档。§9 的 NOT_RUN（端口占用演练）与 §10 的两条许可待裁 **不因本次重采改变**。
+
 ---
 
-**owner**：w1-t02-env（执行）/ lead（门禁硬化）　Wave W1，T02　**status**：PASS（残余见 §9/§10；镜像与 PG 发行版已于 2026-10-29 升级，见 §14）
+**owner**：w1-t02-env（执行）/ lead（门禁硬化 + W13 按 ADR-0010 重采）
+Wave W1，T02　**status**：PASS（残余见 §9/§10；镜像与 PG 发行版于 2026-10-29 升级，见 §14；**证据已于同日按 ADR-0010 重采，见 §15**）
