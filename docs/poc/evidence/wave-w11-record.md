@@ -67,4 +67,14 @@ verdict_fields: [判定, 理由, 证据, 残余风险, 下一步]
 - **待提交（3 个文件）**：`docs/poc/evidence/Phase0_Full_Gate_Review.md`（新）、`docs/poc/evidence/wave-w11-record.md`（本文件）、`docs/IMPLEMENTATION_STATUS.md`（改）。
 - **不提交**：`.t32_tmp/`（已删）、全量回归重写的 tracked 证据（若被改写则 `git stash` 隔离，同 W10 处理）。
 - **核心结论**：**G-FULL 不成立 —— 九项 PoC 全部 PARTIAL，0 项无保留 PASS**；Phase 0 不得标记完整完成，可提出受限范围准入（见评审文档 §7）。
-- **等待用户裁决**：是否提交、是否推送、是否 `--no-ff` 合入 `dev`。
+- **用户裁决**：选 1 —— 提交 + 推送 + `--no-ff` 合入 `dev`。
+
+### 4.1 落地结果（回填）
+
+| 环节 | 结果 |
+| --- | --- |
+| 提交 | `eb390db`（`docs(poc): T32 全量出口评审与 W11 收口`，3 files changed, 397 insertions(+), 1 deletion(-)）；`git diff --cached --check` exit 0 |
+| 推送分支 | `feature/w11-t32` → `origin`，`[new branch]`，本地/远端同为 `eb390db8b7c0aece711caf6c00eef3ef0af6eb82` |
+| 合入 dev | `git merge --no-ff feature/w11-t32`（ort）→ `50b5cfd`，`merge_exit=0`，无冲突 |
+| 推送 dev | `65a2f89..50b5cfd  dev -> dev`，`pushdev_exit=0`；`git ls-remote` 显示 `dev = 50b5cfda85e39deef41503775214f4c2154681b1`，与本地逐位一致 |
+| 全量回归副作用 | 重写的 6 份 tracked 证据已 `git stash push -m w11-fullsuite-regen-6-evidence`（`stash@{0}`）；`security-probes.json` 复算 sha256 = `84c09916…616f6`，与评审文档 §5.1 引用一致 |
