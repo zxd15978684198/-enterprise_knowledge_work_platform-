@@ -1,6 +1,6 @@
 # PyKnora 实施状态
 
-更新日期：2026-10-29（Asia/Shanghai）。Phase 0 实验阶段**收口完成**：W1–W15 十五个波次全部执行完毕，四条修复分支（`fix/w5-t17`、`fix/w5-t18`、`fix/w7r-t05-t09`、`fix/w1-t02-pgvector`）与 W10 的 ruff 收口提交按序合入 `dev`（`dev` 顶点 `2c00b84`），**W14（机制批 M1/M2/M3）与 W15（D5 缺口补齐）已完成并经 `--no-ff` 合入 `dev`**。P0-T01–P0-T32 三十二项任务级全部执行完毕（绝大多数 **PASS（限域）**；T01 为文档交付，T17/T18 经修复分支收口，PoC-09 为 `PARTIAL`）。**两道出口门仍不成立**：G-P0 = 5 门 0 门 PASS（G1–G4 = `PARTIAL`；G5 的「ANN 不可用」已由 W13 解除，但阈值校准归 ADR-0014 未批，故 G5 仍 `NOT_RUN`）；G-FULL = 九项 PoC **全部 `PARTIAL`、0 项无保留 PASS**。**Phase 0 不得标记为完整完成**，只能按 `05_Phase0_Acceptance.md:81-82` 走受限范围准入的三方评审。本轮新增三条**证据卫生机制**（不提升任何能力，只让结论可复核）：M1 把 `02_Phase0_PoC_Plan.md` 的状态列改为「依据到 `文件:行`」并写明唯一维护人；M2 用 `SHA256SUMS` + `evidence_manifest.json` 外部台账 + `evidence_meta.py` 校验 8 份证据 JSON（不注入、不改写历史）；M3 用 `verdict_lint.py` 4 条规则拦「限域写成通过」并固定 8 条存量基线。W15 补齐 T31 登记的 D5 输入缺口（SBOM/许可、远程扩展连接、证据指纹生命周期），并修复一个**结构性测试缺陷**：探针把证据写回 tracked 路径，导致台账用例在同一次回归里必然失败——改为测试会话重定向到临时目录后，全量回归 **1037 passed / 8 skipped / 576.82s**，且跑完仓库证据目录零改动。ADR 共 14 份（0007–0014），其中 **ADR-0010 已接受**，其余 13 份仍 `Proposed`。所有结论仅为实验环境内验证，不代表可生产。
+更新日期：2026-10-29（Asia/Shanghai）。Phase 0 实验阶段**收口完成**：W1–W15 十五个波次全部执行完毕，四条修复分支（`fix/w5-t17`、`fix/w5-t18`、`fix/w7r-t05-t09`、`fix/w1-t02-pgvector`）与 W10 的 ruff 收口提交按序合入 `dev`（`dev` 顶点 `2c00b84`），**W14（机制批 M1/M2/M3）与 W15（D5 缺口补齐）已完成并经 `--no-ff` 合入 `dev`**；**W16 补建了 PoC-07 聚合验收报告 `docs/poc/evidence/poc07-report.md`**（判定 `PASS（限域）`，残限 D1–D7 原样保留），关闭 `Phase0_Full_Gate_Review.md:31` 登记的最后一个文件级输入缺口，但**门级判定不变**。P0-T01–P0-T32 三十二项任务级全部执行完毕（绝大多数 **PASS（限域）**；T01 为文档交付，T17/T18 经修复分支收口，PoC-09 为 `PARTIAL`）。**两道出口门仍不成立**：G-P0 = 5 门 0 门 PASS（G1–G4 = `PARTIAL`；G5 的「ANN 不可用」已由 W13 解除，但阈值校准归 ADR-0014 未批，故 G5 仍 `NOT_RUN`）；G-FULL = 九项 PoC **全部 `PARTIAL`、0 项无保留 PASS**。**Phase 0 不得标记为完整完成**，只能按 `05_Phase0_Acceptance.md:81-82` 走受限范围准入的三方评审。本轮新增三条**证据卫生机制**（不提升任何能力，只让结论可复核）：M1 把 `02_Phase0_PoC_Plan.md` 的状态列改为「依据到 `文件:行`」并写明唯一维护人；M2 用 `SHA256SUMS` + `evidence_manifest.json` 外部台账 + `evidence_meta.py` 校验 8 份证据 JSON（不注入、不改写历史）；M3 用 `verdict_lint.py` 4 条规则拦「限域写成通过」并固定 8 条存量基线。W15 补齐 T31 登记的 D5 输入缺口（SBOM/许可、远程扩展连接、证据指纹生命周期），并修复一个**结构性测试缺陷**：探针把证据写回 tracked 路径，导致台账用例在同一次回归里必然失败——改为测试会话重定向到临时目录后，全量回归 **1037 passed / 8 skipped / 576.82s**，且跑完仓库证据目录零改动。ADR 共 14 份（0007–0014），其中 **ADR-0010 已接受**，其余 13 份仍 `Proposed`。所有结论仅为实验环境内验证，不代表可生产。
 
 ## 阶段收口：W1–W5 全部合入 dev（2026-10-28）
 
@@ -464,3 +464,22 @@
 - **判定**：**不改变任何门级判定**。三份文档是输入缺口与可维护性说明，不是能力补齐；`poc07-report.md` 仍缺（另有登记）。
 - **提交状态**：**已提交、已推送、已合入 dev**（与 W14 同批，`2c00b84`）。
 - **下一步（推荐顺序）**：① W14+W15 一并提交、推送、`--no-ff` 合入 `dev`；② G5 最后一项 = ADR-0014 阈值校准，需产品侧批准 `DG-3/DG-4`；③ 13 份 ADR 待法务/产品/安全裁决（W12 已立项）；④ `poc07-report.md`、口径债 8 条、规则粒度列语义解析等文档债务批次；⑤ 真实后端批在机制批与准入评审之后。
+
+## 本轮：W16 波次执行（补建 `poc07-report.md`：PoC-07 聚合验收报告，2026-10-29）
+
+- **为什么 `N=1`**：单文件交付，证据来自同一批波次记录与同一组测试，拆并行只产生互相引用的碎片。分支 `feature/w16-poc07-report` 从 `dev@f9a7455` 拉出，声明见 `docs/poc/evidence/wave-w16-record.md` §1（含写权白名单 4 项）。
+- **交付（新增 2 + 修改 2）**：
+  - `docs/poc/evidence/poc07-report.md`（**新增**，9 节）：PoC-07（T22 Planner/DAG、T23 ready 调度、T24 Evaluator/重规划）的条款级对照、残限汇总、证据可复算性核对。
+  - `docs/poc/evidence/wave-w16-record.md`（**新增**）：声明块 + 执行记录 + 门禁 + 提交决策。
+  - `docs/poc/02_Phase0_PoC_Plan.md`（**改**）：PoC-07 行补聚合验收指针与三项残限。
+  - 本文件（**改**）：前沿行 + 本段。
+- **关键实测**：
+  - 定向复跑三任务测试：**`101 passed in 15.16s`**（51+28+22），与三份波次记录逐项相符，说明历史结论仍可在当前 `HEAD` 复现。
+  - 全量回归：**`1037 passed / 8 skipped in 464.25s`**（与 W14/W15 基线一致），跑完证据目录**零 tracked 改动**（W14 的隔离修复生效）。
+  - 判定口径门禁：`verdict_lint.py --check` 首跑 **exit 1**（本记录当时缺 §2/§3/§4，`WAVE_RECORD_SECTIONS`）→ 补齐后 `violations=8 new=0` exit 0。
+- **证据可复算性（本波次主要发现）**：同仓库存在**两种 sha256 口径** —— `git show HEAD:<path>`（blob/LF）与磁盘检出（worktree/CRLF，`core.autocrlf=true` 且无 `.gitattributes`）。实测可解析 163 条记录值：**blob 口径匹配 89、worktree 口径匹配 27、真漂移 47**。即 T31 §2.3 的「119 处漂移」中约七成是**换行口径差异而非内容变更**；hash 不能直接当门禁判据，必须先声明口径（建议统一 blob）。另有「非空行 vs 总行」的行数口径差异（`task_scheduler.py` 1613 vs 1787）同属此列。
+- **残限（随判定一并引用，不因本报告消失）**：D1 单活 runner、D2 checkpoint 端口替身、**D3 竞争实验 30 轮 ≠ 条款 100 轮**、D4 T20 真实 BudgetLedger 未接线（`release_calls == 0`）、D5 真实模型 plan `NOT_RUN`、D6 kill/迟到回放 `NOT_RUN`、D7 对账为拉取式。
+- **判定**：PoC-07 记 **`PASS（限域）`**；**门级不变** —— G-P0 仍 4×PARTIAL + 1×NOT_RUN，G-FULL 仍 9 项全 PARTIAL。可关闭的只有「`poc07-report.md` 文件不存在」这一个输入缺口。
+- **过程偏离（已留痕）**：为量化 hash 口径新建了 `experiments/phase0/w16_hash_audit.py`，**越出声明块写权**（明确写了「不写 `experiments/**`」）→ 跑完即删、无残留，数字保留、复现方法写进报告 §8。教训：声明块写权应覆盖「可能的一次性工具」，否则先用 `python -c` 内联或先改声明。
+- **提交状态**：**待用户裁决**。
+- **下一步（推荐顺序）**：① 本波次提交 + 推送 + `--no-ff` 合入 `dev`；② 补测批：D3（100 轮竞争）+ D4（真实预算台账）；③ 证据 hash 回填批：47 条真漂移 + 统一口径（可写进 `evidence-integrity.md`）；④ `P0-T32`/`Phase0_Full_Gate_Review.md` 的输入缺口表述需同步「poc07 已补建」；⑤ 13 份 ADR 待法务/产品/安全裁决。
