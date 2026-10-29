@@ -119,3 +119,5 @@ hash_without_path    82     # 路径不在同行/上行，未参与判定
 | 判定影响 | **不改变任何门级判定**：G-P0 仍 4×PARTIAL + 1×NOT_RUN；PoC-07 仍 `PASS（限域）`，残限 D1–D7 不因本报告消失 |
 | 关闭项 | `Phase0_Full_Gate_Review.md:31` 登记的 `poc07-report.md` 输入缺口**可关闭**（文件已存在且可复算） |
 | 提交权 | Lead（用户批准后执行） |
+| 实际提交 | `8570d68`（4 文件 +302/−2）→ 推送 `origin/feature/w16-poc07-report` |
+| 合入结果 | `420cb11`（`--no-ff` 合入 `dev`，`f9a7455..420cb11`），已推送；`dev` 本地 = 远端 = `420cb11` |
