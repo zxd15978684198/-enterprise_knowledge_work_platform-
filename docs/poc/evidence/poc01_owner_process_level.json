@@ -2,7 +2,7 @@
   "task": "P0-T05R",
   "kind": "process_level_evidence",
   "scope": "补 docs/poc/evidence/poc01-owner.md §6.1-E：进程存活 + 锁已释放",
-  "generated_at": "2026-10-29T10:56:26.763896+08:00",
+  "generated_at": "2026-10-29T12:38:57.924103+08:00",
   "schema": "p0_t05",
   "t05_verdict": "PASS（限域：单活）",
   "verdict": {
@@ -15,15 +15,15 @@
       "-c",
       "<inline child script：DSN 与绑定经环境变量传入>"
     ],
-    "popen_pid": 21960,
-    "reported_pid": 20336,
+    "popen_pid": 872,
+    "reported_pid": 19716,
     "launcher_indirection": true,
     "nonce_proven": true,
-    "lock_backend_pid": 878,
-    "saver_backend_pid": 882,
+    "lock_backend_pid": 38735,
+    "saver_backend_pid": 38739,
     "lock_backend_is_process_pid": false,
     "lock_backend_is_saver_pid": false,
-    "invocation_id": "268ed9f2-a540-47e2-9a10-e2e351915594",
+    "invocation_id": "38c935b8-800f-45c6-b10e-6e75dfb0a652",
     "owner_epoch_after_claim": 1,
     "bootstrap_accepted": true,
     "bootstrap_seq": 1,
@@ -32,19 +32,19 @@
   },
   "fault_injection": {
     "sql": "SELECT pg_terminate_backend(<lock_backend_pid>)",
-    "lock_terminated_at": "2026-10-29T10:56:26.607042+08:00",
+    "lock_terminated_at": "2026-10-29T12:38:57.398121+08:00",
     "takeover_proof": "阻塞 pg_advisory_lock 成功返回（非 pg_locks 快照）",
     "takeover": {
-      "lock_wait_ms": 3.674099998534075,
-      "lock_backend_pid": 883,
+      "lock_wait_ms": 16.87839999976859,
+      "lock_backend_pid": 38740,
       "owner_epoch": 2,
-      "invocation_id": "920f9668-592c-42ee-b018-263b1221945a"
+      "invocation_id": "f1a5213a-0123-4d11-aa7c-5ae1cd4e804f"
     }
   },
   "native_saver": {
     "accepted": true,
     "code": "ACCEPTED",
-    "checkpoint_id": "a5d60208-2bf1-4d52-98fe-7bd95a751fdf",
+    "checkpoint_id": "a27ca101-160c-492f-ac74-2987fce3f8ed",
     "checkpoints_before": 1,
     "checkpoints_after": 2,
     "committed_row_found": true
@@ -57,8 +57,8 @@
   },
   "child_alive_at_native_put": true,
   "timeline": {
-    "started_at": "2026-10-29T10:56:25.494802+08:00",
-    "lock_terminated_at": "2026-10-29T10:56:26.607042+08:00",
-    "native_put_at": "2026-10-29T10:56:26.671733+08:00"
+    "started_at": "2026-10-29T12:38:54.382364+08:00",
+    "lock_terminated_at": "2026-10-29T12:38:57.398121+08:00",
+    "native_put_at": "2026-10-29T12:38:57.548347+08:00"
   }
 }

@@ -4,7 +4,7 @@
 
 依据与权威顺序：顺序看 [04 依赖 DAG](../poc/04_Phase0_Dependency_DAG.md)、范围看 [03 Backlog](../poc/03_Phase0_Task_Backlog.md)、通过标准看 [05 验收与故障矩阵](../poc/05_Phase0_Acceptance.md)、操作方式看 [06 执行指南](../poc/06_Phase0_Execution_Guide.md)；契约输入为 [07 契约闭合](../poc/07_Contract_Closure.md)（P0-T01 产物）。本文件不改写上述任何权威文档，只把「并行判定 → 执行顺序 → 逐任务执行规程」固化为可复用文件。
 
-**当前进度（2026-10-29 刷新）**：W1–W7 七个波次与三条修复分支（`fix/w5-t17`、`fix/w7r-t05-t09`、`fix/w5-t18`）均已通过门禁、提交并合入 `dev`（顶点 `5809d80`，与 `origin/dev` 同步）。**28 项任务已有实验产出**：其中 19 项 PASS、9 项 PASS（限域：T05 单活、T09 静态、T13/T17/T24/T25/T27/T30 各有一格 `NOT_RUN`，T18 真机 `tab borrow` 需人工确认）。**P0-T18 已完成并合入**（owner epoch CAS / 撤销后不可执行 / 旧 epoch 迟到结果不写当前 session；单测 45 用例、真机 44 passed + 1 `NOT_RUN`、全量回归 958 tests / 0 failed / 8 skipped（均带 `NOT_RUN` 理由）、ruff 通过）。**环境修复 `fix/w1-t02-pgvector` 已通过门禁（959 tests / 0 failed / 8 skipped、ruff 通过）但尚未提交**：postgres 镜像升级为 `pgvector/pgvector:pg17`，`vector` 0.8.7 实测可用。剩余 **5 项未开始**：T26（前置已齐、可开工）、T28、T29、T31、T32。九项 PoC 仍无整体 PASS 结论；本文件不声明任何工程验证通过。
+**当前进度（2026-10-29 刷新）**：W1–W8 八个波次与四条修复分支（`fix/w5-t17`、`fix/w7r-t05-t09`、`fix/w5-t18`、`fix/w1-t02-pgvector`）均已通过门禁并合入 `dev`（顶点 `9d3252a`，与 `origin/dev` 同步）；W8（T26）本身已通过门禁，**等待用户确认提交**。**29 项任务已有实验产出**：其中 20 项 PASS、9 项 PASS（限域：T05 单活、T09 静态、T13/T17/T24/T25/T27/T30 各有一格 `NOT_RUN`，T18 真机 `tab borrow` 需人工确认）。T26 交付 RAG Graph / 可核验引用 / 终态一次事务：21 用例通过、100 例引用实测 `citation_accuracy=1.0`（40/40）、伪引用与越权引用全 0；但**真实 chat 模型链路 `NOT_RUN`**，故只判 `PASS（限域）`。**环境修复 `fix/w1-t02-pgvector` 已提交（`c44ce5d`+`7c8a585`）并合入 `dev`（合并 `cc45265`，回填 `9d3252a`）**：postgres 镜像 `pgvector/pgvector:pg17`、`vector` 0.8.7 实测可用；T25 的 ANN `NOT_RUN` 因此从「不可解」变为「可补做」。波次门禁基线由 959 → **980 tests（972 passed / 8 skipped / 0 failed）**。剩余 **4 项未开始**：T28、T29、T31、T32。九项 PoC 仍无整体 PASS 结论；本文件不声明任何工程验证通过。
 
 ---
 
@@ -33,11 +33,11 @@
 | 已完成 | W6 | T13、T24 | ✅ 门禁通过（778 passed / ruff 通过 / 零越界），已提交 `8911608`+`8f82061` 并合入 `dev` | [wave-w6-record](../poc/evidence/wave-w6-record.md)：T13 PASS(限域) / T24 PASS(限域)；T18 由 `fix/w5-t18` 单独完成（见 [fix-w5-t18-record](../poc/evidence/fix-w5-t18-record.md)） |
 | 已完成 | W7 | T25、T27、T30 | ✅ 门禁通过（913 passed）、提交、已推送、已合入 `dev`（合并点 `63cee71`） | [wave-w7-record](../poc/evidence/wave-w7-record.md)：三项 PASS(限域) |
 | 已完成（修复分支） | — | T17 / T05·T09 / T18 | ✅ `fix/w5-t17`（T17 真机配对，合并 `7d40c7b`）、`fix/w7r-t05-t09`（T05 单活正式化 / T09 镜像许可，合并 `027c5b5`）、`fix/w5-t18`（T18，合并 `f35443c`）均已合入 `dev` | 证据：[poc05-browserskill-live](../poc/evidence/poc05-browserskill-live.md)（T17）、[wave-w7r-record](../poc/evidence/wave-w7r-record.md)（T05R/T09R）、[fix-w5-t18-record](../poc/evidence/fix-w5-t18-record.md)（T18） |
-| 门禁通过待提交 | — | T02 环境（pgvector） | 🟡 分支 `fix/w1-t02-pgvector`：959 passed / ruff 通过，等用户确认提交 | [fix-w1-t02-pgvector-record](../poc/evidence/fix-w1-t02-pgvector-record.md)：镜像升级 `pgvector/pgvector:pg17`，`vector` 0.8.7 可用 |
-| **执行前沿** | **W8** | **T26**（`N=1`） | **可开工（等用户授权）** | T26←T25 ✓ / T05 ✓(限域) / T21 ✓；pgvector 缺失这一环境缺口已由 `fix/w1-t02-pgvector` 解除 |
-| 未解锁 | W9–W11 | T28、T29、T31、T32（4 项） | 未解锁 | 前置未 `PASS`，不得派发，也不得预先建分支 |
+| 已完成（修复分支） | — | T02 环境（pgvector） | ✅ 门禁通过（959 tests / 0 failed / 8 skipped）、提交 `c44ce5d`+`7c8a585`、已合入 `dev`（合并 `cc45265`，回填 `9d3252a`） | [fix-w1-t02-pgvector-record](../poc/evidence/fix-w1-t02-pgvector-record.md)：镜像升级 `pgvector/pgvector:pg17`，`vector` 0.8.7 可用 |
+| **门禁通过待提交** | **W8** | **T26**（`N=1`） | 🟡 **21 用例通过 / 全量 980 tests（972 passed·8 skipped·0 failed）/ ruff 干净 / 零越界；等用户确认提交** | [wave-w8-record](../poc/evidence/wave-w8-record.md)：PASS（限域）；真实 chat 模型、真实 MinIO、pgvector ANN、Redis 事件投递等 8 类 `NOT_RUN` 已逐项列明 |
+| 未解锁 | W9–W11 | T28、T29、T31、T32（4 项） | 未解锁 | W9 的 T28/T29 以 T26 `PASS` 且 W8 提交为前提；未满足前不得派发，也不得预先建分支 |
 
-规则：**任何时刻只有「执行前沿」这一行允许创建分支与派发子 agent**；前沿推进的唯一判据是上一波次通过 §4.5.4 门禁且用户确认提交。表中未解锁任务即使看起来「文件不冲突」也不开工——依赖层未满足即不可并行。
+规则：**任何时刻只有「执行前沿」或「门禁通过待提交」这一行允许拥有分支与派发记录**；新前沿的开工条件是上一波次通过 §4.5.4 门禁**且**用户确认提交。表中未解锁任务即使看起来「文件不冲突」也不开工——依赖层未满足即不可并行。
 
 ---
 
@@ -117,16 +117,15 @@
 | 波次 | 可 ready 任务 | 状态 | 依赖层并行的实际含义 |
 | --- | --- | --- | --- |
 | W0 | T01 ✅ 已完成 | 已完成 | 唯一根任务 |
-| W0 | T01 ✅ 已完成 | 已完成 | 唯一根任务 |
 | W1 | T02、T09、T14 | ✅ 已完成、已提交、已合入 `dev` | 三者写入权互斥（环境 / 两份静态预检证据）；T02 PASS、T14 PASS(限域)、T09 PARTIAL |
 | W2 | T03、T04 | ✅ 已完成、已提交、已合入 `dev` | 文件不重叠；都需 T02 的隔离环境；T03 PASS、T04 PASS(限域) |
 | W3 | T05、T07、T10、T15、T19 | ✅ 已完成、已提交、已合入 `dev` | 核心恢复 / 可靠作业 / 解析 / 浏览器 / 模型五线分叉；T05 PARTIAL，其余四线 PASS(限域) |
 | W4 | T06、T08、T11、T16、T20、T22 | ✅ 已完成、已提交、已合入 `dev` | 最大波次，六项不相交，全部 PASS(限域) |
 | W5 | T12、T17、T21、T23 | ✅ 已完成、已提交、已合入 `dev` | T12 是解析线与作业线的收敛点；T17 BLOCKED，其余三项 PASS(限域) |
 | W6 | T13、T24、T18 | ✅ 门禁通过、已合入 `dev` | T13 是解析线收敛点；T18 当时因 T17 材料缺失移出并行集（实际 `N=2`），T17 于 `fix/w5-t17` 解除后由 `fix/w5-t18` 单开补齐 |
-| W7 | T25、T27、T30 | **◀ 执行前沿（未启动）** | T25 检索三路对照（依赖 T13/T19）、T27 来源审阅（依赖 T11/T16/T24/T03）、T30 备份/迁移/回滚（依赖 T05 PARTIAL/T08/T13/T21，限域） |
-| W8 | T26 | 未解锁 | 单任务波次（融合点） |
-| W9 | T28、T29 | 未解锁 | — |
+| W7 | T25、T27、T30 | ✅ 已完成、已提交、已合入 `dev`（合并 `63cee71`） | T25 检索三路对照（依赖 T13/T19）、T27 来源审阅（依赖 T11/T16/T24/T03）、T30 备份/迁移/回滚（依赖 T05 PARTIAL/T08/T13/T21，限域） |
+| W8 | T26 | **🟡 门禁通过（980 tests）、等用户确认提交** | 单任务波次（融合点）：T13/T19 的检索与 T21 的取消/恢复在此汇合 |
+| W9 | T28、T29 | 未解锁（等 W8 提交） | Research 全链与安全回归两路，写权互斥 |
 | W10 | T31 | 未解锁 | P0 核心门禁 |
 | W11 | T32 | 未解锁 | 全量门禁 |
 
@@ -138,8 +137,8 @@ flowchart LR
     W3 --> W4["W4 · T06·T08·T11·T16·T20·T22 ✅ 已合入 dev"]
     W4 --> W5["W5 · T12·T17·T21·T23 ✅ 已合入 dev（T17 BLOCKED）"]
     W5 --> W6["W6 · T13·T24 ✅ 已合入 dev；T18 由 fix/w5-t18 补齐"]
-    W6 --> W7["W7 · T25·T27·T30 ◀ 执行前沿"]
-    W7 --> W8["W8 · T26"]
+    W6 --> W7["W7 · T25·T27·T30 ✅ 已合入 dev"]
+    W7 --> W8["W8 · T26 ✅ 门禁通过待提交"]
     W8 --> W9["W9 · T28·T29"]
     W9 --> W10["W10 · T31"]
     W10 --> W11["W11 · T32"]
@@ -161,7 +160,7 @@ flowchart LR
 
 默认执行单元是**波次**：每波次先切分支、按可并行任务数分发 N 个子 agent、波次末进入放行门禁（§4.5）。当某波次判定为不可并行（依赖/写入权/资源冲突，或用户要求串行）时，退回本序列在波内逐项执行；两视图的任务集合与先后顺序完全一致。
 
-**执行前沿（2026-10-29）**：第 1–26 行均已通过门禁并合入 `dev`（顶点 `34337c8`），第 22 项（T18）已由 `fix/w5-t18` 完成、待提交；**尚未开始的只有第 27–31 行（T26、T28、T29、T31、T32）**。T26 的直接前置 T25/T05/T21 均已 PASS（限域），是下一个可开工项；但 T26 依赖真实检索/引用证据，而本机 PostgreSQL 无 `vector` 扩展（T25 已记 ANN `NOT_RUN`），开工前需先确认限域口径。未经用户授权不得预建分支或派发。
+**执行前沿（2026-10-29 12:50 刷新）**：第 1–27 行均已通过门禁，其中第 1–26 行已合入 `dev`（顶点 `9d3252a`），第 27 行（T26）已完成并通过 W8 门禁、**待用户确认提交**；**尚未开始的只有第 28–31 行（T28、T29、T31、T32）**。T26 已用 `ModelPort` 替身补齐检索/引用/事件链路，真实模型链路记 `NOT_RUN`；pgvector 0.8.7 已随 `fix/w1-t02-pgvector` 就绪，T25 的 ANN `NOT_RUN` 属可补做项。未经用户确认提交与授权，不得为新前沿建分支或派发。
 
 1. ~~**T02**（W1）隔离实验环境与核心依赖清单~~ ✅ PASS
 2. ~~**T09**（W1）DocReader proto/镜像/许可静态预检~~ ✅ PARTIAL（缺 SBOM/镜像 digest）
@@ -183,13 +182,13 @@ flowchart LR
 18. ~~**T17**（W5）BrowserSkill 真扩展配对与读取~~ ⊘ BLOCKED（无 pinned upstream 产物与真设备）
 19. ~~**T21**（W5）Harness 节点集成、取消与安全 trace~~ ✅ PASS（限域）
 20. ~~**T23**（W5）DependencyScheduler 与 Task/Graph/Job 对账~~ ✅ PASS（限域）
-21. ~~**T13**（W6）原子发布与版本竞态故障注入~~ ✅ PASS（限域；门禁通过待提交）
-22. **T18**（W6）BrowserSkill owner、撤销与人工接管 ✅ **已完成（fix/w5-t18，待提交）**
-23. ~~**T24**（W6）Evaluator、重规划 revision 与产物复用~~ ✅ PASS（限域；门禁通过待提交）
-24. **T25**（W7）授权检索、真实 Embedding 与 Hybrid 对照 ◀ **执行前沿**
-25. **T27**（W7）来源质量、去重与人工 Review 契约 ◀ **执行前沿**
-26. **T30**（W7）备份恢复、迁移和版本回滚演练 ◀ **执行前沿（限域：T05 为 PARTIAL）**
-27. **T26**（W8）RAG Graph、引用与最终事件一致性
+21. ~~**T13**（W6）原子发布与版本竞态故障注入~~ ✅ PASS（限域）
+22. ~~**T18**（W6）BrowserSkill owner、撤销与人工接管~~ ✅ PASS（限域；由 `fix/w5-t18` 完成并合入 `dev`）
+23. ~~**T24**（W6）Evaluator、重规划 revision 与产物复用~~ ✅ PASS（限域）
+24. ~~**T25**（W7）授权检索、真实 Embedding 与 Hybrid 对照~~ ✅ PASS（限域）
+25. ~~**T27**（W7）来源质量、去重与人工 Review 契约~~ ✅ PASS（限域）
+26. ~~**T30**（W7）备份恢复、迁移和版本回滚演练~~ ✅ PASS（限域；T05 为 PARTIAL）
+27. ~~**T26**（W8）RAG Graph、引用与最终事件一致性~~ ✅ PASS（限域；门禁通过待提交）
 28. **T28**（W9）Research 全链控制站集成
 29. **T29**（W9）P0 全链授权与内容安全回归
 30. **T31**（W10）P0 核心出口证据评审（文档）
@@ -295,11 +294,11 @@ per_task: id | 写入范围 | 资源槽 | agent 名 | 前置任务
 
 约定：`E/` = `experiments/phase0/`，`T/` = `tests/phase0/`，`V/` = `docs/poc/evidence/`。验收锚点为摘要，权威定义见 [03 Backlog](../poc/03_Phase0_Task_Backlog.md) 对应任务卡。共享写权列标 `是` 者见 §3.2。
 
-**状态列口径**：✅ = 门禁通过；◐ = PARTIAL（有限域或未执行项已标注）；⊘ = BLOCKED；☐ = 未开始；◀ = 当前进行中。第 1–26 行随 W1–W7 与两条修复分支（`fix/w5-t17`、`fix/w7r-t05-t09`）通过门禁并合入 `dev`（顶点 `34337c8`），其中 8 项标「限域」（T05 单活、T09 静态、T13/T17/T24/T25/T27/T30 各有一格 NOT_RUN）；T05/T09 的早期 PARTIAL 已由 `fix/w7r-t05-t09` 升级、T17 的 BLOCKED 已由 `fix/w5-t17` 解除。第 22 行 T18 已由 `fix/w5-t18` 完成（owner epoch CAS / 撤销后不可执行 / 旧 epoch 迟到结果不写当前 session；单测 45 用例、真机 44 passed + 1 `NOT_RUN`、全量 958 tests / 8 skipped 均带理由），**待提交**；其后无进行中项；其余 5 项（第 27–31 行：T26、T28、T29、T31、T32）仍未开始，不得写入任何派发声明、波次记录或分支名。T18 原记的「依赖 T17 真设备」阻塞已于 2026-10-28 解除，不再是 BLOCKED，而是排期项。
+**状态列口径**：✅ = 门禁通过；◐ = PARTIAL（有限域或未执行项已标注）；⊘ = BLOCKED；☐ = 未开始；◀ = 当前进行中。第 1–27 行已全部通过门禁：第 1–26 行随 W1–W7 与四条修复分支（`fix/w5-t17`、`fix/w7r-t05-t09`、`fix/w5-t18`、`fix/w1-t02-pgvector`）合入 `dev`（顶点 `9d3252a`），其中 9 项标「限域」（T05 单活、T09 静态、T13/T17/T24/T25/T27/T30 各有一格 `NOT_RUN`，另 T09 的 SBOM 缺口已在 `fix/w7r` 补齐）；第 27 行 T26 已完成并通过 W8 门禁（21 用例、100 例引用实测、全量 980 tests / 972 passed / 8 skipped / 0 failed），**待用户确认提交**。其余 4 项（第 28–31 行：T28、T29、T31、T32）仍未开始，不得写入任何派发声明、波次记录或分支名。T18 原记的「依赖 T17 真设备」阻塞已于 2026-10-28 解除。
 
 | # | ID | 波次 | 状态（2026-10-29） | 直接依赖 | 主要产物 | 量化验收锚点（摘要） | 共享写权 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | T02 | W1 | ✅ PASS（镜像已于 2026-10-29 升级为 pgvector，见 `fix-w1-t02-pgvector-record.md`，待提交） | T01 | `E/pyproject.toml`、`E/uv.lock`、`E/compose.yaml`、`E/.env.example`、`V/environment.md` | 核心包/镜像 100% 有精确版本+hash+license+来源；干净目录可重建；缺变量/镜像/端口显式失败；零真实秘密 | 是 |
+| 1 | T02 | W1 | ✅ PASS（镜像已于 2026-10-29 升级为 pgvector 并合入 `dev`，见 `fix-w1-t02-pgvector-record.md`） | T01 | `E/pyproject.toml`、`E/uv.lock`、`E/compose.yaml`、`E/.env.example`、`V/environment.md` | 核心包/镜像 100% 有精确版本+hash+license+来源；干净目录可重建；缺变量/镜像/端口显式失败；零真实秘密 | 是 |
 | 2 | T09 | W1 | ✅ PASS（限域） | T01 | `V/docreader_manifest.md`、`V/docreader_fixture_plan.md` | 四 RPC 100% 有请求/响应/错误/限制；五格式均有路线；未知项逐项列阻断与替代 | 否 |
 | 3 | T14 | W1 | ✅ PASS（限域） | T01 | `V/browserskill_protocol_manifest.md` | 每暴露动作 100% 有协议依据或标 unsupported；三组件部署/授权分开；无材料即全 U | 否 |
 | 4 | T03 | W2 | ✅ PASS | T02 | `E/contracts.py`、`E/db/migrations/001_scope_core.sql`、`E/scope.py`、`T/test_scope.py` | 越权命中/可写 0；组合 FK 100% 拒绝跨空间；无 Run Job 恢复读当前 Principal；RLS 角色无 BYPASSRLS | 是 |
@@ -325,7 +324,7 @@ per_task: id | 写入范围 | 资源槽 | agent 名 | 前置任务
 | 24 | T25 | W7 | ✅ PASS（限域） | T13、T19 | `E/retrieval_probe.py`、`T/test_retrieval_permissions.py`、`V/retrieval-baseline.json` | 100 QA 三路对照；只命中当前 active winning attempt；跨空间检索 0 命中 | 否 |
 | 25 | T27 | W7 | ✅ PASS（限域） | T11、T16、T24、T03 | `E/candidate_review.py`、`E/db/migrations/007_candidates.sql`、`T/test_candidate_review.py` | 候选/去重/审阅追加历史；撤销后不可入库；缺来源/证据不发布 | 是 |
 | 26 | T30 | W7 | ✅ PASS（限域） | T05、T08、T13、T21 | `E/restore_probe/`、`T/test_restore_upgrade.py`、`V/restore-runbook.md` | 备份可还原到一致状态；迁移/回滚可重复执行；RPO/RTO 待定需标注 | 否 |
-| 27 | T26 | W8 | ◀ 前沿（前置已齐，等授权） | T25、T05、T21 | `E/rag_probe.py`、`E/events_probe.py`、`T/test_rag_events.py`、`V/poc09-report.md` | 引用固定版本且访问再授权；最终事件与业务终态一致 | 否 |
+| 27 | T26 | W8 | ✅ PASS（限域；门禁通过待提交） | T25、T05、T21 | `E/rag_probe.py`、`E/events_probe.py`、`T/test_rag_events.py`、`V/poc09-report.md`、`V/rag-citations.json` | 引用固定版本且访问再授权；最终事件与业务终态一致 | 否 |
 | 28 | T28 | W9 | ☐ 未开始 | T27、T18、T26、T13、T21 | `E/research_probe.py`、`T/test_research_e2e.py`、`V/poc08-report.md` | 30 研究任务全链；证据链可追溯；无设备则相关段 BLOCKED | 否 |
 | 29 | T29 | W9 | ☐ 未开始 | T06、T08、T13、T21、T26 | `T/test_security_gate.py`、`V/security-matrix.md` | ≥100 越权探测 0 命中；跨空间/撤权/篡改 payload 全拒绝 | 否 |
 | 30 | T31 | W10 | ☐ 未开始 | T26、T29、T30 | `V/P0_Core_Gate_Review.md` | 文档门禁：逐项证据可核、未通过项不得标 PASS | 否 |
@@ -475,22 +474,32 @@ pwsh → git status、uv run --project experiments/phase0 pytest ...、docker co
 
 ---
 
-## 12. 当前前沿与下一步（2026-10-29 更新）
+## 12. 当前前沿与下一步（2026-10-29 12:50 更新）
 
-**已完成并合入 `dev`**：W1–W7 七个波次 + `fix/w5-t17`（T17 真机）+ `fix/w7r-t05-t09`（T05/T09 收口）+ `fix/w5-t18`（T18），顶点 `5809d80`。
+**已完成并合入 `dev`**：W1–W7 七个波次 + `fix/w5-t17`（T17 真机）+ `fix/w7r-t05-t09`（T05/T09 收口）+ `fix/w5-t18`（T18）+ `fix/w1-t02-pgvector`（pgvector 环境），`dev` 顶点 `9d3252a`，与 `origin/dev` 同步。
 
-**门禁通过、待用户确认提交**：`fix/w1-t02-pgvector`（postgres 镜像升级为 `pgvector/pgvector:pg17`，解锁真实向量检索）——959 passed / 0 failed / 8 skipped（均带 `NOT_RUN`）、`ruff` 通过、core 容器 healthy。
+**门禁通过、待用户确认提交**：W8 = T26（分支 `feature/w8-t26`，HEAD 仍 `9d3252a`）。证据见 [wave-w8-record](../poc/evidence/wave-w8-record.md) 与 [poc09-report](../poc/evidence/poc09-report.md)：
 
-**剩余 5 项（全部未开始，其中 T26 前置已齐）**：
+| 门禁项 | 真实结果 |
+| --- | --- |
+| 任务级 pytest | 21 passed（Lead 独立复跑 157.18s，与子 agent 162.22s 一致） |
+| 全量 pytest | 980 tests / **972 passed** / 8 skipped / 0 failed，691.18s |
+| ruff（本波 3 个 .py） | `All checks passed!` |
+| 秘密扫描 | 0 命中 |
+| 越界写入 / 临时残留 / 端口 | 受跟踪改动 0；T26 仅写声明内 6 个文件；`p0_t26` 已 teardown；5500/5501/5600/5610 均 0 监听 |
+| 判定 | **PASS（限域）**：真实 chat 模型链路、真实 MinIO/S3、pgvector ANN、Redis 事件投递、删除/取消/重建、SSE 断网重连等 8 类 `NOT_RUN`；引用准确率 1.0 只是结构测量，不等于人工验收 |
+
+**剩余 4 项（全部未开始）**：
 
 | 任务 | 波次 | 直接依赖 | 现状 |
 | --- | --- | --- | --- |
-| T26 RAG/引用/事件 | W8 | T25、T05、T21 | 前置均已 PASS（限域），**可开工**；pgvector 缺口已由 `fix/w1-t02-pgvector` 解除（新库仍需自带 `CREATE EXTENSION vector`） |
-| T28 Research 全链 | W9 | T27、T18、T26、T13、T21 | 等 T26 |
-| T29 P0 安全回归 | W9 | T06、T08、T13、T21、T26 | 等 T26 |
+| T28 Research 全链 | W9 | T27、T18、T26、T13、T21 | 依赖已齐（T26 待提交），提交后可开工 |
+| T29 P0 安全回归 | W9 | T06、T08、T13、T21、T26 | 同上；可直接用 `rag-citations.json` 的 100 例做评测基线 |
 | T31 核心门禁评审 | W10 | T26、T29、T30 | 文档任务 |
 | T32 全量门禁评审 | W11 | T28、T18、T24、T31 | 文档任务；BSK/Research 段缺证据则整体不 PASS |
 
-**下一执行单元（等用户授权）**：W8 = T26，`N=1`，分支 `feature/w8-t26`（从 `dev` 的 pgvector 合并点拉出）；按 §4.5 规程派发、门禁、询问提交。
+**下一执行单元（等用户确认 W8 提交后授权）**：W9 = T28 + T29，`N=2`，分支从 `dev` 的 W8 合并点拉出；按 §4.5 规程派发、门禁、询问提交。
 
-**本波次未启动**：不建分支、不派发子 agent、不写执行声明；等用户明确授权后再按 §4.5 规程启动。
+**可补做项（不阻塞 W9）**：pgvector 0.8.7 已就绪，T25 的 ANN 对照可补跑并把 `NOT_RUN` 改判；T26 的真实模型链路可在拿到厂商 key 后用同一 100 例复跑。
+
+**本波次未启动**：不建 W9 分支、不派发子 agent、不写执行声明；等用户明确授权后再按 §4.5 规程启动。
