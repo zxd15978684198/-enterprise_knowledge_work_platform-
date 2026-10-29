@@ -116,4 +116,16 @@
 | 待提交 | `ann_bench.py`（新）、`test_ann_bench.py`（新）、`ann-bench.json`（新）、`wave-w13-record.md`（新）、`environment.md` §15（追加）、`restore-runbook.md` §11（追加）、`poc09-report.md`（§3/§8/§9/§10 + §12 追加）、`docs/adr/0010_Pgvector_Core_Profile.md`（状态 + 执行结果）、`docs/IMPLEMENTATION_STATUS.md` |
 | 不提交 | 全量回归重生成的 6 份 tracked 证据（时间戳/PID 抖动，按既有做法 `git stash` 隔离） |
 | 判定 | ADR-0010 四条验证条件全满足 → **ADR-0010 转「已接受」**；G5 的 ANN 阻塞项**解除**，但 G5 整体仍不成立（阈值校准属 ADR-0014，未批） |
-| 待用户裁决 | 是否提交 `feature/w13-adr0010` + 是否推送 / 合入 dev |
+| 用户裁决 | 选 **1 = 提交 + 推送 + `--no-ff` 合入 dev** |
+
+### 4.1 执行结果（真实 SHA）
+
+| 动作 | 结果 |
+| --- | --- |
+| 代码提交 | `7c4402e` feat(poc)：`ann_bench.py` 825 行 + `test_ann_bench.py` 82 行 + `ann-bench.json` 292 行（3 文件 +1199） |
+| 文档提交 | `e1bde5e` docs(poc)：6 文件 +298/−7（含 ADR-0010 状态与执行结果、`environment.md` §15、`restore-runbook.md` §11、`poc09-report.md` §12、状态文件） |
+| 分支推送 | `feature/w13-adr0010` → `e1bde5ecb0763e055d045b5ba4d3f715c63bc399`，`git push -u` exit 0 |
+| 合入 dev | `--no-ff` 合并生成 `6e00b9b`（`d134319..6e00b9b`，9 文件 +1497/−7） |
+| dev 推送 | `git push origin dev` → `6e00b9b27680e94799d3162b679fe7ded2938d69`，本地/远端逐位一致 |
+| 提交前检查 | 两笔提交前均跑 `git diff --cached --check`，均 exit 0（无 EOF 空行/空白问题） |
+| 未提交 | 全量跑重写的 6 份证据已 `git stash` 为 `stash@{0}: w13-fullsuite-regen-6-evidence` |
