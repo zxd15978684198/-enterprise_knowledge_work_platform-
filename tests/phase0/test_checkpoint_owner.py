@@ -462,7 +462,12 @@ def test_process_level_native_saver_accepts_write_after_lock_loss_is_fail_eviden
     )
 
     repo_root = PROJECT.parents[1]
-    evidence_path = repo_root / "docs" / "poc" / "evidence" / "poc01_owner_process_level.json"
+    # 证据目录可能被测试会话重定向到临时目录（见 conftest 的证据目录重定向）：
+    # 只有单独运行本用例时才落在仓库 tracked 路径。
+    evidence_dir = Path(
+        os.environ.get("PYKNORA_EVIDENCE_DIR") or (repo_root / "docs" / "poc" / "evidence")
+    )
+    evidence_path = evidence_dir / "poc01_owner_process_level.json"
     binding = harness.create_run()
     env = os.environ.copy()
     env["PYTHONUTF8"] = "1"

@@ -1,0 +1,71 @@
+{
+  "schema": "pyknora.phase0.verdict-lint-baseline.v1",
+  "generated_by": "experiments/phase0/verdict_lint.py --write-baseline",
+  "note": "基线只豁免已有条数；同类新增违规仍会让 --check 失败",
+  "entries": [
+    {
+      "path": "docs/poc/evidence/environment.md",
+      "rule": "BARE_PASS_WITH_CAVEAT",
+      "count": 2,
+      "lines": [
+        8,
+        39
+      ],
+      "reason": "T02 状态行写裸 **PASS**，却在同一行记录「端口占用演练 NOT_RUN」；与 D4 同类口径债，应在文档债务批次改为 PASS（限域），本轮不改写历史证据"
+    },
+    {
+      "path": "docs/poc/evidence/poc01-owner.md",
+      "rule": "BARE_PASS_WITH_CAVEAT",
+      "count": 1,
+      "lines": [
+        219
+      ],
+      "reason": "首列判定已是 PARTIAL（单活），备注列写替身路径 PASS；数值正确但未加限定词，属口径债，待文档债务批次统一"
+    },
+    {
+      "path": "docs/poc/evidence/poc02-replanning.md",
+      "rule": "BARE_PASS_WITH_CAVEAT",
+      "count": 1,
+      "lines": [
+        9
+      ],
+      "reason": "状态行写 **PASS** 而括注「1 项子契约 PARTIAL」；应写 PASS（限域），属口径债"
+    },
+    {
+      "path": "docs/poc/evidence/wave-w1-record.md",
+      "rule": "BARE_PASS_WITH_CAVEAT",
+      "count": 1,
+      "lines": [
+        88
+      ],
+      "reason": "D4 原始两处之一（T31 评审已登记）：T02 标裸 PASS 但行内含 NOT_RUN 与待决 ADR"
+    },
+    {
+      "path": "docs/poc/evidence/wave-w2-record.md",
+      "rule": "BARE_PASS_WITH_CAVEAT",
+      "count": 1,
+      "lines": [
+        107
+      ],
+      "reason": "D4 原始两处之一（T31 评审已登记）：P0-T03 标裸 PASS 而行内含未覆盖项"
+    },
+    {
+      "path": "docs/poc/evidence/wave-w3-record.md",
+      "rule": "BARE_PASS_WITH_CAVEAT",
+      "count": 1,
+      "lines": [
+        59
+      ],
+      "reason": "同一行并列多个任务或子项，PASS 与 PARTIAL 分属不同主体；保留原文以留痕"
+    },
+    {
+      "path": "docs/poc/evidence/wave-w6-record.md",
+      "rule": "BARE_PASS_WITH_CAVEAT",
+      "count": 1,
+      "lines": [
+        37
+      ],
+      "reason": "同一行并列多个任务或子项，PASS 与 PARTIAL 分属不同主体；保留原文以留痕"
+    }
+  ]
+}

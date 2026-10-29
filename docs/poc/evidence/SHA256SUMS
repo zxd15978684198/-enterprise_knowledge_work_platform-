@@ -1,0 +1,10 @@
+# P0 机器证据指纹（规范化 JSON 的 sha256）；由 evidence_meta.py --write 生成，勿手改
+# 复算命令：python experiments/phase0/evidence_meta.py --check
+41d104a07e8c1b09eb4d6a26f52ff2f21ce62b9d25693d4e67a9018c3b68434e  docs/poc/evidence/ann-bench.json
+9ce631798f5cb49127914e80a61499300f67dbdecac27bfc1e55b4e46c9b1f3e  docs/poc/evidence/docreader_image_inventory.json
+f39fc294d731ef5eb3c5618f9c38c814405092d50e1ba788886925c85779559b  docs/poc/evidence/p0-t17-live-run.json
+8827573665a82bb881a479d375e0eedb67d15bf0c904fe0bc91add1d7aaa61b2  docs/poc/evidence/poc01_owner_process_level.json
+199ae4e5b935746a889c978694833035b534ba373d65492c3ff37b0514ef974a  docs/poc/evidence/rag-citations.json
+20b3845aa55458fc0796e5cdc4ad8ece55c5855497cd0389a3eb2c4089d64cd5  docs/poc/evidence/research-batch.json
+c4810d4c3a824154217dd4e6dfa271ec7e35e9e17183b1c2598875799e038828  docs/poc/evidence/retrieval-baseline.json
+aa617a9ab24299b2698768e81c861039b395c5e35628a52e0b1d50c08934ada2  docs/poc/evidence/security-probes.json

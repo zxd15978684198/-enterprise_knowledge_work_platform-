@@ -35,6 +35,7 @@ from langgraph.graph import END, START, StateGraph
 from psycopg.pq import TransactionStatus
 
 import events_probe as ep
+from evidence_dir import evidence_dir
 from retrieval_probe import cosine, embed, tokenize
 
 SCHEMA: Final = ep.SCHEMA
@@ -50,7 +51,8 @@ MAX_RETRIEVAL_ROUNDS: Final = 2
 RRF_K: Final = 60
 MAX_STREAM_CHARS: Final = 12_000
 REPO_ROOT: Final = Path(__file__).resolve().parents[2]
-EVIDENCE_PATH: Final = REPO_ROOT / "docs" / "poc" / "evidence" / "rag-citations.json"
+EVIDENCE_DIR: Final = evidence_dir()
+EVIDENCE_PATH: Final = EVIDENCE_DIR / "rag-citations.json"
 
 _HANDLE_RE: Final = re.compile(r"\[\[(\d{1,3})\]\]")
 _CHUNK_REF_RE: Final = re.compile(r"chunk:([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"

@@ -1,0 +1,200 @@
+{
+  "schema": "pyknora.phase0.evidence-manifest.v1",
+  "generated_by": "experiments/phase0/evidence_meta.py",
+  "generated_at": "2026-10-29T11:23:52+00:00",
+  "fingerprint_rule": "json.dumps(sort_keys=True,separators=(',',':'),ensure_ascii=False) → sha256(utf-8)",
+  "entries": [
+    {
+      "name": "ann-bench.json",
+      "task": "P0-T25",
+      "wave": "W13",
+      "sha256": "41d104a07e8c1b09eb4d6a26f52ff2f21ce62b9d25693d4e67a9018c3b68434e",
+      "timestamp": "2026-10-29T16:57:52+0800",
+      "timestamp_source": "payload",
+      "task_source": "payload",
+      "wave_source": "payload",
+      "derived_from": [
+        {
+          "path": "docs/poc/evidence/wave-w13-record.md",
+          "exists": true,
+          "sha256": "906598bc3f271a5f2ed37935601a222bae95bf1c984ebc729a7fed0dde618dc5",
+          "cites_task": true
+        },
+        {
+          "path": "experiments/phase0/ann_bench.py",
+          "exists": true,
+          "sha256": "5fb6893f0713e592bc09865abe49389e45877b89ff7f105c351404a01cef069a"
+        }
+      ],
+      "problems": []
+    },
+    {
+      "name": "docreader_image_inventory.json",
+      "task": "P0-T09R",
+      "wave": "W7R",
+      "sha256": "9ce631798f5cb49127914e80a61499300f67dbdecac27bfc1e55b4e46c9b1f3e",
+      "timestamp": "2026-10-28T04:03:41.576Z",
+      "timestamp_source": "payload",
+      "task_source": "payload",
+      "wave_source": "manifest",
+      "derived_from": [
+        {
+          "path": "docs/poc/evidence/wave-w7r-record.md",
+          "exists": true,
+          "sha256": "534858649d5b5e156734ea15172aa0134542074f9bbe1638f76d85f858f07e77",
+          "cites_task": true
+        },
+        {
+          "path": "experiments/phase0/audit_docreader_image.ps1",
+          "exists": true,
+          "sha256": "89a14a46c6a7dbd41bb95c5cd3da2bf72f4f05ae35b20637ad3cf0cea23810cd"
+        }
+      ],
+      "problems": []
+    },
+    {
+      "name": "p0-t17-live-run.json",
+      "task": "P0-T17",
+      "wave": "W5",
+      "sha256": "f39fc294d731ef5eb3c5618f9c38c814405092d50e1ba788886925c85779559b",
+      "timestamp": "2026-10-28T11:44:41+0800",
+      "timestamp_source": "payload",
+      "task_source": "payload",
+      "wave_source": "manifest",
+      "derived_from": [
+        {
+          "path": "docs/poc/evidence/wave-w5-record.md",
+          "exists": true,
+          "sha256": "4b3c01ffd3faf0b218a36af222535ea5fa578137bc7e1c5dfdda62adadebaf95",
+          "cites_task": true
+        },
+        {
+          "path": "tests/phase0/test_bsk_live.py",
+          "exists": true,
+          "sha256": "ffce158f85a2ac772577998b71e549c5f6f49c2940030068748a7d9761a17c91"
+        }
+      ],
+      "problems": []
+    },
+    {
+      "name": "poc01_owner_process_level.json",
+      "task": "P0-T05R",
+      "wave": "W7R",
+      "sha256": "8827573665a82bb881a479d375e0eedb67d15bf0c904fe0bc91add1d7aaa61b2",
+      "timestamp": "2026-10-29T13:35:51.289783+08:00",
+      "timestamp_source": "payload",
+      "task_source": "payload",
+      "wave_source": "manifest",
+      "derived_from": [
+        {
+          "path": "docs/poc/evidence/wave-w7r-record.md",
+          "exists": true,
+          "sha256": "534858649d5b5e156734ea15172aa0134542074f9bbe1638f76d85f858f07e77",
+          "cites_task": true
+        },
+        {
+          "path": "experiments/phase0/checkpoint_probe.py",
+          "exists": true,
+          "sha256": "921e14c0e107e817e87519a14846cb7b56b451ce93ccbd456448fe361d44543a"
+        }
+      ],
+      "problems": []
+    },
+    {
+      "name": "rag-citations.json",
+      "task": "P0-T26",
+      "wave": "W8",
+      "sha256": "199ae4e5b935746a889c978694833035b534ba373d65492c3ff37b0514ef974a",
+      "timestamp": "2026-10-29T05:38:26.852753+00:00",
+      "timestamp_source": "payload",
+      "task_source": "manifest",
+      "wave_source": "manifest",
+      "derived_from": [
+        {
+          "path": "docs/poc/evidence/wave-w8-record.md",
+          "exists": true,
+          "sha256": "0e1490bd94e36ea911ed5a1edfb378d6744839a3595dbe3e3628333ba9d4fa0f",
+          "cites_task": true
+        },
+        {
+          "path": "experiments/phase0/rag_probe.py",
+          "exists": true,
+          "sha256": "9c0adfd059c7c7fe049416fe5f2880d5f8128c88934a4b996373ff67434f163e"
+        }
+      ],
+      "problems": []
+    },
+    {
+      "name": "research-batch.json",
+      "task": "P0-T28",
+      "wave": "W9",
+      "sha256": "20b3845aa55458fc0796e5cdc4ad8ece55c5855497cd0389a3eb2c4089d64cd5",
+      "timestamp": null,
+      "timestamp_source": "absent",
+      "task_source": "manifest",
+      "wave_source": "manifest",
+      "derived_from": [
+        {
+          "path": "docs/poc/evidence/wave-w9-record.md",
+          "exists": true,
+          "sha256": "7a7e84da49d38856d434d0a0e1b78d3dbe05950912e6b591f43eabbeb880e13b",
+          "cites_task": true
+        },
+        {
+          "path": "experiments/phase0/research_probe.py",
+          "exists": true,
+          "sha256": "9ef99b7dafc765b72254dfcdce4d50a09b68c567eae9730d1c298a00163f7286"
+        }
+      ],
+      "problems": []
+    },
+    {
+      "name": "retrieval-baseline.json",
+      "task": "P0-T25",
+      "wave": "W7",
+      "sha256": "c4810d4c3a824154217dd4e6dfa271ec7e35e9e17183b1c2598875799e038828",
+      "timestamp": "2026-10-29T05:40:32+00:00",
+      "timestamp_source": "payload",
+      "task_source": "payload",
+      "wave_source": "payload",
+      "derived_from": [
+        {
+          "path": "docs/poc/evidence/wave-w7-record.md",
+          "exists": true,
+          "sha256": "048b039e4cc2c5db9ae3d584848d0d0f03b11e816049c2ef5dca4e3b469bd590",
+          "cites_task": true
+        },
+        {
+          "path": "experiments/phase0/retrieval_probe.py",
+          "exists": true,
+          "sha256": "bbc43ecad21ea45e093387560f483b5f8a60ea147f6b6775feeab633d82c134b"
+        }
+      ],
+      "problems": []
+    },
+    {
+      "name": "security-probes.json",
+      "task": "P0-T29",
+      "wave": "W9",
+      "sha256": "aa617a9ab24299b2698768e81c861039b395c5e35628a52e0b1d50c08934ada2",
+      "timestamp": "2026-10-29T05:40:41.691719+00:00",
+      "timestamp_source": "payload",
+      "task_source": "payload",
+      "wave_source": "manifest",
+      "derived_from": [
+        {
+          "path": "docs/poc/evidence/wave-w9-record.md",
+          "exists": true,
+          "sha256": "7a7e84da49d38856d434d0a0e1b78d3dbe05950912e6b591f43eabbeb880e13b",
+          "cites_task": true
+        },
+        {
+          "path": "experiments/phase0/security_probe.py",
+          "exists": true,
+          "sha256": "fa31c7e804f6b292258847063ac17f757c9f310624379ca0778ba8eb43b502b6"
+        }
+      ],
+      "problems": []
+    }
+  ]
+}

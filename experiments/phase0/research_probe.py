@@ -41,6 +41,7 @@ from psycopg.rows import dict_row
 
 import events_probe as ep
 import scope as scope_module
+from evidence_dir import evidence_dir
 
 SCHEMA: Final = "p0_t28"
 MIGRATION_ID: Final = "t28_research_inline"
@@ -48,7 +49,8 @@ MIGRATION_FILENAME: Final = "inline:research_probe.py::MIGRATION_SQL"
 REDIS_DB: Final = 15
 CONTROL_SITE_PORTS: Final[tuple[int, ...]] = (5500, 5501)
 REPO_ROOT: Final = Path(__file__).resolve().parents[2]
-EVIDENCE_PATH: Final = REPO_ROOT / "docs" / "poc" / "evidence" / "research-batch.json"
+EVIDENCE_DIR: Final = evidence_dir()
+EVIDENCE_PATH: Final = EVIDENCE_DIR / "research-batch.json"
 
 CHANNELS: Final[tuple[str, ...]] = ("search", "http", "js", "user_browser")
 TASK_KINDS: Final[tuple[str, ...]] = (

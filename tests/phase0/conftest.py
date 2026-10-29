@@ -13,8 +13,11 @@
 
 from __future__ import annotations
 
+import os
+import shutil
 import socket
 import sys
+import tempfile
 import threading
 from collections.abc import Callable, Iterator
 from pathlib import Path
@@ -32,11 +35,37 @@ from faults import FaultBarrier  # noqa: E402
 
 FIXED_PORT = 5500
 SITE_START_TIMEOUT_S = 5.0
+
+# ---------------------------------------------------------------------------
+# 证据目录重定向（W15 修复）
+#
+# 若干探针（T05/T25/T26/T28/T29）会把实测证据写回仓库 tracked 路径。全量回归时
+# 前面的用例先改写证据、后面的 ``test_repo_evidence_ledger_is_clean`` 再按台账校验，
+# 同一次运行里必然互相打脸（W14/W15 各复现一次）。这里在**收集任何测试模块之前**
+# 把 ``PYKNORA_EVIDENCE_DIR`` 指到临时目录并预置一份 tracked 证据副本：
+# 运行期写入落在临时目录，仓库保持干净，探针代码不必知道自己被测试。
+# ---------------------------------------------------------------------------
+REPO_ROOT = Path(__file__).resolve().parents[2]
+TRACKED_EVIDENCE_DIR = REPO_ROOT / "docs" / "poc" / "evidence"
+EVIDENCE_TMP_DIR = Path(tempfile.mkdtemp(prefix="pyknora-evidence-"))
+if TRACKED_EVIDENCE_DIR.is_dir():  # pragma: no branch - 仓库内恒为真
+    shutil.copytree(TRACKED_EVIDENCE_DIR, EVIDENCE_TMP_DIR, dirs_exist_ok=True)
+os.environ["PYKNORA_EVIDENCE_DIR"] = str(EVIDENCE_TMP_DIR)
+
+
+def pytest_sessionfinish(session: object, exitstatus: int) -> None:  # noqa: ARG001
+    """整轮结束后删掉临时证据目录，不留残留。"""
+
+    shutil.rmtree(EVIDENCE_TMP_DIR, ignore_errors=True)
+
+
 BARRIER_TIMEOUT_S = 2.0
 GATE_WAIT_TIMEOUT_S = 5.0
 
 
-def port_is_listening(host: str = "127.0.0.1", port: int = 0, *, timeout: float = 0.25) -> bool:
+def port_is_listening(
+    host: str = "127.0.0.1", port: int = 0, *, timeout: float = 0.25
+) -> bool:
     """用一次 TCP connect 判断端口是否仍有人在 listen（不睡眠、不重试）。"""
     probe = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     probe.settimeout(timeout)
@@ -100,8 +129,12 @@ def site_manager() -> Iterator[SiteManager]:
     finally:
         report = manager.stop_all()
         for item in report:
-            assert not item["listening_after_stop"], f"端口 {item['port']} 在 stop() 后仍在监听"
-            assert item["armed_barriers"] == [], f"仍有未释放的屏障：{item['armed_barriers']}"
+            assert not item["listening_after_stop"], (
+                f"端口 {item['port']} 在 stop() 后仍在监听"
+            )
+            assert item["armed_barriers"] == [], (
+                f"仍有未释放的屏障：{item['armed_barriers']}"
+            )
 
 
 @pytest.fixture()
@@ -189,7 +222,9 @@ def gated_call(fault_site: ControlSite) -> GatedCall:
             except BaseException as exc:  # noqa: BLE001 - 线程内异常转交给主线程断言
                 failure["error"] = exc
 
-        thread = threading.Thread(target=worker, name=f"gated-{barrier_name}", daemon=True)
+        thread = threading.Thread(
+            target=worker, name=f"gated-{barrier_name}", daemon=True
+        )
         thread.start()
         try:
             reached = fault_site.barrier.wait_armed(barrier_name, timeout=wait_timeout)

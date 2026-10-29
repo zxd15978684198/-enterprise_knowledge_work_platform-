@@ -1,6 +1,6 @@
 # PyKnora 实施状态
 
-更新日期：2026-10-29（Asia/Shanghai）。当前为 **Phase 0 实验阶段收口**：W1–W12 十二个波次已执行完成，并连同四条修复分支（`fix/w5-t17`、`fix/w5-t18`、`fix/w7r-t05-t09`、`fix/w1-t02-pgvector`）与 W10 内的 ruff 收口提交按序合入 `dev`；**W13（执行 ADR-0010）已在 `feature/w13-adr0010` 上做完、待用户裁决提交**——备份演练在 pg17+pgvector 下复跑 PASS（63 表逐表摘要零差异）、T02 环境证据按新 digest 重采（`environment.md` §15）、T25 ANN 补跑完成（HNSW recall 0.998–1.000、IVFFlat 0.971–1.000）。P0-T01–P0-T32 共 32 项任务级全部执行完毕（绝大多数为 **PASS（限域）**，T01 为文档交付，T17/T18 经修复分支收口）。**两道出口门仍不成立**：G-P0 = 5 门 0 门 PASS（G1–G4 = PARTIAL；**G5 的「ANN 不可用」阻塞已由 W13 解除**，但阈值校准归 ADR-0014 未批，G5 仍为 `NOT_RUN`，见 `docs/poc/evidence/P0_Core_Gate_Review.md`）；G-FULL = 九项 PoC **全部 PARTIAL、0 项无保留 PASS**（见 `docs/poc/evidence/Phase0_Full_Gate_Review.md`）。**Phase 0 不得标记为完整完成**，可按 `05_Phase0_Acceptance.md:81-82` 走「受限范围准入」三方评审。ADR 共 **14 份（0007–0014）**，其中 **ADR-0010 于 W13 转为「已接受」**（四条验证条件逐项落实并附执行结果），其余 13 份仍为 `Proposed`，接受权在法务/产品/安全，不由工程侧自行升级。所有结论仅为实验环境内验证，不代表可生产。
+更新日期：2026-10-29（Asia/Shanghai）。Phase 0 实验阶段**收口完成**：W1–W15 十五个波次全部执行完毕，四条修复分支（`fix/w5-t17`、`fix/w5-t18`、`fix/w7r-t05-t09`、`fix/w1-t02-pgvector`）与 W10 的 ruff 收口提交按序合入 `dev`（`dev` 顶点 `1bcad95`），**W14（机制批 M1/M2/M3）与 W15（D5 缺口补齐）已在本分支 `feature/w14-m1-m2-m3` 上完成并通过门禁、待用户裁决提交**。P0-T01–P0-T32 三十二项任务级全部执行完毕（绝大多数 **PASS（限域）**；T01 为文档交付，T17/T18 经修复分支收口，PoC-09 为 `PARTIAL`）。**两道出口门仍不成立**：G-P0 = 5 门 0 门 PASS（G1–G4 = `PARTIAL`；G5 的「ANN 不可用」已由 W13 解除，但阈值校准归 ADR-0014 未批，故 G5 仍 `NOT_RUN`）；G-FULL = 九项 PoC **全部 `PARTIAL`、0 项无保留 PASS**。**Phase 0 不得标记为完整完成**，只能按 `05_Phase0_Acceptance.md:81-82` 走受限范围准入的三方评审。本轮新增三条**证据卫生机制**（不提升任何能力，只让结论可复核）：M1 把 `02_Phase0_PoC_Plan.md` 的状态列改为「依据到 `文件:行`」并写明唯一维护人；M2 用 `SHA256SUMS` + `evidence_manifest.json` 外部台账 + `evidence_meta.py` 校验 8 份证据 JSON（不注入、不改写历史）；M3 用 `verdict_lint.py` 4 条规则拦「限域写成通过」并固定 8 条存量基线。W15 补齐 T31 登记的 D5 输入缺口（SBOM/许可、远程扩展连接、证据指纹生命周期），并修复一个**结构性测试缺陷**：探针把证据写回 tracked 路径，导致台账用例在同一次回归里必然失败——改为测试会话重定向到临时目录后，全量回归 **1037 passed / 8 skipped / 576.82s**，且跑完仓库证据目录零改动。ADR 共 14 份（0007–0014），其中 **ADR-0010 已接受**，其余 13 份仍 `Proposed`。所有结论仅为实验环境内验证，不代表可生产。
 
 ## 阶段收口：W1–W5 全部合入 dev（2026-10-28）
 
@@ -436,3 +436,31 @@
 - **判定**：ADR-0010 四条验证条件全满足 → **ADR-0010 转「已接受」**；G5 的 ANN 阻塞项解除，但 G5 仍不成立（阈值校准属 ADR-0014，未批），G-P0/G-FULL 状态不变。
 - **提交状态**：**已提交、已推送、已合入 dev**（用户选 1）。代码 `7c4402e`、文档 `e1bde5e`、回填 `8375994`；`--no-ff` 合并 `6e00b9b`、回填合并 `fb6979f`。`feature/w13-adr0010` 远端 `8375994`，`dev` 远端 `fb6979f`，本地与远端逐位一致。全量回归重生成的 6 份 tracked 证据按既有做法 `git stash` 隔离（`stash@{0}`），不入提交。
 - **下一步（唯一推荐顺序）**：① G5 最后一项 = ADR-0014 阈值校准，需产品侧批准 `DG-3/DG-4` 阈值后才能补测；② W14 = 机制批 M1（上下文压缩）/M2（工具适配）/M3（预算熔断）三条正交机制，N=3 并行（用户已批准）；③ 其余 13 份 ADR 待法务/产品/安全裁决；④ 真实后端批在机制批之后。
+
+## 本轮：W14 波次执行（机制批 M1/M2/M3，2026-10-29）
+
+- **为什么做**：T32 评审与 W10 评审都指出「结论可复核性」是真问题——计划状态列全 `NOT_STARTED`、证据文件可被手改、限域结论容易被后续阅读者读成「通过」。三条机制各自正交，声明块按 `N=3` 开，实际由 Lead 串行执行（派发通道连续第 4 次失效，见波次记录 §5-1）。
+- **交付（新增 12 + 修改 2）**：
+  - **M1**：`docs/poc/02_Phase0_PoC_Plan.md` §3 表格新增「依据（W14 复核）」列，9 行状态从 `NOT_STARTED` 改为 8×`PASS（限域）`+PoC-09 `PARTIAL`，每行依据定位到 `文件:行`；新增 §3.1「状态列维护条款」（唯一维护人 = 波次 Lead，时机 = 每波次回填，依据必须可 grep）。
+  - **M2**：`docs/poc/evidence/SHA256SUMS` + `evidence_manifest.json`（外部台账，**不注入**历史证据）+ `experiments/phase0/evidence_meta.py`（解析 24 种时间戳键名、区分工具产物与证据）+ `tests/phase0/test_evidence_meta.py`（13 例）→ `--check` 结果 `evidence=8 with_problem=0 global_problems=0`。
+  - **M3**：`experiments/phase0/verdict_lint.py` 4 条规则（同行裸 `**PASS**` 且同行含 `NOT_RUN`/`PARTIAL`/`BLOCKED`/`NOT_STARTED`、`NOT_RUN` 却声称门通过、缺证据字段、`_（待填）_` 残留）+ `verdict_lint_baseline.json` 固定 8 条存量 + `tests/phase0/test_verdict_lint.py`（13 例）→ `--check` 结果 `docs_scanned=52 violations=9 new=0`。
+  - 三份机制报告 `w14-m1-report.md`/`w14-m2-report.md`/`w14-m3-report.md` + 本波次记录。
+- **与声明块的偏差（三条，均落地为更强或更窄的口径）**：E1 M2 由「幂等注入三字段」改为「外部台账 + 校验器」（改写历史证据会改变其指纹，而多份报告引用的是改写前结论）；E2 M1 由「更新六项 PoC」扩到九行全量（同一张表半真半过期更糟）；E3 M3 由「文档级规则」收敛为「行级规则」（文档级会把 30+ 份合法文档判违规）。
+- **门禁**：`ruff` All checks passed（含清掉 16 条 E501）；定向 26 passed；台账 `--check` 与口径 `--check` 均 exit 0；秘密扫描 0 命中。**全量回归跑了 5 次**：前两次被环境漂移与本波次真实缺陷阻断（`UNREGISTERED:verdict_lint_baseline.json`），第 3/4 次暴露**套件自我污染**（探针写证据 ↔ 台账用例校验证据），修复后第 5 次 **1037 passed / 8 skipped / 576.82s**、跑完证据目录零改动（详见 `wave-w14-record.md` §3.4）。
+- **判定**：**不改变任何 P0 门级判定**（G-P0 仍 4×`PARTIAL`+1×`NOT_RUN`，G-FULL 仍不成立）。M1/M2/M3 是证据卫生，不是能力补齐。
+- **提交状态**：**待用户裁决**（与 W15 同分支 `feature/w14-m1-m2-m3` 一并提交）。
+- **下一步**：见 W15 段末。
+
+## 本轮：W15 波次执行（D5 输入缺口补齐 + 门禁自证修复，2026-10-29）
+
+- **为什么做**：T31 评审 §2.4 登记的 D5 缺口里，有三份文档「被引用但不存在」直接削弱了评审可复核性（SBOM/许可、远程扩展连接说明、证据指纹生命周期）。三件事互不重叠，声明块开 `N=3`。
+- **派发事实**：3 个 teammate 再次零产出（连续第 5 次），改走 `subagent` 通道 **3/3 成功**；W15 §2 已把这次事故与两条同行工作流的并发证据完整留痕。
+- **交付（3 份新文档 + 6 个文件的代码修复）**：
+  - `docs/poc/evidence/sbom.md`（319 行）：`uv export` 固定层依赖、`pip-licenses` 64 包分类、逐包许可正文实读、GPL/AGPL 定位与 Redis RSALv2/SSPLv1 边界；4 条决策点留给用户/法务（含「psycopg LGPL 的三缺三」不能以清单替代披露材料）。
+  - `docs/remote-extension-connection.md`（269 行）：daemon/扩展/CLI 三者的真实链路与版本、配对鉴权、故障排查表、12 项显式「待验证」；并纠正声明块里两处**不存在的文件名**（未伪造同名文件）。
+  - `docs/poc/evidence/evidence-integrity.md`（169 行）：`SHA256SUMS`/`evidence_manifest.json` 的生命周期与复算命令、`derived_from` 分级、台账重算时机；现场记录了校验器自身无指纹、并发写入无锁两条事实。
+- **门禁自证修复（§6 E1，代码改动）**：新增 `experiments/phase0/evidence_dir.py` + 4 个探针改用它 + `conftest.py` 把证据目录重定向到临时目录 + `test_checkpoint_owner.py` 同步；直接后果是全量回归从「必然 1 failed」变为 **1037 passed / 8 skipped / 576.82s** 且跑完仓库零改动。
+- **门禁**：引用一致性无新增伪路径（6 处「缺失」全部为 venv 内路径/勘误行/已登记缺口/模板占位符）；`verdict_lint --check` `violations=8 new=0`；`evidence_meta --check` `global_problems=0`；ruff All checks passed；秘密扫描 0 实命中；全量回归 1037 passed。
+- **判定**：**不改变任何门级判定**。三份文档是输入缺口与可维护性说明，不是能力补齐；`poc07-report.md` 仍缺（另有登记）。
+- **提交状态**：**待用户裁决**（与 W14 同分支提交）。
+- **下一步（推荐顺序）**：① W14+W15 一并提交、推送、`--no-ff` 合入 `dev`；② G5 最后一项 = ADR-0014 阈值校准，需产品侧批准 `DG-3/DG-4`；③ 13 份 ADR 待法务/产品/安全裁决（W12 已立项）；④ `poc07-report.md`、口径债 8 条、规则粒度列语义解析等文档债务批次；⑤ 真实后端批在机制批与准入评审之后。
