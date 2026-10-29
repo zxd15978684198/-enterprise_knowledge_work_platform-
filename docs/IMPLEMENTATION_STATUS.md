@@ -1,6 +1,6 @@
 # PyKnora 实施状态
 
-更新日期：2026-10-29（Asia/Shanghai）。当前为 **Phase 0 实验阶段**：W1–W9 九个波次已执行完成，并连同四条修复分支（`fix/w5-t17`、`fix/w5-t18`、`fix/w7r-t05-t09`、`fix/w1-t02-pgvector`）按序合入 `dev`（顶点 `ae0a5ae`）。判定现状：P0-T01–P0-T30 共 30 项中 28 项任务级成立（绝大多数为 **PASS（限域）**，T01 为文档交付、T17/T18 经修复分支收口），P0-T31 已完成核心出口评审，**P0-T32 仍 NOT_STARTED**。**G-P0 核心出口不成立：5 门 0 门 PASS（G1–G4 = PARTIAL，G5 = NOT_RUN）**，详见 `docs/poc/evidence/P0_Core_Gate_Review.md`。九项 PoC 无整体 PASS；ADR 仍为 Proposed；所有结果仅是实验环境内的验证结论，不代表 ADR 已接受或 Phase 0 工程验证通过。
+更新日期：2026-10-29（Asia/Shanghai）。当前为 **Phase 0 实验阶段收口**：W1–W11 十一个波次已执行完成，并连同四条修复分支（`fix/w5-t17`、`fix/w5-t18`、`fix/w7r-t05-t09`、`fix/w1-t02-pgvector`）与 W10 内的 ruff 收口提交按序合入 `dev`。P0-T01–P0-T32 共 32 项任务级全部执行完毕（绝大多数为 **PASS（限域）**，T01 为文档交付，T17/T18 经修复分支收口）。**两道出口门均不成立**：G-P0 = 5 门 0 门 PASS（G1–G4 = PARTIAL，G5 = NOT_RUN，见 `docs/poc/evidence/P0_Core_Gate_Review.md`）；G-FULL = 九项 PoC **全部 PARTIAL、0 项无保留 PASS**（见 `docs/poc/evidence/Phase0_Full_Gate_Review.md`）。**Phase 0 不得标记为完整完成**，可按 `05_Phase0_Acceptance.md:81-82` 走「受限范围准入」三方评审。ADR 仍为 Proposed；所有结论仅为实验环境内验证，不代表 ADR 已接受或可生产。
 
 ## 阶段收口：W1–W5 全部合入 dev（2026-10-28）
 
@@ -376,3 +376,21 @@
 - **判定**：**G-P0 不成立**；任务级 28/30 成立。**不得据此宣称 Phase 0 通过或可进入 Phase 1。**
 - **提交状态**：**已提交、已推送、已合入 `dev`**（用户裁决「提交 + 推送 + 合入 dev」）：docs `44cc5eb`（3 文件 +530/−3）、style `5ca0659`（4 文件 import 排序，清 4 条存量 `I001`）；`--no-ff` 合入 `dev` → merge commit `8c97c75`，`dev` 已推送（`ae0a5ae..8c97c75`）。
 - **下一步**：W11 = T32（全量评审/收口），依赖 T31 结论；此外三件可补做项——清 4 条 `I001` 存量、补跑 T25 ANN 对照（pgvector 已可用）、按 §7 处理 5 条 ADR 建议。
+
+## 本轮：W11 波次执行（P0-T32 全量 Phase 0 / P1 前置证据评审，2026-10-29）
+
+- **为什么 `N=1`**：T32 是 Backlog 最后一个 P0 任务，纯文档评审、无代码改动，且依赖 T28/T18/T24/T31 全部已收口；分支 `feature/w11-t32` 从 `dev`（`65a2f89`）拉出，声明见 `docs/poc/evidence/wave-w11-record.md` §1。
+- **执行方式（Lead 自执行，不再派发）**：T31 已暴露「跨 12 份波次记录的全量对账 + 长文连续写作」是子 agent 的失败模式（静默失败 1 次、中途退出 1 次），且 T32 是 Phase 0 唯一收口结论、不能试错，故由 Lead 执行，方法沿用 T31 收敛出的「脚本化证据提取 → 人工判定 → 文档写作」三段式。
+- **交付（2 份新增 + 1 份修改）**：
+  - `docs/poc/evidence/Phase0_Full_Gate_Review.md`（**新增**）：§1 输入清单、§2 方法、§3 **九项 PoC 全量退出判定 + 3.1 汇总 + 3.2 与 T31 口径差异**、§4 G-FULL 判定（含判据表与 Mermaid 判定图）、§5 P1 安全矩阵与数据许可、§6 ADR 8 条 + TDD 6 条 + 降级清单 DG-1–DG-7、§7 受限范围准入（7 类禁用能力 / 接受者 / 6 条残余风险 / 6 批补测任务）、§8 注入测试、§9 剩余风险与下一步。
+  - `docs/poc/evidence/wave-w11-record.md`（新增，含 §2 派发/§3 门禁/§4 提交决策）。
+  - 本文件。
+- **九项 PoC 判定（唯一态）**：**9 项全部 `PARTIAL`，0 项 `PASS`（无保留）、0 项 `PASS（限域）`、0 项 FAIL/BLOCKED/NOT_STARTED**。逐项缺项：PoC-01 多实例 saver 不可 fencing；PoC-02 真实 Celery worker 与 60s deadline 未按原样；PoC-03 真实对象存储/删除传播；PoC-04 真实服务端到端与真实样本（50/50 全合成）；PoC-05 Playwright 真实 read 缺失（双后端只有单后端真实，31 动作仅映射 13）；PoC-06 真实 provider 与 `stream()`；PoC-07 真实结构化 plan；PoC-08 真实 chat 模型生成段；PoC-09 ANN/召回与阈值校准。
+- **与 T31 的口径分层（必须显式说明）**：T31 按「任务级 + 六 PoC」判 → 5 项 `PASS（限域）` + PoC-01/PoC-09 各 `PARTIAL`；T32 按「九 PoC × `05:21-31` 强制项」判 → 9 项全 `PARTIAL`。差异来自口径不是翻案：限域只属任务级，PoC 级强制项缺一条即不得无保留 PASS。对外只能引用 T32 做 Phase 0 退出结论。
+- **G-FULL 判定**：**不成立**。逐条对照 `05:80`：G-P0 未满足；九项强制项未全 PASS；PoC-05 双后端真实证据不全；PoC-07/08 缺真实模型环节；多实例/许可/身份域/质量阈值四项高风险未验证且未走正式范围变更。
+- **量化证据**：安全侧 549 探针 / 536 拒绝 / 13 允许 / **0 越权漏放**；DocReader 镜像 digest 固定但 `NOASSERTION`，apt 971（**227 unknown**）、pip 72（**11 unknown**），OCR 权重项已闭合为「不存在」；全仓 SBOM 仍不存在；`links` 引用 34 条 → `exists=28 / known_gap=6 / missing=0`。
+- **注入测试（T32 强制项）**：构造声明集 4 条（2 真 2 伪），校验器 6 条规则（存在性/完整性/限域一致性/声明-证据/mock 冒充/五态合法）。实测 `TOTAL claims=4 rejected=2 expect_mismatch=0`：把 Playwright `NOT_RUN` 声明成「真浏览器 read 已完成（裸 PASS）」与把「真实厂商 API 已完成」声明成裸 PASS 均被 `R3/R4` 拦下；如实标注限域则放行。结论：**mock→real 的声明篡改可被机器拒绝**，建议作为 M3 的落地形态。
+- **门禁（Lead 实跑）**：全量 **1006 passed / 0 failed / 0 errors / 8 skipped in 838.95s (0:13:58)**；本波次零 `.py` 改动 → ruff N/A（存量 `I001` 已于 W10 清零）；口径 linter 复检 `violations=2`（均为 W1/W2 历史记录，非本轮新增）；引用一致性 `missing=0`；秘密扫描 0 命中（3 条命中均为描述扫描规则的文字，非凭据）。
+- **判定**：**G-FULL 不成立 → Phase 0 不得标记为完整完成**；九项 PoC 全部 PARTIAL，可提出「受限范围准入」供产品/安全/架构三方评审。
+- **提交状态**：待回填。
+- **下一步（唯一推荐顺序）**：① ADR 立项批（新增 8 条建议，ADR-NEW-1/2/5 与 3/4/6/7/8）；② G5 补齐（pgvector 进 core → 重采 T02 证据 → 补跑 T25 ANN → 阈值校准）；③ 真实后端批（MinIO/Celery/DocReader/真实模型）；④ 机制批（M1/M2/M3 进脚本门禁）；⑤ P1 开发只能在受限准入签署后启动。
