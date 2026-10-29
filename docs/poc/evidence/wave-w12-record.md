@@ -52,4 +52,14 @@
 - **待提交（11 个文件）**：`docs/adr/0007..0014_*.md`（8 个新增）、`docs/adr/README.md`（改）、`docs/IMPLEMENTATION_STATUS.md`（改）、`docs/poc/evidence/wave-w12-record.md`（新增）。
 - **不提交**：`docs/plans/README.md`（既有未跟踪，非本波次产物）。
 - **核心结论**：8 条建议已全部立项为编号 ADR，**状态一律提议**；本波次不改变 Phase 0 的任何判定（G-P0 0/5、G-FULL 9 项 PARTIAL 不变），只把「该谁裁决什么」从评审附录变成可引用的正式记录。
-- **等待用户裁决**：是否提交、是否推送、是否 `--no-ff` 合入 `dev`。
+- **用户裁决**：选 1 —— 提交 + 推送 + `--no-ff` 合入 `dev`。
+
+### 4.1 落地结果（回填）
+
+| 环节 | 结果 |
+| --- | --- |
+| 提交 | `dbfce54`（`docs(adr): 立项 8 份 ADR（0007-0014）`，11 个文件）；`git diff --cached --check` exit 0 |
+| 推送分支 | `feature/w12-adr` → `origin`，本地/远端同为 `dbfce54` |
+| 合入 dev | `git merge --no-ff feature/w12-adr`（ort）→ `b1759b9`，无冲突 |
+| 推送 dev | `557948b..b1759b9  dev -> dev`，exit 0 |
+| 一致性 | `docs/adr/*.md` 15 文件 59 链接 `missing=0`；14 份 ADR 状态全为「提议」 |
