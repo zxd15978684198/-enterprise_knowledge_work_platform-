@@ -129,6 +129,18 @@ env_test_exit=0   (13 passed，含新增 pgvector 静态断言)
 - 直接解锁：T26（检索/引用/事件）可做真实向量检索；W5 记录中的缺口 ③ 由此关闭；T25 的 ANN 部分可在后续回归中从 `NOT_RUN` 升级（需重跑该任务才有新证据，不能凭本记录改判）。
 - 仍需注意：`vector` 扩展要在每个新建数据库里 `CREATE EXTENSION`（本记录只在 `pyknora` 库执行过探针并已清理），后续任务的迁移/夹具需要自带这一句，否则依旧会 `type "vector" does not exist`。
 
+## 9. 提交与合入（2026-10-29，用户确认「提交 + 推送 + 合入 dev」后执行）
+
+| 步骤 | 真实结果 |
+| --- | --- |
+| env 改动提交 | `c44ce5d` `fix(phase0): switch postgres image to pgvector/pgvector:pg17`（5 文件 +69 −29） |
+| docs 记录提交 | `7c8a585` `docs(phase0): record pgvector env fix and refresh frontier to W8/T26`（3 文件 +159 −9，含本文件） |
+| 推送分支 | `git push -u origin fix/w1-t02-pgvector` → `* [new branch]`，exit 0，已设上游 |
+| 合入 dev | `git merge --no-ff --no-edit fix/w1-t02-pgvector` → 合并提交 `cc45265`（8 文件 +228 −38），exit 0 |
+| 推送 dev | `git push origin dev` → `5809d80..cc45265`，exit 0；`origin/dev` = `cc45265` |
+
+提交前均跑 `git diff --cached --check`（exit 0），只暂存本修复相关文件；`.idea/`、`CLAUDE.md`、`docs/plans/README.md`、`docs/teacher/` 仍未入库。
+
 ---
 
-**owner**：lead　分支 `fix/w1-t02-pgvector`　**status**：门禁通过（见 §7），等待用户确认是否提交
+**owner**：lead　分支 `fix/w1-t02-pgvector`　**status**：门禁通过（见 §7），已提交并合入 `dev`（见 §9）
