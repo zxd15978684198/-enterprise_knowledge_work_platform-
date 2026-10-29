@@ -1,6 +1,6 @@
 # Phase 0 风险驱动 PoC 计划
 
-日期：2026-10-27。**九项均为 NOT_STARTED**，无工程执行/性能基线。本轮没有安装依赖、启动容器/PoC 或修改业务代码。原始风险依据：[研究风险](../research/03_Compatibility_Risks.md)，本轮编号见 [风险登记](01_Technical_Risk_Register.md)。任务路径均为未来预计产物，当前不存在不代表已实现。
+日期：2026-10-27。**九项均为 NOT_STARTED**，无工程执行/性能基线。本轮没有安装依赖、启动容器/PoC 或修改业务代码。（↑ 该句是 W0 规划时点的状态快照，**保持原样不改写**；实时状态见 §3 总览表的「当前结果 / 依据」两列与 §3.1 维护条款。）原始风险依据：[研究风险](../research/03_Compatibility_Risks.md)，本轮编号见 [风险登记](01_Technical_Risk_Register.md)。任务路径均为未来预计产物，当前不存在不代表已实现。
 
 ## 1. 目标、范围、证据与依赖原则
 
@@ -25,19 +25,30 @@ PoC 用于证伪关键架构假设，不是提前交付完整产品。隔离代�
 
 ## 3. PoC 总览
 
-| PoC ID | 风险/PRD | Task IDs | 外部依赖（硬门禁） | 当前结果 |
-| --- | --- | --- | --- | --- |
-| PoC-01 | R-01/02/11/16；F-09、AC-E09、AC-06 | P0-T05、P0-T06 | T01–T04；T07/T08不是初测前提，后续T21补可靠唤醒集成 | NOT_STARTED |
-| PoC-02 | R-03/04/11；AC-05、F-03/04 | P0-T07、P0-T08 | T03/T04；真实PG/Redis/Celery | NOT_STARTED |
-| PoC-03 | R-05/11/17；AC-01/04/05 | P0-T12、P0-T13 | T08/T11；真实PG/pgvector/对象服务 | NOT_STARTED |
-| PoC-04 | R-06/13/16；F-04、AC-01/03 | P0-T09、P0-T10、P0-T11 | T02/T04/T09，T11还需T03授权fixture | NOT_STARTED |
-| PoC-05 | R-07/08/11/13；F-11、AC-E02/08/09 | P0-T14–P0-T18 | T15基础port；BSK真动作需T06，upstream/设备真实可用 | NOT_STARTED |
-| PoC-06 | R-10/14/16；F-02/09/16、AC-E08/09/10 | P0-T19、P0-T20、P0-T21 | T03/T04；集成T21需T05/T06/T08/T20 | NOT_STARTED |
-| PoC-07 | R-09/14；F-10、AC-E01/09 | P0-T22、P0-T23、P0-T24 | T19；调度需T05/T08/T20 | NOT_STARTED |
-| PoC-08 | R-12及全链；F-10/12、AC-E01–E10 | P0-T27、P0-T28 | T11/T16/T24，最终T18/T26/T13/T21 | NOT_STARTED |
-| PoC-09 | R-05/06/11/15；F-05/06、AC-02/03 | P0-T25、P0-T26 | T13/T19，最终T05/T21 | NOT_STARTED |
+| PoC ID | 风险/PRD | Task IDs | 外部依赖（硬门禁） | 当前结果 | 依据（W14 复核，2026-10-29） |
+| --- | --- | --- | --- | --- | --- |
+| PoC-01 | R-01/02/11/16；F-09、AC-E09、AC-06 | P0-T05、P0-T06 | T01–T04；T07/T08不是初测前提，后续T21补可靠唤醒集成 | **PASS（限域：单活）** | `wave-w7r-record.md:61`（T05R `12 passed / exit 0`）、`wave-w3-record.md:100`、`wave-w4-record.md:154`；多实例 fencing 仍 PARTIAL |
+| PoC-02 | R-03/04/11；AC-05、F-03/04 | P0-T07、P0-T08 | T03/T04；真实PG/Redis/Celery | **PASS（限域）** | `wave-w3-record.md:174`（T07）、`wave-w4-record.md:155`（T08 `applied=100 / duplicate=900`） |
+| PoC-03 | R-05/11/17；AC-01/04/05 | P0-T12、P0-T13 | T08/T11；真实PG/pgvector/对象服务 | **PASS（限域）** | `wave-w5-record.md:140`（T12）、`wave-w6-record.md:111`（T13，10 000 次并发读零混版本） |
+| PoC-04 | R-06/13/16；F-04、AC-01/03 | P0-T09、P0-T10、P0-T11 | T02/T04/T09，T11还需T03授权fixture | **PASS（限域）** | `wave-w7r-record.md:62`（T09R 镜像 digest）、`wave-w4-record.md:156`（T11 golden 50/50）；残余：真实样本 + OCR 权重许可 |
+| PoC-05 | R-07/08/11/13；F-11、AC-E02/08/09 | P0-T14–P0-T18 | T15基础port；BSK真动作需T06，upstream/设备真实可用 | **PASS（限域）** | T14/T15/T16 见 `wave-w1-record.md:55`、`wave-w3-record.md:92`、`wave-w4-record.md:157`；T17 `wave-w5-record.md:86`（`fix/w5-t17` 真配对）；T18 `fix-w5-t18-record.md:94`。残余：T15 能力位未与真 daemon 握手、`tab borrow` `NOT_RUN`、`LeaseRegistry` 仅进程内 |
+| PoC-06 | R-10/14/16；F-02/09/16、AC-E08/09/10 | P0-T19、P0-T20、P0-T21 | T03/T04；集成T21需T05/T06/T08/T20 | **PASS（限域）** | `wave-w3-record.md:177`（T19）、`wave-w4-record.md:158`（T20）、`wave-w5-record.md:141`（T21）；残余：真实供应商、`stream()` 未实现 |
+| PoC-07 | R-09/14；F-10、AC-E01/09 | P0-T22、P0-T23、P0-T24 | T19；调度需T05/T08/T20 | **PASS（限域）** | `wave-w4-record.md:91`（T22）、`wave-w5-record.md:142`（T23）、`wave-w6-record.md:68`（T24）；残余：单活前提、checkpoint 用替身 |
+| PoC-08 | R-12及全链；F-10/12、AC-E01–E10 | P0-T27、P0-T28 | T11/T16/T24，最终T18/T26/T13/T21 | **PASS（限域）** | `wave-w7-record.md:68`（T27 `66 passed`）、`wave-w9-record.md:38`（T28）、T29 安全回归同波次；残余：真实模型/真实后端 |
+| PoC-09 | R-05/06/11/15；F-05/06、AC-02/03 | P0-T25、P0-T26 | T13/T19，最终T05/T21 | **PARTIAL** | `wave-w7-record.md:67`（T25，当时 ANN `NOT_RUN`）、`wave-w8-record.md:80`（T26 `21/21`，替身模型 `citation_accuracy=1.0`）；ANN 已于 W13 补跑（`ann-bench.json`，HNSW recall 0.998–1.000），但**质量阈值未获批准（ADR-0014）→ 不得判质量 PASS** |
 
 本表的“依赖”与 Backlog 是硬依赖；PoC 本身可拆分先做静态/局部任务，不能把未完成子路线聚合成 PASS。PoC-08 只评估 AC-E07 的最小两轮变化/观察，不交付生产周期调度器。
+
+### 3.1 状态列维护条款（M1，W14 立项）
+
+| 项 | 约定 |
+| --- | --- |
+| 唯一维护人 | 当前波次 **Lead**（轮次交接时在 `docs/IMPLEMENTATION_STATUS.md` 前沿行声明） |
+| 更新时机 | 每个波次 `docs/poc/evidence/wave-wN-record.md` 的 §2/§3 收口时，**必须同步**本表「当前结果」与「依据」两列 |
+| 更新依据 | 该波次记录的判定行 + `docs/poc/evidence/` 下的报告文件（`poc0*-report.md`、`fix-*-record.md`、`P0_Core_Gate_Review.md`） |
+| 状态取值 | 只允许 `NOT_STARTED` / `PARTIAL` / `PASS（限域）` / `PASS` / `FAIL` / `BLOCKED`；**含 `NOT_RUN` 或未覆盖边界者一律不得写成无保留 `PASS`**（`05_Phase0_Acceptance.md:73-76`，由 `verdict_lint.py` 机检） |
+| 与判据的关系 | 本表是**结论索引**，不是判据：门级判定以 `P0_Core_Gate_Review.md` / `Phase0_Full_Gate_Review.md` 为准，任务级判定以各波次记录为准 |
+| 历史保护 | W0 时点的「九项均为 NOT_STARTED」等历史表述不得改写，只能追加「截至 Wxx」的更新行，保证可追溯 |
 
 ## 4. PoC-01：Checkpoint、审批与副作用恢复
 
@@ -121,3 +132,5 @@ PoC 用于证伪关键架构假设，不是提前交付完整产品。隔离代�
 ## 13. 当前运行状态与后续
 
 所有PoC结果NOT_STARTED，环境命令只草案；缺真实设备/模型/镜像/许可是已知前置缺口，不假装本轮尝试运行失败。完整PASS/PARTIAL/FAIL/BLOCKED规则、阻断和ADR重审见 [05](05_Phase0_Acceptance.md)。优先执行资料/契约T01，再并行T02/T09/T14；具体任务依赖以 [04](04_Phase0_Dependency_DAG.md) 唯一表为准。
+
+**截至 W14（2026-10-29）的实时状态**：上一段是 W0 规划时点的状态，不改写。实际执行到 W13 收口：§3 总览表中 **8 项 `PASS（限域）` + PoC-09 `PARTIAL`**；门级仍**未通过**——P0 核心出口 G-P0 = 4 门 PARTIAL（G1/G2/G3/G4）+ 1 门 NOT_RUN（G5），全量出口 G-FULL 同样不成立，详见 `docs/poc/evidence/P0_Core_Gate_Review.md` 与 `Phase0_Full_Gate_Review.md`。**「限域 PASS」不等于门通过**，本表的维护责任与更新时机见 §3.1。
