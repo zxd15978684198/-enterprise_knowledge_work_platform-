@@ -1,0 +1,799 @@
+{
+  "schema_version": 1,
+  "graph_version": "research.v1",
+  "task_count": 30,
+  "rows": [
+    {
+      "task_id": "p01",
+      "expect": "succeeded",
+      "goal": "差旅报销上限与发票要求是什么",
+      "run_id": "f8172e50-0dd8-5b65-ba4c-cf3a6f5b956f",
+      "status": "succeeded",
+      "interrupted": false,
+      "interactions": [],
+      "published": 1,
+      "candidates": 1,
+      "citations": 3,
+      "events": 16,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "js",
+        "search",
+        "user_browser"
+      ],
+      "replayed": false,
+      "diagnostics": [],
+      "error_code": null,
+      "actual": "succeeded",
+      "external_keys": [
+        "t28-research:f8172e50-0dd8-5b65-ba4c-cf3a6f5b956f:613de2b0-3c13-46a7-bd3d-32ef4c0781d3"
+      ],
+      "external_applied": 1
+    },
+    {
+      "task_id": "p02",
+      "expect": "succeeded",
+      "goal": "费用报销流程需要几级审批",
+      "run_id": "c3eca833-d125-54a1-b5d3-dcbe05583761",
+      "status": "succeeded",
+      "interrupted": false,
+      "interactions": [],
+      "published": 1,
+      "candidates": 1,
+      "citations": 3,
+      "events": 16,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "js",
+        "search",
+        "user_browser"
+      ],
+      "replayed": false,
+      "diagnostics": [],
+      "error_code": null,
+      "actual": "succeeded",
+      "external_keys": [
+        "t28-research:c3eca833-d125-54a1-b5d3-dcbe05583761:63c85c1d-6792-4aaf-b537-cb328d67f2a7"
+      ],
+      "external_applied": 1
+    },
+    {
+      "task_id": "p03",
+      "expect": "succeeded",
+      "goal": "外部链接访问的安全策略要求",
+      "run_id": "8406c27f-38ec-5dd0-819c-7b93e451ea61",
+      "status": "succeeded",
+      "interrupted": false,
+      "interactions": [],
+      "published": 1,
+      "candidates": 1,
+      "citations": 3,
+      "events": 16,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "js",
+        "search",
+        "user_browser"
+      ],
+      "replayed": false,
+      "diagnostics": [],
+      "error_code": null,
+      "actual": "succeeded",
+      "external_keys": [
+        "t28-research:8406c27f-38ec-5dd0-819c-7b93e451ea61:3194a0f0-c033-44c6-9a00-513d300c508a"
+      ],
+      "external_applied": 1
+    },
+    {
+      "task_id": "p04",
+      "expect": "succeeded",
+      "goal": "审计日志与原始文档快照保留多久",
+      "run_id": "8d0e0958-4711-5f8f-8339-10b676bd7470",
+      "status": "succeeded",
+      "interrupted": false,
+      "interactions": [],
+      "published": 1,
+      "candidates": 1,
+      "citations": 3,
+      "events": 15,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "js",
+        "search",
+        "user_browser"
+      ],
+      "replayed": false,
+      "diagnostics": [],
+      "error_code": null,
+      "actual": "succeeded",
+      "external_keys": [
+        "t28-research:8d0e0958-4711-5f8f-8339-10b676bd7470:80c4ce19-29fd-4446-a42a-e546a73b6ae4"
+      ],
+      "external_applied": 1
+    },
+    {
+      "task_id": "p05",
+      "expect": "succeeded",
+      "goal": "知识库导入失败时活动版本是否受影响",
+      "run_id": "8ed90177-69eb-5b1e-971a-cb70d183eb87",
+      "status": "succeeded",
+      "interrupted": false,
+      "interactions": [],
+      "published": 1,
+      "candidates": 1,
+      "citations": 3,
+      "events": 15,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "js",
+        "search",
+        "user_browser"
+      ],
+      "replayed": false,
+      "diagnostics": [],
+      "error_code": null,
+      "actual": "succeeded",
+      "external_keys": [
+        "t28-research:8ed90177-69eb-5b1e-971a-cb70d183eb87:9962b4d7-1178-4317-a534-77a9517a5373"
+      ],
+      "external_applied": 1
+    },
+    {
+      "task_id": "p06",
+      "expect": "succeeded",
+      "goal": "差旅与费用报销的区别",
+      "run_id": "a37e5d3c-2563-5cb9-aabf-a2e4775db2fa",
+      "status": "succeeded",
+      "interrupted": false,
+      "interactions": [],
+      "published": 1,
+      "candidates": 1,
+      "citations": 3,
+      "events": 16,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "js",
+        "search",
+        "user_browser"
+      ],
+      "replayed": false,
+      "diagnostics": [],
+      "error_code": null,
+      "actual": "succeeded",
+      "external_keys": [
+        "t28-research:a37e5d3c-2563-5cb9-aabf-a2e4775db2fa:8c346d02-2ab9-4e0c-92e5-411a927dfaad"
+      ],
+      "external_applied": 1
+    },
+    {
+      "task_id": "p07",
+      "expect": "succeeded",
+      "goal": "安全白名单是否允许携带凭据",
+      "run_id": "d5bf24a0-85aa-50a9-935e-4379a7f4c753",
+      "status": "succeeded",
+      "interrupted": false,
+      "interactions": [],
+      "published": 1,
+      "candidates": 1,
+      "citations": 3,
+      "events": 15,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "js",
+        "search",
+        "user_browser"
+      ],
+      "replayed": false,
+      "diagnostics": [],
+      "error_code": null,
+      "actual": "succeeded",
+      "external_keys": [
+        "t28-research:d5bf24a0-85aa-50a9-935e-4379a7f4c753:b2fd077c-9b86-409e-9bbb-fa621bb0faad"
+      ],
+      "external_applied": 1
+    },
+    {
+      "task_id": "p08",
+      "expect": "succeeded",
+      "goal": "原始文档快照的归档周期",
+      "run_id": "e1a5e1e2-fb81-5d61-ac40-66102faae53e",
+      "status": "succeeded",
+      "interrupted": false,
+      "interactions": [],
+      "published": 1,
+      "candidates": 1,
+      "citations": 3,
+      "events": 15,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "js",
+        "search",
+        "user_browser"
+      ],
+      "replayed": false,
+      "diagnostics": [],
+      "error_code": null,
+      "actual": "succeeded",
+      "external_keys": [
+        "t28-research:e1a5e1e2-fb81-5d61-ac40-66102faae53e:1ad6335b-f45b-4636-8104-af5580641ca3"
+      ],
+      "external_applied": 1
+    },
+    {
+      "task_id": "p09",
+      "expect": "succeeded",
+      "goal": "二级审批的金额门槛",
+      "run_id": "7e8a319d-9706-5b07-a4d8-154be453b0f2",
+      "status": "succeeded",
+      "interrupted": false,
+      "interactions": [],
+      "published": 1,
+      "candidates": 1,
+      "citations": 3,
+      "events": 16,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "js",
+        "search",
+        "user_browser"
+      ],
+      "replayed": false,
+      "diagnostics": [],
+      "error_code": null,
+      "actual": "succeeded",
+      "external_keys": [
+        "t28-research:7e8a319d-9706-5b07-a4d8-154be453b0f2:76d09a95-b7bf-4cd3-aaa0-6a862df3f9c1"
+      ],
+      "external_applied": 1
+    },
+    {
+      "task_id": "p10",
+      "expect": "succeeded",
+      "goal": "部门负责人与财务复核的职责边界",
+      "run_id": "cdad7838-3750-5bae-8dbd-87ca3228103d",
+      "status": "succeeded",
+      "interrupted": false,
+      "interactions": [],
+      "published": 1,
+      "candidates": 1,
+      "citations": 3,
+      "events": 16,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "js",
+        "search",
+        "user_browser"
+      ],
+      "replayed": false,
+      "diagnostics": [],
+      "error_code": null,
+      "actual": "succeeded",
+      "external_keys": [
+        "t28-research:cdad7838-3750-5bae-8dbd-87ca3228103d:d2629acc-5b54-4e34-b24b-c8ce9270b71d"
+      ],
+      "external_applied": 1
+    },
+    {
+      "task_id": "p11",
+      "expect": "succeeded",
+      "goal": "导入流程的分块与索引顺序",
+      "run_id": "d5c4d195-7b1c-57a9-a8d8-e97478070e09",
+      "status": "succeeded",
+      "interrupted": false,
+      "interactions": [],
+      "published": 1,
+      "candidates": 1,
+      "citations": 3,
+      "events": 15,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "js",
+        "search",
+        "user_browser"
+      ],
+      "replayed": false,
+      "diagnostics": [],
+      "error_code": null,
+      "actual": "succeeded",
+      "external_keys": [
+        "t28-research:d5c4d195-7b1c-57a9-a8d8-e97478070e09:904e0ea3-02a7-4648-a2dd-713a959bd36f"
+      ],
+      "external_applied": 1
+    },
+    {
+      "task_id": "p12",
+      "expect": "succeeded",
+      "goal": "报销单必须附带的材料",
+      "run_id": "6b72a386-407d-545d-a3b7-98de1ca12ad4",
+      "status": "succeeded",
+      "interrupted": false,
+      "interactions": [],
+      "published": 1,
+      "candidates": 1,
+      "citations": 3,
+      "events": 17,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "js",
+        "search",
+        "user_browser"
+      ],
+      "replayed": false,
+      "diagnostics": [],
+      "error_code": null,
+      "actual": "succeeded",
+      "external_keys": [
+        "t28-research:6b72a386-407d-545d-a3b7-98de1ca12ad4:b6d3a2fd-8ac6-43bd-8b12-631398978da5"
+      ],
+      "external_applied": 1
+    },
+    {
+      "task_id": "r01",
+      "expect": "approval_rejected",
+      "goal": "需要人工否决的研究议题 1",
+      "run_id": "52ed9230-a3f2-52ea-86c5-b9478768da4b",
+      "status": "succeeded",
+      "interrupted": false,
+      "interactions": [],
+      "published": 0,
+      "candidates": 1,
+      "citations": 3,
+      "events": 14,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "js",
+        "search",
+        "user_browser"
+      ],
+      "replayed": false,
+      "diagnostics": [],
+      "error_code": null,
+      "actual": "approval_rejected",
+      "external_keys": [],
+      "external_applied": 0
+    },
+    {
+      "task_id": "r02",
+      "expect": "approval_rejected",
+      "goal": "需要人工否决的研究议题 2",
+      "run_id": "16f1174a-dc09-56ef-8eff-03adeb49afbe",
+      "status": "succeeded",
+      "interrupted": false,
+      "interactions": [],
+      "published": 0,
+      "candidates": 1,
+      "citations": 3,
+      "events": 14,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "js",
+        "search",
+        "user_browser"
+      ],
+      "replayed": false,
+      "diagnostics": [],
+      "error_code": null,
+      "actual": "approval_rejected",
+      "external_keys": [],
+      "external_applied": 0
+    },
+    {
+      "task_id": "r03",
+      "expect": "approval_rejected",
+      "goal": "需要人工否决的研究议题 3",
+      "run_id": "0d6a0f04-33bc-547c-8f37-57f28e739a51",
+      "status": "succeeded",
+      "interrupted": false,
+      "interactions": [],
+      "published": 0,
+      "candidates": 1,
+      "citations": 3,
+      "events": 14,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "js",
+        "search",
+        "user_browser"
+      ],
+      "replayed": false,
+      "diagnostics": [],
+      "error_code": null,
+      "actual": "approval_rejected",
+      "external_keys": [],
+      "external_applied": 0
+    },
+    {
+      "task_id": "r04",
+      "expect": "approval_rejected",
+      "goal": "需要人工否决的研究议题 4",
+      "run_id": "53ae2ac6-96de-597b-af47-dfc3b09d5cff",
+      "status": "succeeded",
+      "interrupted": false,
+      "interactions": [],
+      "published": 0,
+      "candidates": 1,
+      "citations": 3,
+      "events": 14,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "js",
+        "search",
+        "user_browser"
+      ],
+      "replayed": false,
+      "diagnostics": [],
+      "error_code": null,
+      "actual": "approval_rejected",
+      "external_keys": [],
+      "external_applied": 0
+    },
+    {
+      "task_id": "r05",
+      "expect": "approval_rejected",
+      "goal": "需要人工否决的研究议题 5",
+      "run_id": "cfce54e8-019e-5493-86e6-fdf56a0b0ab9",
+      "status": "succeeded",
+      "interrupted": false,
+      "interactions": [],
+      "published": 0,
+      "candidates": 1,
+      "citations": 3,
+      "events": 14,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "js",
+        "search",
+        "user_browser"
+      ],
+      "replayed": false,
+      "diagnostics": [],
+      "error_code": null,
+      "actual": "approval_rejected",
+      "external_keys": [],
+      "external_applied": 0
+    },
+    {
+      "task_id": "r06",
+      "expect": "approval_rejected",
+      "goal": "需要人工否决的研究议题 6",
+      "run_id": "de7f7230-6a89-57dc-870e-d73118d6f3eb",
+      "status": "succeeded",
+      "interrupted": false,
+      "interactions": [],
+      "published": 0,
+      "candidates": 1,
+      "citations": 3,
+      "events": 14,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "js",
+        "search",
+        "user_browser"
+      ],
+      "replayed": false,
+      "diagnostics": [],
+      "error_code": null,
+      "actual": "approval_rejected",
+      "external_keys": [],
+      "external_applied": 0
+    },
+    {
+      "task_id": "b01",
+      "expect": "budget_exceeded",
+      "goal": "预算受限的研究议题 1",
+      "run_id": "65ad9725-927d-5fce-a2dd-0c52e859057d",
+      "status": "failed",
+      "interrupted": false,
+      "interactions": [],
+      "published": 0,
+      "candidates": 0,
+      "citations": 0,
+      "events": 2,
+      "terminal_count": 1,
+      "channels": [],
+      "replayed": false,
+      "diagnostics": [
+        "budget_denied:BUDGET_EXCEEDED: 预算不足（tokens）：spent+reserved+maximum 超过 limit (dimension=tokens)"
+      ],
+      "error_code": "BUDGET_EXCEEDED",
+      "actual": "budget_exceeded",
+      "external_keys": [],
+      "external_applied": 0
+    },
+    {
+      "task_id": "b02",
+      "expect": "budget_exceeded",
+      "goal": "预算受限的研究议题 2",
+      "run_id": "030728d5-a8f6-5ea9-ac3f-30c386374c62",
+      "status": "failed",
+      "interrupted": false,
+      "interactions": [],
+      "published": 0,
+      "candidates": 0,
+      "citations": 0,
+      "events": 2,
+      "terminal_count": 1,
+      "channels": [],
+      "replayed": false,
+      "diagnostics": [
+        "budget_denied:BUDGET_EXCEEDED: 预算不足（tokens）：spent+reserved+maximum 超过 limit (dimension=tokens)"
+      ],
+      "error_code": "BUDGET_EXCEEDED",
+      "actual": "budget_exceeded",
+      "external_keys": [],
+      "external_applied": 0
+    },
+    {
+      "task_id": "b03",
+      "expect": "budget_exceeded",
+      "goal": "预算受限的研究议题 3",
+      "run_id": "e024a322-c2ec-59af-8e52-836dd7863c32",
+      "status": "failed",
+      "interrupted": false,
+      "interactions": [],
+      "published": 0,
+      "candidates": 0,
+      "citations": 0,
+      "events": 2,
+      "terminal_count": 1,
+      "channels": [],
+      "replayed": false,
+      "diagnostics": [
+        "budget_denied:BUDGET_EXCEEDED: 预算不足（tokens）：spent+reserved+maximum 超过 limit (dimension=tokens)"
+      ],
+      "error_code": "BUDGET_EXCEEDED",
+      "actual": "budget_exceeded",
+      "external_keys": [],
+      "external_applied": 0
+    },
+    {
+      "task_id": "b04",
+      "expect": "budget_exceeded",
+      "goal": "预算受限的研究议题 4",
+      "run_id": "236df9eb-f032-5664-b1c2-f53196bd4e1f",
+      "status": "failed",
+      "interrupted": false,
+      "interactions": [],
+      "published": 0,
+      "candidates": 0,
+      "citations": 0,
+      "events": 2,
+      "terminal_count": 1,
+      "channels": [],
+      "replayed": false,
+      "diagnostics": [
+        "budget_denied:BUDGET_EXCEEDED: 预算不足（tokens）：spent+reserved+maximum 超过 limit (dimension=tokens)"
+      ],
+      "error_code": "BUDGET_EXCEEDED",
+      "actual": "budget_exceeded",
+      "external_keys": [],
+      "external_applied": 0
+    },
+    {
+      "task_id": "d01",
+      "expect": "browser_down",
+      "goal": "浏览器断线的研究议题 1",
+      "run_id": "5dabf554-2bce-5b21-82e9-8750eb7f7435",
+      "status": "failed",
+      "interrupted": false,
+      "interactions": [],
+      "published": 0,
+      "candidates": 0,
+      "citations": 0,
+      "events": 7,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "search"
+      ],
+      "replayed": false,
+      "diagnostics": [
+        "channel_unavailable:browse_js:浏览器连接被重置（fixture 断线）",
+        "failure:SOURCE_UNAVAILABLE:浏览器连接被重置（fixture 断线）"
+      ],
+      "error_code": "SOURCE_UNAVAILABLE",
+      "actual": "browser_down",
+      "external_keys": [],
+      "external_applied": 0
+    },
+    {
+      "task_id": "d02",
+      "expect": "browser_down",
+      "goal": "浏览器断线的研究议题 2",
+      "run_id": "cbed4982-c315-5108-8c07-cd562bda8d13",
+      "status": "failed",
+      "interrupted": false,
+      "interactions": [],
+      "published": 0,
+      "candidates": 0,
+      "citations": 0,
+      "events": 7,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "search"
+      ],
+      "replayed": false,
+      "diagnostics": [
+        "channel_unavailable:browse_js:浏览器连接被重置（fixture 断线）",
+        "failure:SOURCE_UNAVAILABLE:浏览器连接被重置（fixture 断线）"
+      ],
+      "error_code": "SOURCE_UNAVAILABLE",
+      "actual": "browser_down",
+      "external_keys": [],
+      "external_applied": 0
+    },
+    {
+      "task_id": "d03",
+      "expect": "browser_down",
+      "goal": "浏览器断线的研究议题 3",
+      "run_id": "c6971f6f-3f87-5e45-886f-62fc2af3ad96",
+      "status": "failed",
+      "interrupted": false,
+      "interactions": [],
+      "published": 0,
+      "candidates": 0,
+      "citations": 0,
+      "events": 7,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "search"
+      ],
+      "replayed": false,
+      "diagnostics": [
+        "channel_unavailable:browse_js:浏览器连接被重置（fixture 断线）",
+        "failure:SOURCE_UNAVAILABLE:浏览器连接被重置（fixture 断线）"
+      ],
+      "error_code": "SOURCE_UNAVAILABLE",
+      "actual": "browser_down",
+      "external_keys": [],
+      "external_applied": 0
+    },
+    {
+      "task_id": "d04",
+      "expect": "browser_down",
+      "goal": "浏览器断线的研究议题 4",
+      "run_id": "98dc79d6-5f56-5ff6-8c3b-ef2db5b5b48c",
+      "status": "failed",
+      "interrupted": false,
+      "interactions": [],
+      "published": 0,
+      "candidates": 0,
+      "citations": 0,
+      "events": 7,
+      "terminal_count": 1,
+      "channels": [
+        "http",
+        "search"
+      ],
+      "replayed": false,
+      "diagnostics": [
+        "channel_unavailable:browse_js:浏览器连接被重置（fixture 断线）",
+        "failure:SOURCE_UNAVAILABLE:浏览器连接被重置（fixture 断线）"
+      ],
+      "error_code": "SOURCE_UNAVAILABLE",
+      "actual": "browser_down",
+      "external_keys": [],
+      "external_applied": 0
+    },
+    {
+      "task_id": "i01",
+      "expect": "plan_invalid",
+      "goal": "非法计划的研究议题 1",
+      "run_id": "08a11f6f-fda3-52a5-bbe2-3c9652a6f503",
+      "status": "failed",
+      "interrupted": false,
+      "interactions": [],
+      "published": 0,
+      "candidates": 0,
+      "citations": 0,
+      "events": 2,
+      "terminal_count": 1,
+      "channels": [],
+      "replayed": false,
+      "diagnostics": [
+        "failure:PLAN_INVALID:INVALID_TYPE: nodes 必须是数组，实际 str"
+      ],
+      "error_code": "PLAN_INVALID",
+      "actual": "plan_invalid",
+      "external_keys": [],
+      "external_applied": 0
+    },
+    {
+      "task_id": "i02",
+      "expect": "plan_invalid",
+      "goal": "非法计划的研究议题 2",
+      "run_id": "90c90d36-b5a0-5fdd-b833-433605c4a190",
+      "status": "failed",
+      "interrupted": false,
+      "interactions": [],
+      "published": 0,
+      "candidates": 0,
+      "citations": 0,
+      "events": 2,
+      "terminal_count": 1,
+      "channels": [],
+      "replayed": false,
+      "diagnostics": [
+        "failure:PLAN_INVALID:INVALID_TYPE: nodes 必须是数组，实际 str"
+      ],
+      "error_code": "PLAN_INVALID",
+      "actual": "plan_invalid",
+      "external_keys": [],
+      "external_applied": 0
+    },
+    {
+      "task_id": "i03",
+      "expect": "plan_invalid",
+      "goal": "非法计划的研究议题 3",
+      "run_id": "bce71fde-b403-5b5c-a9dc-0729d7888113",
+      "status": "failed",
+      "interrupted": false,
+      "interactions": [],
+      "published": 0,
+      "candidates": 0,
+      "citations": 0,
+      "events": 2,
+      "terminal_count": 1,
+      "channels": [],
+      "replayed": false,
+      "diagnostics": [
+        "failure:PLAN_INVALID:INVALID_TYPE: nodes 必须是数组，实际 str"
+      ],
+      "error_code": "PLAN_INVALID",
+      "actual": "plan_invalid",
+      "external_keys": [],
+      "external_applied": 0
+    },
+    {
+      "task_id": "i04",
+      "expect": "plan_invalid",
+      "goal": "非法计划的研究议题 4",
+      "run_id": "0276e16e-6bc7-58c1-8da4-f9722762a06e",
+      "status": "failed",
+      "interrupted": false,
+      "interactions": [],
+      "published": 0,
+      "candidates": 0,
+      "citations": 0,
+      "events": 2,
+      "terminal_count": 1,
+      "channels": [],
+      "replayed": false,
+      "diagnostics": [
+        "failure:PLAN_INVALID:INVALID_TYPE: nodes 必须是数组，实际 str"
+      ],
+      "error_code": "PLAN_INVALID",
+      "actual": "plan_invalid",
+      "external_keys": [],
+      "external_applied": 0
+    }
+  ],
+  "summary": {
+    "succeeded": 12,
+    "approval_rejected": 6,
+    "budget_exceeded": 4,
+    "browser_down": 4,
+    "plan_invalid": 4,
+    "unexpected": 0
+  }
+}

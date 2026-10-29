@@ -1,0 +1,5264 @@
+{
+  "breaches": [],
+  "budget": {
+    "min_probes": {
+      "business_state": 12,
+      "canary": 12,
+      "citations": 100,
+      "cross_workspace": 100,
+      "payload": 20,
+      "revocation": 12,
+      "ssrf": 24
+    },
+    "min_total": 100
+  },
+  "dsn": "postgresql://pyknora:***@127.0.0.1:5433/pyknora",
+  "generated_at": "2026-10-29T05:40:41.691719+00:00",
+  "git": {
+    "available": true,
+    "branch": "feature/w9-t28-t29",
+    "dirty": true,
+    "dirty_sha256": "0aa24bf32f6a1bf6e8c38bcfcf741c5d0f8ac141fd422fbede25c125176e573b",
+    "head": "f7b96760cea986ee1d39f84e9a5b5c28dfc2d14c"
+  },
+  "not_run": [
+    {
+      "item": "真实 chat 模型链路",
+      "reason": "禁止联网/禁止真实 key；本任务不含模型语义段"
+    },
+    {
+      "item": "真实身份提供商登录",
+      "reason": "C-07 BLOCKED：身份域产品+安全+架构决策未定"
+    },
+    {
+      "item": "真实对象存储签名代理",
+      "reason": "无 MinIO/S3 环境；只用合成 HMAC 签名口径"
+    },
+    {
+      "item": "真实 DNS 重绑定攻击",
+      "reason": "本机无受控 DNS；用 host 白名单 + IP 校验替身"
+    },
+    {
+      "item": "pgvector ANN 检索越权",
+      "reason": "ANN 属 T25 范围且本任务镜像精确扫描口径"
+    }
+  ],
+  "poc": "PoC-01/02/03/04/06/09",
+  "probes": [
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "allow",
+      "observed": "rows=15",
+      "probe_id": "xw-control-owner-visible",
+      "refused": false,
+      "vector": "positive control：A owner 在自己的 Scope 内应看到 A 的 chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-select_one-00",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-select_list-00",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-update-00",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-delete-00",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-select_one-00",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-select_list-00",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-update-00",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-delete-00",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-select_one-00",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-select_list-00",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-update-00",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-delete-00",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-select_one-00",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-select_list-00",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-update-00",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-delete-00",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-select_one-00",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-select_list-00",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-update-00",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-delete-00",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-select_one-00",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-select_list-00",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-update-00",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-delete-00",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-select_one-00",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-select_list-00",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-update-00",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-delete-00",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-select_one-00",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-select_list-00",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-update-00",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-delete-00",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-select_one-00",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-select_list-00",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-update-00",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-delete-00",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-select_one-01",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-select_list-01",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-update-01",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-delete-01",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-select_one-01",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-select_list-01",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-update-01",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-delete-01",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-select_one-01",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-select_list-01",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-update-01",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-delete-01",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-select_one-01",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-select_list-01",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-update-01",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-delete-01",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-select_one-01",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-select_list-01",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-update-01",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-delete-01",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-select_one-01",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-select_list-01",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-update-01",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-delete-01",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-select_one-01",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-select_list-01",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-update-01",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-delete-01",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-select_one-01",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-select_list-01",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-update-01",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-delete-01",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-select_one-01",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-select_list-01",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-update-01",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-delete-01",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-select_one-02",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-select_list-02",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-update-02",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-delete-02",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-select_one-02",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-select_list-02",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-update-02",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-delete-02",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-select_one-02",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-select_list-02",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-update-02",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-delete-02",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-select_one-02",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-select_list-02",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-update-02",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-delete-02",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-select_one-02",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-select_list-02",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-update-02",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-delete-02",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-select_one-02",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-select_list-02",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-update-02",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-delete-02",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-select_one-02",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-select_list-02",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-update-02",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-delete-02",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-select_one-02",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-select_list-02",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-update-02",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-delete-02",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-select_one-02",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-select_list-02",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-update-02",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-delete-02",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-select_one-03",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-select_list-03",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-update-03",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-delete-03",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-select_one-03",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-select_list-03",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-update-03",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-delete-03",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-select_one-03",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-select_list-03",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-update-03",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-delete-03",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-select_one-03",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-select_list-03",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-update-03",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-delete-03",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-select_one-03",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-select_list-03",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-update-03",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-delete-03",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-select_one-03",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-select_list-03",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-update-03",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-delete-03",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-select_one-03",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-select_list-03",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-update-03",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-delete-03",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-select_one-03",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-select_list-03",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-update-03",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-delete-03",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-select_one-03",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-select_list-03",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-update-03",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-delete-03",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-select_one-04",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-select_list-04",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-update-04",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-delete-04",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-select_one-04",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-select_list-04",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-update-04",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-delete-04",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-select_one-04",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-select_list-04",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-update-04",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-delete-04",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-select_one-04",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-select_list-04",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-update-04",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-delete-04",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-select_one-04",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-select_list-04",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-update-04",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-delete-04",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-select_one-04",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-select_list-04",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-update-04",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-delete-04",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-select_one-04",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-select_list-04",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-update-04",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-delete-04",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-select_one-04",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-select_list-04",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-update-04",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-delete-04",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-select_one-04",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-select_list-04",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-update-04",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-delete-04",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-select_one-05",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-select_list-05",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-update-05",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-delete-05",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-select_one-05",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-select_list-05",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-update-05",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-delete-05",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-select_one-05",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-select_list-05",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-update-05",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-delete-05",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-select_one-05",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-select_list-05",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-update-05",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-delete-05",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-select_one-05",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-select_list-05",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-update-05",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-delete-05",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-select_one-05",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-select_list-05",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-update-05",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-delete-05",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-select_one-05",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-select_list-05",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-update-05",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-delete-05",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-select_one-05",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-select_list-05",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-update-05",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-delete-05",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-select_one-05",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-select_list-05",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-update-05",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-delete-05",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-select_one-06",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-select_list-06",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-update-06",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-delete-06",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-select_one-06",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-select_list-06",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-update-06",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-delete-06",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-select_one-06",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-select_list-06",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-update-06",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-delete-06",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-select_one-06",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-select_list-06",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-update-06",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-delete-06",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-select_one-06",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-select_list-06",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-update-06",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-delete-06",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-select_one-06",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-select_list-06",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-update-06",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-delete-06",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-select_one-06",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-select_list-06",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-update-06",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-delete-06",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-select_one-06",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-select_list-06",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-update-06",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-delete-06",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-select_one-06",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-select_list-06",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-update-06",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-delete-06",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-select_one-07",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-select_list-07",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-update-07",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-delete-07",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-select_one-07",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-select_list-07",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-update-07",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-delete-07",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-select_one-07",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-select_list-07",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-update-07",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-delete-07",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-select_one-07",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-select_list-07",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-update-07",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-delete-07",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-select_one-07",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-select_list-07",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-update-07",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-delete-07",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-select_one-07",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-select_list-07",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-update-07",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-delete-07",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-select_one-07",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-select_list-07",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-update-07",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-delete-07",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-select_one-07",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-select_list-07",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-update-07",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-delete-07",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-select_one-07",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-select_list-07",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-update-07",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-delete-07",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-select_one-08",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-select_list-08",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-update-08",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-delete-08",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-select_one-08",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-select_list-08",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-update-08",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-delete-08",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-select_one-08",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-select_list-08",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-update-08",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-delete-08",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-select_one-08",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-select_list-08",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-update-08",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-delete-08",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-select_one-08",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-select_list-08",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-update-08",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-delete-08",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-select_one-08",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-select_list-08",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-update-08",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-delete-08",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-select_one-08",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-select_list-08",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-update-08",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-delete-08",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-select_one-08",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-select_list-08",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-update-08",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-delete-08",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-select_one-08",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-select_list-08",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-update-08",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-delete-08",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-select_one-09",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-select_list-09",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-update-09",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_principals-delete-09",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim principal"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-select_one-09",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-select_list-09",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-update-09",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_documents",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_documents-delete-09",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim document"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-select_one-09",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-select_list-09",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-update-09",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_document_versions",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_document_versions-delete-09",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim retired version"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-select_one-09",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-select_list-09",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-update-09",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_chunks",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_chunks-delete-09",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim chunk"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-select_one-09",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-select_list-09",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-update-09",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_approvals-delete-09",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim approval"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-select_one-09",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-select_list-09",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-update-09",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_run_events-delete-09",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim run event"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-select_one-09",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-select_list-09",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-update-09",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_jobs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_jobs-delete-09",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim job"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-select_one-09",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-select_list-09",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-update-09",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_object_refs-delete-09",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim object ref"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-select_one-09",
+      "refused": true,
+      "vector": "B 空间 select_one A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-select_list-09",
+      "refused": true,
+      "vector": "B 空间 select_list A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-update-09",
+      "refused": true,
+      "vector": "B 空间 update A 的 victim citation"
+    },
+    {
+      "category": "cross_workspace",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "rows=0 affected=0",
+      "probe_id": "xw-phase0_citations-delete-09",
+      "refused": true,
+      "vector": "B 空间 delete A 的 victim citation"
+    },
+    {
+      "category": "revocation",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "allow",
+      "observed": "allowed",
+      "probe_id": "rev-baseline-live",
+      "refused": false,
+      "vector": "撤权前 session 可读（正向对照）"
+    },
+    {
+      "category": "revocation",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "denied:NO_VISIBLE_ROWS",
+      "probe_id": "rev-disabled-scope",
+      "refused": true,
+      "vector": "撤权后复用旧 Scope 读 chunk"
+    },
+    {
+      "category": "revocation",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "rev-disabled-citation",
+      "refused": true,
+      "vector": "撤权后复用旧 citation"
+    },
+    {
+      "category": "revocation",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "denied:PRINCIPAL_DISABLED",
+      "probe_id": "rev-disabled-job",
+      "refused": true,
+      "vector": "撤权后 Job 恢复"
+    },
+    {
+      "category": "revocation",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "denied:PRINCIPAL_DISABLED",
+      "probe_id": "rev-stale-token",
+      "refused": true,
+      "vector": "撤权后旧 session token"
+    },
+    {
+      "category": "revocation",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "denied:TOKEN_EXPIRED",
+      "probe_id": "rev-expired-token",
+      "refused": true,
+      "vector": "过期 session token"
+    },
+    {
+      "category": "revocation",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "denied:TOKEN_UNKNOWN",
+      "probe_id": "rev-tampered-token",
+      "refused": true,
+      "vector": "自签未登记 session（攻击者本地伪造）"
+    },
+    {
+      "category": "revocation",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "denied:APPROVAL_PRINCIPAL_INVALID",
+      "probe_id": "rev-stale-approval",
+      "refused": true,
+      "vector": "撤权后复用旧审批"
+    },
+    {
+      "category": "revocation",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "denied:CURSOR_FORGED",
+      "probe_id": "rev-old-cursor",
+      "refused": true,
+      "vector": "撤权后旧游标"
+    },
+    {
+      "category": "revocation",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "denied:sqlstate=00000",
+      "probe_id": "rev-kb-grant",
+      "refused": true,
+      "vector": "KB 授权撤销后检索"
+    },
+    {
+      "category": "revocation",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "deny",
+      "observed": "denied:SCOPE_CLAIM_IGNORED",
+      "probe_id": "rev-forged-scope-header",
+      "refused": true,
+      "vector": "body 自报 workspace/principal"
+    },
+    {
+      "category": "revocation",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "allow",
+      "observed": "allowed",
+      "probe_id": "rev-restored-scope",
+      "refused": false,
+      "vector": "恢复后新 session 放行"
+    },
+    {
+      "category": "revocation",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "allow",
+      "observed": "allowed",
+      "probe_id": "rev-restored-citation",
+      "refused": false,
+      "vector": "恢复后新引用放行"
+    },
+    {
+      "category": "revocation",
+      "evidence_ref": "p0_t29.phase0_principals",
+      "expected": "allow",
+      "observed": "allowed",
+      "probe_id": "rev-restored-job",
+      "refused": false,
+      "vector": "恢复后 Job 恢复放行"
+    },
+    {
+      "category": "payload",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "allow",
+      "observed": "allowed",
+      "probe_id": "pl-approval-control",
+      "refused": false,
+      "vector": "正向对照：完整审批放行"
+    },
+    {
+      "category": "payload",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "denied:TOOL_APPROVAL_MISMATCH",
+      "probe_id": "pl-approval-operation",
+      "refused": true,
+      "vector": "工具操作/参数版本漂移"
+    },
+    {
+      "category": "payload",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "denied:TOOL_APPROVAL_EXPIRED",
+      "probe_id": "pl-approval-expired",
+      "refused": true,
+      "vector": "审批已过期"
+    },
+    {
+      "category": "payload",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "denied:TOOL_APPROVAL_MISMATCH",
+      "probe_id": "pl-approval-status",
+      "refused": true,
+      "vector": "审批未批准（pending）"
+    },
+    {
+      "category": "payload",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "allow",
+      "observed": "allowed",
+      "probe_id": "pl-db-control",
+      "refused": false,
+      "vector": "DB 审批逐项比对正向对照"
+    },
+    {
+      "category": "payload",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "denied:APPROVAL_INTENT_MISMATCH",
+      "probe_id": "pl-db-intent",
+      "refused": true,
+      "vector": "篡改审批 intent_key"
+    },
+    {
+      "category": "payload",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "denied:APPROVAL_OPERATION_MISMATCH",
+      "probe_id": "pl-db-operation",
+      "refused": true,
+      "vector": "篡改审批 operation"
+    },
+    {
+      "category": "payload",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "denied:APPROVAL_SCOPE_MISMATCH",
+      "probe_id": "pl-db-scope",
+      "refused": true,
+      "vector": "篡改审批 scope_hash"
+    },
+    {
+      "category": "payload",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "denied:APPROVAL_IDEMPOTENCY_MISMATCH",
+      "probe_id": "pl-db-idempotency",
+      "refused": true,
+      "vector": "篡改幂等键"
+    },
+    {
+      "category": "payload",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "denied:sqlstate=23503",
+      "probe_id": "pl-db-run",
+      "refused": true,
+      "vector": "审批绑定到其它 run"
+    },
+    {
+      "category": "payload",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "denied:APPROVAL_STATUS_INVALID",
+      "probe_id": "pl-db-status",
+      "refused": true,
+      "vector": "审批状态非 approved"
+    },
+    {
+      "category": "payload",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "denied:APPROVAL_EXPIRED",
+      "probe_id": "pl-db-expired",
+      "refused": true,
+      "vector": "审批过期"
+    },
+    {
+      "category": "payload",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "denied:APPROVAL_MISSING",
+      "probe_id": "pl-db-missing",
+      "refused": true,
+      "vector": "审批记录不存在"
+    },
+    {
+      "category": "payload",
+      "evidence_ref": "p0_t29.phase0_approvals",
+      "expected": "deny",
+      "observed": "denied:APPROVAL_PRINCIPAL_INVALID",
+      "probe_id": "pl-db-approver-disabled",
+      "refused": true,
+      "vector": "审批人撤权"
+    },
+    {
+      "category": "payload",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "allow",
+      "observed": "allowed",
+      "probe_id": "pl-citation-control",
+      "refused": false,
+      "vector": "正向对照：合法 handle 放行"
+    },
+    {
+      "category": "payload",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "pl-citation-cross-space",
+      "refused": true,
+      "vector": "篡改引用指向 B 空间 chunk"
+    },
+    {
+      "category": "payload",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "pl-citation-stale",
+      "refused": true,
+      "vector": "篡改引用指向 retired 旧版本 chunk"
+    },
+    {
+      "category": "payload",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "pl-citation-unknown",
+      "refused": true,
+      "vector": "篡改引用指向不存在 chunk"
+    },
+    {
+      "category": "payload",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "pl-citation-handle",
+      "refused": true,
+      "vector": "handle 超出本轮 evidence"
+    },
+    {
+      "category": "payload",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "pl-citation-duplicate",
+      "refused": true,
+      "vector": "重复 handle"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "allow",
+      "observed": "reached:200 hops=1",
+      "probe_id": "ssrf-allow-literal",
+      "refused": false,
+      "vector": "出站请求 http://127.0.0.1:5600/"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "allow",
+      "observed": "reached:200 hops=1",
+      "probe_id": "ssrf-allow-localhost",
+      "refused": false,
+      "vector": "出站请求 http://localhost:5600/"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "allow",
+      "observed": "reached:200 hops=3",
+      "probe_id": "ssrf-allow-redirect",
+      "refused": false,
+      "vector": "出站请求 http://127.0.0.1:5600/redirect/2"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "blocked:SCHEME",
+      "probe_id": "ssrf-block-scheme-file",
+      "refused": true,
+      "vector": "出站请求 file:///etc/passwd"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "blocked:SCHEME",
+      "probe_id": "ssrf-block-scheme-gopher",
+      "refused": true,
+      "vector": "出站请求 gopher://127.0.0.1:6379/_PING"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "blocked:SCHEME",
+      "probe_id": "ssrf-block-scheme-ftp",
+      "refused": true,
+      "vector": "出站请求 ftp://127.0.0.1/"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "blocked:USERINFO",
+      "probe_id": "ssrf-block-userinfo",
+      "refused": true,
+      "vector": "出站请求 http://pyknora:secret@127.0.0.1:5600/"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "blocked:PORT",
+      "probe_id": "ssrf-block-port",
+      "refused": true,
+      "vector": "出站请求 http://127.0.0.1:22/"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "blocked:PORT",
+      "probe_id": "ssrf-block-port-pg",
+      "refused": true,
+      "vector": "出站请求 http://127.0.0.1:5433/"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "blocked:HOST",
+      "probe_id": "ssrf-block-metadata",
+      "refused": true,
+      "vector": "出站请求 http://169.254.169.254/latest/meta-data/"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "blocked:HOST",
+      "probe_id": "ssrf-block-private-10",
+      "refused": true,
+      "vector": "出站请求 http://10.0.0.5/"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "blocked:HOST",
+      "probe_id": "ssrf-block-private-172",
+      "refused": true,
+      "vector": "出站请求 http://172.16.3.4/"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "blocked:HOST",
+      "probe_id": "ssrf-block-private-192",
+      "refused": true,
+      "vector": "出站请求 http://192.168.1.10/"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "blocked:HOST",
+      "probe_id": "ssrf-block-loopback-alt",
+      "refused": true,
+      "vector": "出站请求 http://127.0.0.2:5600/"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "blocked:HOST",
+      "probe_id": "ssrf-block-unspecified",
+      "refused": true,
+      "vector": "出站请求 http://0.0.0.0:5600/"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "blocked:HOST",
+      "probe_id": "ssrf-block-ipv6",
+      "refused": true,
+      "vector": "出站请求 http://[::1]:5600/"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "blocked:HOST",
+      "probe_id": "ssrf-block-redirect-metadata",
+      "refused": true,
+      "vector": "出站请求 http://127.0.0.1:5600/redirect-metadata"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "blocked:HOST",
+      "probe_id": "ssrf-block-redirect-private",
+      "refused": true,
+      "vector": "出站请求 http://127.0.0.1:5600/redirect-private"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "blocked:REDIRECT_LIMIT",
+      "probe_id": "ssrf-block-redirect-loop",
+      "refused": true,
+      "vector": "出站请求 http://127.0.0.1:5600/redirect-loop"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "blocked:SCHEME",
+      "probe_id": "ssrf-block-redirect-file",
+      "refused": true,
+      "vector": "出站请求 http://127.0.0.1:5600/redirect-file"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "blocked:HOST",
+      "probe_id": "ssrf-block-external",
+      "refused": true,
+      "vector": "出站请求 http://example.com/"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "blocked:HOST",
+      "probe_id": "ssrf-block-decimal-ip",
+      "refused": true,
+      "vector": "出站请求 http://2130706433:5600/"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "blocked:TimeoutError",
+      "probe_id": "ssrf-block-slow",
+      "refused": true,
+      "vector": "出站请求 http://127.0.0.1:5600/slow"
+    },
+    {
+      "category": "ssrf",
+      "evidence_ref": "p0_t29.phase0_object_refs",
+      "expected": "deny",
+      "observed": "blocked:BODY_TOO_LARGE",
+      "probe_id": "ssrf-block-huge",
+      "refused": true,
+      "vector": "出站请求 http://127.0.0.1:5600/huge"
+    },
+    {
+      "category": "canary",
+      "evidence_ref": "safe_trace.SafeTrace",
+      "expected": "deny",
+      "observed": "denied:CANARY_CLEAN",
+      "probe_id": "canary-trace-secret",
+      "refused": true,
+      "vector": "secret 写入 trace note_code"
+    },
+    {
+      "category": "canary",
+      "evidence_ref": "safe_trace.SafeTrace",
+      "expected": "deny",
+      "observed": "denied:CANARY_CLEAN",
+      "probe_id": "canary-trace-auth",
+      "refused": true,
+      "vector": "Authorization 值写入 trace"
+    },
+    {
+      "category": "canary",
+      "evidence_ref": "safe_trace.SafeTrace",
+      "expected": "deny",
+      "observed": "denied:CANARY_CLEAN",
+      "probe_id": "canary-trace-pii-email",
+      "refused": true,
+      "vector": "PII 邮箱写入 trace"
+    },
+    {
+      "category": "canary",
+      "evidence_ref": "safe_trace.SafeTrace",
+      "expected": "deny",
+      "observed": "denied:CANARY_CLEAN",
+      "probe_id": "canary-trace-pii-phone",
+      "refused": true,
+      "vector": "PII 手机号写入 trace"
+    },
+    {
+      "category": "canary",
+      "evidence_ref": "safe_trace.SafeTrace",
+      "expected": "deny",
+      "observed": "denied:CANARY_CLEAN",
+      "probe_id": "canary-trace-dsn",
+      "refused": true,
+      "vector": "DSN 写入 trace"
+    },
+    {
+      "category": "canary",
+      "evidence_ref": "safe_trace.SafeTrace",
+      "expected": "deny",
+      "observed": "denied:TRACE_FIELD_REJECTED",
+      "probe_id": "canary-forbidden-field",
+      "refused": true,
+      "vector": "直接写 prompt 字段"
+    },
+    {
+      "category": "canary",
+      "evidence_ref": "safe_trace.SafeTrace",
+      "expected": "deny",
+      "observed": "denied:CANARY_CLEAN",
+      "probe_id": "canary-state-fragment",
+      "refused": true,
+      "vector": "state fragment 含 secret"
+    },
+    {
+      "category": "canary",
+      "evidence_ref": "safe_trace.SafeTrace",
+      "expected": "deny",
+      "observed": "denied:CANARY_CLEAN",
+      "probe_id": "canary-error-message",
+      "refused": true,
+      "vector": "异常消息回显 secret"
+    },
+    {
+      "category": "canary",
+      "evidence_ref": "safe_trace.SafeTrace",
+      "expected": "deny",
+      "observed": "denied:CANARY_CLEAN",
+      "probe_id": "canary-dto",
+      "refused": true,
+      "vector": "安全 DTO（trace 序列化 + state fragment）不含 secret/Auth"
+    },
+    {
+      "category": "canary",
+      "evidence_ref": "safe_trace.SafeTrace",
+      "expected": "deny",
+      "observed": "denied:DSN_REDACTED",
+      "probe_id": "canary-dsn-redaction",
+      "refused": true,
+      "vector": "DSN 证据脱敏"
+    },
+    {
+      "category": "canary",
+      "evidence_ref": "safe_trace.SafeTrace",
+      "expected": "deny",
+      "observed": "denied:CANARY_CLEAN",
+      "probe_id": "canary-hmac-digest",
+      "refused": true,
+      "vector": "HMAC 摘要不含明文"
+    },
+    {
+      "category": "canary",
+      "evidence_ref": "safe_trace.SafeTrace",
+      "expected": "deny",
+      "observed": "denied:CANARY_CLEAN",
+      "probe_id": "canary-correlation-id",
+      "refused": true,
+      "vector": "可记录相关摘要前缀"
+    },
+    {
+      "category": "canary",
+      "evidence_ref": "safe_trace.SafeTrace.to_state_fragment",
+      "expected": "deny",
+      "observed": "canary_hits=0",
+      "probe_id": "canary-full-sink-scan",
+      "refused": true,
+      "vector": "trace 事件 + state fragment 全量扫描 canary"
+    },
+    {
+      "category": "business_state",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "denied:sqlstate=42501",
+      "probe_id": "bs-event-no-scope",
+      "refused": true,
+      "vector": "无 Scope 写终态事件"
+    },
+    {
+      "category": "business_state",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "denied:sqlstate=42501",
+      "probe_id": "bs-event-cross-workspace",
+      "refused": true,
+      "vector": "B Scope 写 A 的事件"
+    },
+    {
+      "category": "business_state",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "denied:sqlstate=42501",
+      "probe_id": "bs-event-forged-principal",
+      "refused": true,
+      "vector": "payload 自报 principal"
+    },
+    {
+      "category": "business_state",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "denied:sqlstate=23505",
+      "probe_id": "bs-event-terminal",
+      "refused": true,
+      "vector": "重复终态事件"
+    },
+    {
+      "category": "business_state",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "bs-citation-revoked",
+      "refused": true,
+      "vector": "撤权 principal 引用"
+    },
+    {
+      "category": "business_state",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "denied:sqlstate=42501",
+      "probe_id": "bs-citation-cross-insert",
+      "refused": true,
+      "vector": "B Scope 插入 A 的引用"
+    },
+    {
+      "category": "business_state",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "denied:OBJECT_NOT_IN_SCOPE",
+      "probe_id": "bs-object-cross-workspace",
+      "refused": true,
+      "vector": "B 空间取 A 的对象签名"
+    },
+    {
+      "category": "business_state",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "denied:OBJECT_SIGNATURE_EXPIRED",
+      "probe_id": "bs-object-expired",
+      "refused": true,
+      "vector": "过期对象签名"
+    },
+    {
+      "category": "business_state",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "denied:OBJECT_METHOD_MISMATCH",
+      "probe_id": "bs-object-method",
+      "refused": true,
+      "vector": "签名未覆盖的方法"
+    },
+    {
+      "category": "business_state",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "denied:OBJECT_SIGNATURE_MISMATCH",
+      "probe_id": "bs-object-forged",
+      "refused": true,
+      "vector": "伪造对象签名"
+    },
+    {
+      "category": "business_state",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "denied:OBJECT_NOT_IN_SCOPE",
+      "probe_id": "bs-object-forged-key",
+      "refused": true,
+      "vector": "路径穿越 object_key"
+    },
+    {
+      "category": "business_state",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "denied:JOB_NOT_IN_SCOPE",
+      "probe_id": "bs-job-cross-workspace",
+      "refused": true,
+      "vector": "B 空间恢复 A 的 Job"
+    },
+    {
+      "category": "business_state",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "denied:JOB_PAYLOAD_MISMATCH",
+      "probe_id": "bs-job-payload-workspace",
+      "refused": true,
+      "vector": "Job payload 篡改 workspace"
+    },
+    {
+      "category": "business_state",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "denied:JOB_PAYLOAD_MISMATCH",
+      "probe_id": "bs-job-payload-principal",
+      "refused": true,
+      "vector": "Job payload 篡改 principal"
+    },
+    {
+      "category": "business_state",
+      "evidence_ref": "p0_t29.phase0_run_events",
+      "expected": "deny",
+      "observed": "denied:sqlstate=00000",
+      "probe_id": "bs-kb-revoked-retrieval",
+      "refused": true,
+      "vector": "KB 授权撤销后检索"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "allow",
+      "observed": "allowed",
+      "probe_id": "ci-control",
+      "refused": false,
+      "vector": "正向对照：合法 handle 被接受"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-unknown-handle-00",
+      "refused": true,
+      "vector": "handle 超出本轮 evidence"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-unknown-chunk-ref-00",
+      "refused": true,
+      "vector": "chunk 引用不存在"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-cross-workspace-chunk-00",
+      "refused": true,
+      "vector": "chunk 属于 B 空间"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-retired-version-00",
+      "refused": true,
+      "vector": "chunk 属于 retired 旧版本"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-revoked-kb-grant-00",
+      "refused": true,
+      "vector": "chunk 属于已撤销 KB 授权"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-not-in-evidence-00",
+      "refused": true,
+      "vector": "chunk 可见但不在本轮 evidence"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-duplicate-handle-00",
+      "refused": true,
+      "vector": "重复 handle"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-out-of-range-00",
+      "refused": true,
+      "vector": "handle 大于 evidence 长度"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-mixed-valid-forged-00",
+      "refused": true,
+      "vector": "合法 handle + 伪造 chunk 混排"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-zero-handle-00",
+      "refused": true,
+      "vector": "handle 0（越界）"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-unknown-handle-01",
+      "refused": true,
+      "vector": "handle 超出本轮 evidence"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-unknown-chunk-ref-01",
+      "refused": true,
+      "vector": "chunk 引用不存在"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-cross-workspace-chunk-01",
+      "refused": true,
+      "vector": "chunk 属于 B 空间"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-retired-version-01",
+      "refused": true,
+      "vector": "chunk 属于 retired 旧版本"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-revoked-kb-grant-01",
+      "refused": true,
+      "vector": "chunk 属于已撤销 KB 授权"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-not-in-evidence-01",
+      "refused": true,
+      "vector": "chunk 可见但不在本轮 evidence"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-duplicate-handle-01",
+      "refused": true,
+      "vector": "重复 handle"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-out-of-range-01",
+      "refused": true,
+      "vector": "handle 大于 evidence 长度"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-mixed-valid-forged-01",
+      "refused": true,
+      "vector": "合法 handle + 伪造 chunk 混排"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-zero-handle-01",
+      "refused": true,
+      "vector": "handle 0（越界）"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-unknown-handle-02",
+      "refused": true,
+      "vector": "handle 超出本轮 evidence"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-unknown-chunk-ref-02",
+      "refused": true,
+      "vector": "chunk 引用不存在"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-cross-workspace-chunk-02",
+      "refused": true,
+      "vector": "chunk 属于 B 空间"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-retired-version-02",
+      "refused": true,
+      "vector": "chunk 属于 retired 旧版本"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-revoked-kb-grant-02",
+      "refused": true,
+      "vector": "chunk 属于已撤销 KB 授权"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-not-in-evidence-02",
+      "refused": true,
+      "vector": "chunk 可见但不在本轮 evidence"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-duplicate-handle-02",
+      "refused": true,
+      "vector": "重复 handle"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-out-of-range-02",
+      "refused": true,
+      "vector": "handle 大于 evidence 长度"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-mixed-valid-forged-02",
+      "refused": true,
+      "vector": "合法 handle + 伪造 chunk 混排"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-zero-handle-02",
+      "refused": true,
+      "vector": "handle 0（越界）"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-unknown-handle-03",
+      "refused": true,
+      "vector": "handle 超出本轮 evidence"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-unknown-chunk-ref-03",
+      "refused": true,
+      "vector": "chunk 引用不存在"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-cross-workspace-chunk-03",
+      "refused": true,
+      "vector": "chunk 属于 B 空间"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-retired-version-03",
+      "refused": true,
+      "vector": "chunk 属于 retired 旧版本"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-revoked-kb-grant-03",
+      "refused": true,
+      "vector": "chunk 属于已撤销 KB 授权"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-not-in-evidence-03",
+      "refused": true,
+      "vector": "chunk 可见但不在本轮 evidence"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-duplicate-handle-03",
+      "refused": true,
+      "vector": "重复 handle"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-out-of-range-03",
+      "refused": true,
+      "vector": "handle 大于 evidence 长度"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-mixed-valid-forged-03",
+      "refused": true,
+      "vector": "合法 handle + 伪造 chunk 混排"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-zero-handle-03",
+      "refused": true,
+      "vector": "handle 0（越界）"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-unknown-handle-04",
+      "refused": true,
+      "vector": "handle 超出本轮 evidence"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-unknown-chunk-ref-04",
+      "refused": true,
+      "vector": "chunk 引用不存在"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-cross-workspace-chunk-04",
+      "refused": true,
+      "vector": "chunk 属于 B 空间"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-retired-version-04",
+      "refused": true,
+      "vector": "chunk 属于 retired 旧版本"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-revoked-kb-grant-04",
+      "refused": true,
+      "vector": "chunk 属于已撤销 KB 授权"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-not-in-evidence-04",
+      "refused": true,
+      "vector": "chunk 可见但不在本轮 evidence"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-duplicate-handle-04",
+      "refused": true,
+      "vector": "重复 handle"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-out-of-range-04",
+      "refused": true,
+      "vector": "handle 大于 evidence 长度"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-mixed-valid-forged-04",
+      "refused": true,
+      "vector": "合法 handle + 伪造 chunk 混排"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-zero-handle-04",
+      "refused": true,
+      "vector": "handle 0（越界）"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-unknown-handle-05",
+      "refused": true,
+      "vector": "handle 超出本轮 evidence"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-unknown-chunk-ref-05",
+      "refused": true,
+      "vector": "chunk 引用不存在"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-cross-workspace-chunk-05",
+      "refused": true,
+      "vector": "chunk 属于 B 空间"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-retired-version-05",
+      "refused": true,
+      "vector": "chunk 属于 retired 旧版本"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-revoked-kb-grant-05",
+      "refused": true,
+      "vector": "chunk 属于已撤销 KB 授权"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-not-in-evidence-05",
+      "refused": true,
+      "vector": "chunk 可见但不在本轮 evidence"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-duplicate-handle-05",
+      "refused": true,
+      "vector": "重复 handle"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-out-of-range-05",
+      "refused": true,
+      "vector": "handle 大于 evidence 长度"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-mixed-valid-forged-05",
+      "refused": true,
+      "vector": "合法 handle + 伪造 chunk 混排"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-zero-handle-05",
+      "refused": true,
+      "vector": "handle 0（越界）"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-unknown-handle-06",
+      "refused": true,
+      "vector": "handle 超出本轮 evidence"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-unknown-chunk-ref-06",
+      "refused": true,
+      "vector": "chunk 引用不存在"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-cross-workspace-chunk-06",
+      "refused": true,
+      "vector": "chunk 属于 B 空间"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-retired-version-06",
+      "refused": true,
+      "vector": "chunk 属于 retired 旧版本"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-revoked-kb-grant-06",
+      "refused": true,
+      "vector": "chunk 属于已撤销 KB 授权"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-not-in-evidence-06",
+      "refused": true,
+      "vector": "chunk 可见但不在本轮 evidence"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-duplicate-handle-06",
+      "refused": true,
+      "vector": "重复 handle"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-out-of-range-06",
+      "refused": true,
+      "vector": "handle 大于 evidence 长度"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-mixed-valid-forged-06",
+      "refused": true,
+      "vector": "合法 handle + 伪造 chunk 混排"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-zero-handle-06",
+      "refused": true,
+      "vector": "handle 0（越界）"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-unknown-handle-07",
+      "refused": true,
+      "vector": "handle 超出本轮 evidence"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-unknown-chunk-ref-07",
+      "refused": true,
+      "vector": "chunk 引用不存在"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-cross-workspace-chunk-07",
+      "refused": true,
+      "vector": "chunk 属于 B 空间"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-retired-version-07",
+      "refused": true,
+      "vector": "chunk 属于 retired 旧版本"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-revoked-kb-grant-07",
+      "refused": true,
+      "vector": "chunk 属于已撤销 KB 授权"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-not-in-evidence-07",
+      "refused": true,
+      "vector": "chunk 可见但不在本轮 evidence"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-duplicate-handle-07",
+      "refused": true,
+      "vector": "重复 handle"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-out-of-range-07",
+      "refused": true,
+      "vector": "handle 大于 evidence 长度"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-mixed-valid-forged-07",
+      "refused": true,
+      "vector": "合法 handle + 伪造 chunk 混排"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-zero-handle-07",
+      "refused": true,
+      "vector": "handle 0（越界）"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-unknown-handle-08",
+      "refused": true,
+      "vector": "handle 超出本轮 evidence"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-unknown-chunk-ref-08",
+      "refused": true,
+      "vector": "chunk 引用不存在"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-cross-workspace-chunk-08",
+      "refused": true,
+      "vector": "chunk 属于 B 空间"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-retired-version-08",
+      "refused": true,
+      "vector": "chunk 属于 retired 旧版本"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-revoked-kb-grant-08",
+      "refused": true,
+      "vector": "chunk 属于已撤销 KB 授权"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-not-in-evidence-08",
+      "refused": true,
+      "vector": "chunk 可见但不在本轮 evidence"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-duplicate-handle-08",
+      "refused": true,
+      "vector": "重复 handle"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-out-of-range-08",
+      "refused": true,
+      "vector": "handle 大于 evidence 长度"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-mixed-valid-forged-08",
+      "refused": true,
+      "vector": "合法 handle + 伪造 chunk 混排"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-zero-handle-08",
+      "refused": true,
+      "vector": "handle 0（越界）"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-unknown-handle-09",
+      "refused": true,
+      "vector": "handle 超出本轮 evidence"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-unknown-chunk-ref-09",
+      "refused": true,
+      "vector": "chunk 引用不存在"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-cross-workspace-chunk-09",
+      "refused": true,
+      "vector": "chunk 属于 B 空间"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-retired-version-09",
+      "refused": true,
+      "vector": "chunk 属于 retired 旧版本"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-revoked-kb-grant-09",
+      "refused": true,
+      "vector": "chunk 属于已撤销 KB 授权"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-not-in-evidence-09",
+      "refused": true,
+      "vector": "chunk 可见但不在本轮 evidence"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-duplicate-handle-09",
+      "refused": true,
+      "vector": "重复 handle"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-out-of-range-09",
+      "refused": true,
+      "vector": "handle 大于 evidence 长度"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-mixed-valid-forged-09",
+      "refused": true,
+      "vector": "合法 handle + 伪造 chunk 混排"
+    },
+    {
+      "category": "citations",
+      "evidence_ref": "p0_t29.phase0_citations",
+      "expected": "deny",
+      "observed": "denied:CITATION_REJECTED",
+      "probe_id": "ci-zero-handle-09",
+      "refused": true,
+      "vector": "handle 0（越界）"
+    },
+    {
+      "category": "canary",
+      "evidence_ref": "redis:db15:p0_t29:counter",
+      "expected": "allow",
+      "observed": "rounds=10 ok=10 value=10",
+      "probe_id": "redis-atomic-counter",
+      "refused": false,
+      "vector": "Redis 原子计数（T29 资源槽 DB15；W9 指定 DB16 超上限）"
+    }
+  ],
+  "rag_baseline": {
+    "available": true,
+    "cases_embedded": 20,
+    "citation_accuracy": 1.0,
+    "fabricated_citations": 0,
+    "note": "T26 基线是结构测量（ModelPort 替身），不能当作安全验收；T29 用自建种子重放 100 例伪造/越权引用",
+    "sample_count": 100,
+    "unauthorized_citations": 0
+  },
+  "redis": {
+    "db": 15,
+    "evidence": {
+      "atomic_ok": true,
+      "cleaned": 1,
+      "db": 15,
+      "rounds": 10
+    },
+    "resource_note": "W9 波次记录指定 Redis DB16，但服务器 CONFIG GET databases=16 只支持索引 0-15，实测 DB16 不可用（ERR DB index is out of range）；改用空闲 DB15，运行前后验证 DB0 仅保留其它任务的 t02:probe 键、DB1-DB14 无键。",
+    "url": "redis://127.0.0.1:6380/15"
+  },
+  "role": {
+    "attributes": {
+      "rolbypassrls": false,
+      "rolcanlogin": true,
+      "rolcreatedb": false,
+      "rolcreaterole": false,
+      "rolsuper": false
+    },
+    "current_user": "pyknora",
+    "owns_tables": 0,
+    "session_user": "pyknora"
+  },
+  "schema": {
+    "ddl_sha256": "f1ae6e4fbc81e65c2acf7d631b5d223fec8337c706356470b4049ac4313dbe33",
+    "migration_id": "t29_security_inline",
+    "name": "p0_t29",
+    "snapshot": {
+      "functions": [
+        {
+          "name": "phase0_current_principal_id",
+          "security_definer": false,
+          "volatility": "s"
+        },
+        {
+          "name": "phase0_current_workspace_id",
+          "security_definer": false,
+          "volatility": "s"
+        },
+        {
+          "name": "phase0_events_append_only",
+          "security_definer": false,
+          "volatility": "v"
+        },
+        {
+          "name": "phase0_principal_active",
+          "security_definer": true,
+          "volatility": "s"
+        },
+        {
+          "name": "phase0_run_event_guard",
+          "security_definer": false,
+          "volatility": "v"
+        }
+      ],
+      "ledger": {
+        "filename": "inline:security_probe.py::MIGRATION_SQL",
+        "migration_id": "t29_security_inline",
+        "sha256": "f1ae6e4fbc81e65c2acf7d631b5d223fec8337c706356470b4049ac4313dbe33"
+      },
+      "policies": [
+        {
+          "cmd": "*",
+          "name": "phase0_approvals_scope",
+          "qual": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())",
+          "with_check": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())"
+        },
+        {
+          "cmd": "*",
+          "name": "phase0_bindings_scope",
+          "qual": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())",
+          "with_check": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())"
+        },
+        {
+          "cmd": "*",
+          "name": "phase0_chunks_scope",
+          "qual": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())",
+          "with_check": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())"
+        },
+        {
+          "cmd": "*",
+          "name": "phase0_citations_scope",
+          "qual": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())",
+          "with_check": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())"
+        },
+        {
+          "cmd": "*",
+          "name": "phase0_documents_scope",
+          "qual": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())",
+          "with_check": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())"
+        },
+        {
+          "cmd": "*",
+          "name": "phase0_jobs_scope",
+          "qual": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())",
+          "with_check": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())"
+        },
+        {
+          "cmd": "*",
+          "name": "phase0_kb_grants_scope",
+          "qual": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())",
+          "with_check": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())"
+        },
+        {
+          "cmd": "*",
+          "name": "phase0_object_refs_scope",
+          "qual": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())",
+          "with_check": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())"
+        },
+        {
+          "cmd": "*",
+          "name": "phase0_principals_scope",
+          "qual": "(workspace_id = p0_t29.phase0_current_workspace_id())",
+          "with_check": "(workspace_id = p0_t29.phase0_current_workspace_id())"
+        },
+        {
+          "cmd": "*",
+          "name": "phase0_run_events_scope",
+          "qual": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())",
+          "with_check": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())"
+        },
+        {
+          "cmd": "*",
+          "name": "phase0_runs_scope",
+          "qual": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())",
+          "with_check": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())"
+        },
+        {
+          "cmd": "*",
+          "name": "phase0_versions_scope",
+          "qual": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())",
+          "with_check": "((workspace_id = p0_t29.phase0_current_workspace_id()) AND p0_t29.phase0_principal_active())"
+        },
+        {
+          "cmd": "*",
+          "name": "phase0_workspaces_scope",
+          "qual": "(workspace_id = p0_t29.phase0_current_workspace_id())",
+          "with_check": "(workspace_id = p0_t29.phase0_current_workspace_id())"
+        }
+      ],
+      "tables": {
+        "phase0_approvals": [
+          true,
+          true
+        ],
+        "phase0_chunks": [
+          true,
+          true
+        ],
+        "phase0_citations": [
+          true,
+          true
+        ],
+        "phase0_document_versions": [
+          true,
+          true
+        ],
+        "phase0_documents": [
+          true,
+          true
+        ],
+        "phase0_execution_bindings": [
+          true,
+          true
+        ],
+        "phase0_jobs": [
+          true,
+          true
+        ],
+        "phase0_kb_grants": [
+          true,
+          true
+        ],
+        "phase0_object_refs": [
+          true,
+          true
+        ],
+        "phase0_principals": [
+          true,
+          true
+        ],
+        "phase0_run_events": [
+          true,
+          true
+        ],
+        "phase0_runs": [
+          true,
+          true
+        ],
+        "phase0_schema_migrations": [
+          false,
+          false
+        ],
+        "phase0_workspaces": [
+          true,
+          true
+        ]
+      }
+    }
+  },
+  "seed": {
+    "chunks": 21,
+    "documents": 6,
+    "jobs": 1,
+    "runs": 2,
+    "stale_chunks": 3,
+    "workspaces": {
+      "A": "f5c43f62-702a-5b70-a5e2-9d6ba398f3fe",
+      "B": "c7dcb9f2-5d2f-5336-b6bc-393ba49a008b",
+      "C": "8c9867ba-1b22-5240-be65-66bff860187f"
+    }
+  },
+  "summary": {
+    "categories": {
+      "business_state": {
+        "allowed": 0,
+        "breaches": 0,
+        "probes": 15,
+        "refused": 15
+      },
+      "canary": {
+        "allowed": 1,
+        "breaches": 0,
+        "probes": 14,
+        "refused": 13
+      },
+      "citations": {
+        "allowed": 1,
+        "breaches": 0,
+        "probes": 101,
+        "refused": 100
+      },
+      "cross_workspace": {
+        "allowed": 1,
+        "breaches": 0,
+        "probes": 361,
+        "refused": 360
+      },
+      "payload": {
+        "allowed": 3,
+        "breaches": 0,
+        "probes": 20,
+        "refused": 17
+      },
+      "revocation": {
+        "allowed": 4,
+        "breaches": 0,
+        "probes": 14,
+        "refused": 10
+      },
+      "ssrf": {
+        "allowed": 3,
+        "breaches": 0,
+        "probes": 24,
+        "refused": 21
+      }
+    },
+    "total": {
+      "allowed": 13,
+      "breaches": 0,
+      "probes": 549,
+      "refused": 536
+    }
+  },
+  "task": "P0-T29"
+}
