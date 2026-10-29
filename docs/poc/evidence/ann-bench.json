@@ -1,0 +1,292 @@
+{
+  "task": "P0-T25",
+  "wave": "W13",
+  "adr": "docs/adr/0010_Pgvector_Core_Profile.md",
+  "purpose": "ADR-0010 步骤 3：ANN 机制补跑（索引近似误差与延迟），不代表语义质量",
+  "generated_at": "2026-10-29T16:57:52+0800",
+  "dsn": "postgresql://pyknora:***@127.0.0.1:5433/pyknora",
+  "method": {
+    "dataset": "合成聚簇向量：100 个随机单位中心 + 幅度 0.35 的高斯抖动，L2 归一化，确定性 seed（聚簇保证近邻结构可测；均匀随机向量在 128 维近乎两两正交，recall 无意义）",
+    "seed": 20261029,
+    "rows": 20000,
+    "dim": 128,
+    "queries": 100,
+    "k": 10,
+    "distance": "cosine（pgvector `<=>`）",
+    "ground_truth": "精确全扫描（SET LOCAL enable_indexscan=off, enable_bitmapscan=off）",
+    "recall_definition": "|ANN@k ∩ exact@k| / k，对 queries 取均值与最小值",
+    "hnsw": {
+      "m": 16,
+      "ef_construction": 64,
+      "ef_search_sweep": [
+        40,
+        64,
+        128
+      ]
+    },
+    "ivfflat": {
+      "lists": 100,
+      "probes_sweep": [
+        1,
+        8,
+        32
+      ]
+    },
+    "workspaces": [
+      "ws_a",
+      "ws_b"
+    ],
+    "clusters": 100,
+    "jitter": 0.35,
+    "filtered_variant": "WHERE workspace_id = %s（先过滤后排序的 SQL 变体，检验过滤与 ANN 共存）",
+    "index_isolation": "HNSW 与 IVFFlat 分开建、分开测、测完即删，避免规划器选错索引污染指标",
+    "measure_filters": "ANN 测量时 `SET LOCAL enable_seqscan = off` 强制走索引；不强制时本机 2 千行规模规划器会选「顺序扫描+排序」，recall 恒为 1.0（等于没测）"
+  },
+  "timings": {
+    "load_seconds": 2.535,
+    "hnsw_build_seconds": 2.573,
+    "ivfflat_build_seconds": 0.803,
+    "total_seconds": 32.661
+  },
+  "sizes": {
+    "hnsw": {
+      "indexes": [
+        {
+          "name": "phase0_ann_chunks_hnsw",
+          "bytes": 16654336
+        }
+      ],
+      "table_bytes": 11706368
+    },
+    "ivfflat": {
+      "indexes": [
+        {
+          "name": "phase0_ann_chunks_ivfflat",
+          "bytes": 11476992
+        }
+      ],
+      "table_bytes": 11706368
+    },
+    "table": {
+      "indexes": [
+        {
+          "name": "phase0_ann_chunks_pkey",
+          "bytes": 466944
+        }
+      ],
+      "table_bytes": 11706368
+    }
+  },
+  "plans_uses_index": {
+    "hnsw": [
+      "Limit  (cost=342.83..349.79 rows=10 width=12)",
+      "  ->  Index Scan using phase0_ann_chunks_hnsw on phase0_ann_chunks  (cost=342.83..14248.00 rows=20000 width=12)",
+      "        Order By: (emb <=> '[-0.099963,-0.024364,0.103487,-0.024619,0.068089,0.084848,0.091748,0.012243,0.044388,0.063543,0.010064,0.091756,0.067126,-0.034023,-0.100484,-0.060764,0.075003,-0.046075,-0.003065,0.049652,-0.027352,0.080657,-0.015119,0.075802,0.012916,0.087478,0.054376,0.012532,-0.071505,0.018945,0.064309,-0.036349,0.062924,-0.023298,0.120208,-0.088164,-0.143855,-0.095949,-0.096762,0.001838,0.005839,-0.100975,0.194331,-0.148066,0.048903,-0.007623,-0.082232,-0.082535,0.043074,-0.149909,0.046217,0.129473,-0.067001,-0.094131,0.059657,0.132596,-0.099189,0.135483,0.224058,0.147576,0.012363,0.069434,0.027408,-0.058643,-0.150981,-0.100904,-0.034262,-0.041242,0.02617,-0.049533,0.044247,-0.138878,-0.044567,0.046372,0.236885,-0.00855,0.039049,0.120281,-0.037336,-0.07363,0.157659,-0.137462,-0.012792,0.100104,-0.004997,-0.052792,-0.055417,0.068497,0.026315,-0.00413,0.061959,-0.042737,0.028266,-0.005217,0.062519,0.205227,0.038273,-0.029816,-0.037753,0.025492,-0.085488,-0.089667,0.051757,-0.041769,0.003179,0.152046,0.093546,-0.057273,-0.064668,0.121316,-0.18427,0.017907,-0.079313,-0.093139,-0.046252,-0.018969,0.211445,0.115657,0.038248,-0.173623,-0.0983,0.142132,0.10278,-0.069068,-0.029215,0.038342,0.087935,-0.057934]'::vector)"
+    ],
+    "ivfflat": [
+      "Limit  (cost=1168.80..1173.02 rows=10 width=12)",
+      "  ->  Index Scan using phase0_ann_chunks_ivfflat on phase0_ann_chunks  (cost=1168.80..9618.50 rows=20000 width=12)",
+      "        Order By: (emb <=> '[-0.099963,-0.024364,0.103487,-0.024619,0.068089,0.084848,0.091748,0.012243,0.044388,0.063543,0.010064,0.091756,0.067126,-0.034023,-0.100484,-0.060764,0.075003,-0.046075,-0.003065,0.049652,-0.027352,0.080657,-0.015119,0.075802,0.012916,0.087478,0.054376,0.012532,-0.071505,0.018945,0.064309,-0.036349,0.062924,-0.023298,0.120208,-0.088164,-0.143855,-0.095949,-0.096762,0.001838,0.005839,-0.100975,0.194331,-0.148066,0.048903,-0.007623,-0.082232,-0.082535,0.043074,-0.149909,0.046217,0.129473,-0.067001,-0.094131,0.059657,0.132596,-0.099189,0.135483,0.224058,0.147576,0.012363,0.069434,0.027408,-0.058643,-0.150981,-0.100904,-0.034262,-0.041242,0.02617,-0.049533,0.044247,-0.138878,-0.044567,0.046372,0.236885,-0.00855,0.039049,0.120281,-0.037336,-0.07363,0.157659,-0.137462,-0.012792,0.100104,-0.004997,-0.052792,-0.055417,0.068497,0.026315,-0.00413,0.061959,-0.042737,0.028266,-0.005217,0.062519,0.205227,0.038273,-0.029816,-0.037753,0.025492,-0.085488,-0.089667,0.051757,-0.041769,0.003179,0.152046,0.093546,-0.057273,-0.064668,0.121316,-0.18427,0.017907,-0.079313,-0.093139,-0.046252,-0.018969,0.211445,0.115657,0.038248,-0.173623,-0.0983,0.142132,0.10278,-0.069068,-0.029215,0.038342,0.087935,-0.057934]'::vector)"
+    ]
+  },
+  "results": [
+    {
+      "label": "hnsw_ef_40",
+      "ef_search": 40,
+      "probes": null,
+      "k": 10,
+      "queries": 100,
+      "recall_mean": 0.998,
+      "recall_min": 0.9,
+      "latency": {
+        "n": 100,
+        "mean_ms": 12.429,
+        "p50_ms": 13.231,
+        "p95_ms": 19.491,
+        "max_ms": 28.767
+      },
+      "index_used": "phase0_ann_chunks_hnsw",
+      "server_exec_ms": 0.612,
+      "returned_mean": 10.0,
+      "returned_min": 10
+    },
+    {
+      "label": "hnsw_ef_64",
+      "ef_search": 64,
+      "probes": null,
+      "k": 10,
+      "queries": 100,
+      "recall_mean": 0.999,
+      "recall_min": 0.9,
+      "latency": {
+        "n": 100,
+        "mean_ms": 5.651,
+        "p50_ms": 4.806,
+        "p95_ms": 10.529,
+        "max_ms": 14.888
+      },
+      "index_used": "phase0_ann_chunks_hnsw",
+      "server_exec_ms": 0.424,
+      "returned_mean": 10.0,
+      "returned_min": 10
+    },
+    {
+      "label": "hnsw_ef_128",
+      "ef_search": 128,
+      "probes": null,
+      "k": 10,
+      "queries": 100,
+      "recall_mean": 1.0,
+      "recall_min": 1.0,
+      "latency": {
+        "n": 100,
+        "mean_ms": 8.642,
+        "p50_ms": 7.671,
+        "p95_ms": 15.919,
+        "max_ms": 21.445
+      },
+      "index_used": "phase0_ann_chunks_hnsw",
+      "server_exec_ms": 0.457,
+      "returned_mean": 10.0,
+      "returned_min": 10
+    },
+    {
+      "label": "ivfflat_probes_1",
+      "ef_search": null,
+      "probes": 1,
+      "k": 10,
+      "queries": 100,
+      "recall_mean": 0.971,
+      "recall_min": 0.2,
+      "latency": {
+        "n": 100,
+        "mean_ms": 7.331,
+        "p50_ms": 7.092,
+        "p95_ms": 11.172,
+        "max_ms": 13.916
+      },
+      "index_used": "phase0_ann_chunks_ivfflat",
+      "server_exec_ms": 0.614,
+      "returned_mean": 10.0,
+      "returned_min": 10
+    },
+    {
+      "label": "ivfflat_probes_8",
+      "ef_search": null,
+      "probes": 8,
+      "k": 10,
+      "queries": 100,
+      "recall_mean": 1.0,
+      "recall_min": 1.0,
+      "latency": {
+        "n": 100,
+        "mean_ms": 9.229,
+        "p50_ms": 9.035,
+        "p95_ms": 13.256,
+        "max_ms": 19.01
+      },
+      "index_used": "phase0_ann_chunks_ivfflat",
+      "server_exec_ms": 1.333,
+      "returned_mean": 10.0,
+      "returned_min": 10
+    },
+    {
+      "label": "ivfflat_probes_32",
+      "ef_search": null,
+      "probes": 32,
+      "k": 10,
+      "queries": 100,
+      "recall_mean": 1.0,
+      "recall_min": 1.0,
+      "latency": {
+        "n": 100,
+        "mean_ms": 12.637,
+        "p50_ms": 11.805,
+        "p95_ms": 18.902,
+        "max_ms": 21.825
+      },
+      "index_used": "phase0_ann_chunks_ivfflat",
+      "server_exec_ms": 2.805,
+      "returned_mean": 10.0,
+      "returned_min": 10
+    }
+  ],
+  "results_filtered": [
+    {
+      "label": "hnsw_ef_64_filtered_ws_a",
+      "ef_search": 64,
+      "probes": null,
+      "k": 10,
+      "queries": 100,
+      "recall_mean": 0.5,
+      "recall_min": 0.0,
+      "latency": {
+        "n": 100,
+        "mean_ms": 9.43,
+        "p50_ms": 8.588,
+        "p95_ms": 16.755,
+        "max_ms": 27.714
+      },
+      "index_used": "phase0_ann_chunks_hnsw",
+      "server_exec_ms": 0.639,
+      "returned_mean": 5.0,
+      "returned_min": 0
+    },
+    {
+      "label": "hnsw_ef_128_filtered_ws_a",
+      "ef_search": 128,
+      "probes": null,
+      "k": 10,
+      "queries": 100,
+      "recall_mean": 0.5,
+      "recall_min": 0.0,
+      "latency": {
+        "n": 100,
+        "mean_ms": 10.621,
+        "p50_ms": 9.182,
+        "p95_ms": 17.596,
+        "max_ms": 36.125
+      },
+      "index_used": "phase0_ann_chunks_hnsw",
+      "server_exec_ms": 0.919,
+      "returned_mean": 5.0,
+      "returned_min": 0
+    }
+  ],
+  "results_exact": {
+    "label": "exact_seqscan",
+    "ef_search": null,
+    "probes": null,
+    "k": 10,
+    "queries": 100,
+    "recall_mean": 1.0,
+    "recall_min": 1.0,
+    "latency": {
+      "n": 100,
+      "mean_ms": 16.834,
+      "p50_ms": 15.468,
+      "p95_ms": 23.433,
+      "max_ms": 84.102
+    },
+    "index_used": null,
+    "server_exec_ms": null,
+    "returned_mean": 0.0,
+    "returned_min": 0
+  },
+  "limitations": [
+    "向量是合成聚簇向量，不是真实 embedding：recall 只反映索引近似误差，不反映语义召回质量（DG-4 不解除）",
+    "pgvector `vector` 索引维度上限 2000；T25 的假向量是 4096 维，无法直接建索引，故基准用 128 维",
+    "单机单实例、无并发写入、无 WAL 归档影响：延迟仅代表本机容器，不得当 SLA",
+    "数据集规模 2 万条量级，不代表生产规模下的 recall/latency 曲线",
+    "过滤变体未启用 hnsw.iterative_scan：过滤率高时 ANN 可能欠召回，这是已知语义，报告需写明"
+  ],
+  "conclusion": {
+    "ann_available": true,
+    "indexes_actually_used": [
+      "phase0_ann_chunks_hnsw",
+      "phase0_ann_chunks_ivfflat"
+    ],
+    "engine": "pgvector 0.8.7（HNSW + IVFFlat）",
+    "semantic_quality": "NOT_RUN"
+  }
+}
