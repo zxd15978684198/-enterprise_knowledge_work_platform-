@@ -29,11 +29,12 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Final, Protocol, TypedDict
 
-import events_probe as ep
 from langchain_core.runnables import RunnableConfig
 from langgraph.config import get_stream_writer
 from langgraph.graph import END, START, StateGraph
 from psycopg.pq import TransactionStatus
+
+import events_probe as ep
 from retrieval_probe import cosine, embed, tokenize
 
 SCHEMA: Final = ep.SCHEMA

@@ -46,15 +46,16 @@ from pathlib import Path
 from typing import Any, Final
 from uuid import UUID, uuid4, uuid5
 
-import contracts
 import psycopg
 import redis
-import safe_trace
-import scope
-import tool_registry
 from psycopg import IsolationLevel, sql
 from psycopg.pq import TransactionStatus
 from psycopg.rows import dict_row
+
+import contracts
+import safe_trace
+import scope
+import tool_registry
 
 # ---------------------------------------------------------------------------
 # 常量

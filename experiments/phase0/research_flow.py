@@ -29,11 +29,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Final, Protocol, TypedDict
 
+import psycopg
+
 import budget_ledger
 import control_site
 import dag_contracts
 import planner_probe
-import psycopg
 import research_probe as rp
 import task_scheduler as ts
 import tool_registry as tr
