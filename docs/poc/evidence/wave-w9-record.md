@@ -73,3 +73,15 @@
 ## 4. 提交决策
 
 > 待用户确认后回填真实 SHA / 推送态 / 未提交清单。
+- **决策**：用户 2026-10-29 选择「提交并推送 W9（不合 dev）」。
+- **提交栈**（`feature/w9-t28-t29`，base `f7b9676`）：
+
+| SHA | 类型 | 内容 |
+| --- | --- | --- |
+| `bdc4b10` | feat | 5 个代码/测试文件（research_probe.py / research_flow.py / security_probe.py / test_research_e2e.py / test_security_gate.py）+ 4 份证据（poc08-report.md / research-batch.json / security-matrix.md / security-probes.json） |
+| `0652474` | docs | 新建本文件、W8 记录时间戳修正、IMPLEMENTATION_STATUS 与执行计划前沿推进、3 份被全量回归重生成的证据 JSON |
+| `e3fda1d` | style | 去 `security-matrix.md` EOF 空行（`git diff --cached --check` 由 exit 2 转 exit 0） |
+
+- **推送**：`git push -u origin feature/w9-t28-t29` → exit 0，`* [new branch] feature/w9-t28-t29 -> feature/w9-t28-t29`；远端 `refs/heads/feature/w9-t28-t29` = `e3fda1db71191ff61f6e6778cfe1303ce084b035`，与本地 `HEAD` 逐位一致。
+- **dev 未动**：`dev` 仍为 `9d3252a`（W1–W7 + 三项 fix 收口），W8/W9 均未合入 dev；T32 评审依赖 T28 证据，合并时机需用户另行授权。
+- **本波遗留**：`docs/plans/README.md` 仍为未跟踪文件（非本波写权范围，保持原状）。
