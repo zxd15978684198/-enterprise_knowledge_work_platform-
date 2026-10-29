@@ -1,6 +1,6 @@
 # PyKnora 实施状态
 
-更新日期：2026-10-29（Asia/Shanghai）。当前为 **Phase 0 实验阶段收口**：W1–W11 十一个波次与 W12（ADR 立项批）已执行完成，并连同四条修复分支（`fix/w5-t17`、`fix/w5-t18`、`fix/w7r-t05-t09`、`fix/w1-t02-pgvector`）与 W10 内的 ruff 收口提交按序合入 `dev`。P0-T01–P0-T32 共 32 项任务级全部执行完毕（绝大多数为 **PASS（限域）**，T01 为文档交付，T17/T18 经修复分支收口）。**两道出口门均不成立**：G-P0 = 5 门 0 门 PASS（G1–G4 = PARTIAL，G5 = NOT_RUN，见 `docs/poc/evidence/P0_Core_Gate_Review.md`）；G-FULL = 九项 PoC **全部 PARTIAL、0 项无保留 PASS**（见 `docs/poc/evidence/Phase0_Full_Gate_Review.md`）。**Phase 0 不得标记为完整完成**，可按 `05_Phase0_Acceptance.md:81-82` 走「受限范围准入」三方评审。ADR 由 W12 扩到 **14 份（0007–0014 为本轮新增）**，覆盖缓存/队列许可、psycopg LGPL、P0/P1 单活部署范围、pgvector 进 core、身份域 C-07、真实后端豁免、浏览器双通道定位、质量阈值批准流程；状态仍全部为 Proposed，接受权在法务/产品/安全，不由工程侧自行升级。所有结论仅为实验环境内验证，不代表可生产。
+更新日期：2026-10-29（Asia/Shanghai）。当前为 **Phase 0 实验阶段收口**：W1–W12 十二个波次已执行完成，并连同四条修复分支（`fix/w5-t17`、`fix/w5-t18`、`fix/w7r-t05-t09`、`fix/w1-t02-pgvector`）与 W10 内的 ruff 收口提交按序合入 `dev`；**W13（执行 ADR-0010）已在 `feature/w13-adr0010` 上做完、待用户裁决提交**——备份演练在 pg17+pgvector 下复跑 PASS（63 表逐表摘要零差异）、T02 环境证据按新 digest 重采（`environment.md` §15）、T25 ANN 补跑完成（HNSW recall 0.998–1.000、IVFFlat 0.971–1.000）。P0-T01–P0-T32 共 32 项任务级全部执行完毕（绝大多数为 **PASS（限域）**，T01 为文档交付，T17/T18 经修复分支收口）。**两道出口门仍不成立**：G-P0 = 5 门 0 门 PASS（G1–G4 = PARTIAL；**G5 的「ANN 不可用」阻塞已由 W13 解除**，但阈值校准归 ADR-0014 未批，G5 仍为 `NOT_RUN`，见 `docs/poc/evidence/P0_Core_Gate_Review.md`）；G-FULL = 九项 PoC **全部 PARTIAL、0 项无保留 PASS**（见 `docs/poc/evidence/Phase0_Full_Gate_Review.md`）。**Phase 0 不得标记为完整完成**，可按 `05_Phase0_Acceptance.md:81-82` 走「受限范围准入」三方评审。ADR 共 **14 份（0007–0014）**，其中 **ADR-0010 于 W13 转为「已接受」**（四条验证条件逐项落实并附执行结果），其余 13 份仍为 `Proposed`，接受权在法务/产品/安全，不由工程侧自行升级。所有结论仅为实验环境内验证，不代表可生产。
 
 ## 阶段收口：W1–W5 全部合入 dev（2026-10-28）
 
@@ -413,3 +413,26 @@
 - **判定**：波次目标是「把建议立项为可裁决记录」，**不是接受决策**。完成后 ADR 仍全部 `Proposed`，Phase 0 两道门的状态不变（G-P0 0/5、G-FULL 9 项全 PARTIAL）。
 - **提交状态**：已提交 `dbfce54`，已推送 `feature/w12-adr`，已 `--no-ff` 合入 `dev`（`b1759b9`）并推送（`557948b..b1759b9`）。
 - **下一步**：按 `docs/adr/README.md` 的分组，请法务/产品/安全分别对 0007/0008、0009/0012/0013、0011/0014 给出裁决；0010 需工程前置授权后方可开始 G5 补齐（重采 T02 → 补跑 T25 ANN → 阈值校准）。
+
+## 本轮：W13 波次执行（执行 ADR-0010：备份演练 → 重采 T02 → 补跑 T25 ANN，2026-10-29）
+
+- **为什么 `N=1`**：ADR-0010 第 3 条明写「顺序不得调整，因为 ANN 结论必须建立在环境证据已重采之上」，三步共享同一 PG 实例与同一份证据链，并行会重演「结论早于证据」。分支 `feature/w13-adr0010` 从 `dev@d134319` 拉出，声明见 `docs/poc/evidence/wave-w13-record.md` §1；Lead 自执行（T31 已暴露子 agent 在长证据链上的失败模式）。
+- **交付（新增 4 + 追加/修改 5）**：
+  - `experiments/phase0/ann_bench.py`（**新增**）：pgvector HNSW/IVFFlat 基准，索引隔离建/测/删、`EXPLAIN` + `index_used` 自证、确定性合成聚簇数据、跑完删 `p0_t25_ann` schema。
+  - `tests/phase0/test_ann_bench.py`（**新增**）：5 条断言（指标自证、schema 不残留、超维度快速失败、向量确定性、纯函数口径）。
+  - `docs/poc/evidence/ann-bench.json`（**新增**）：recall/延迟/索引占用/查询计划全量落盘。
+  - `docs/poc/evidence/wave-w13-record.md`（**新增**）：声明块 + 三步结果 + 门禁 + 提交决策。
+  - `docs/poc/evidence/restore-runbook.md` §11（**追加**）：备份演练在新镜像下复跑，含「`vector` 类型与 HNSW 索引能否随备份恢复」专项。
+  - `docs/poc/evidence/environment.md` §15（**追加**）：新 digest、PG 版本串、`vector 0.8.7`、数据卷原地复用；历史小节不改写。
+  - `docs/poc/evidence/poc09-report.md`（**改**）：A19、§8-1、§9、§10-5 更新 + 新增 §12 变更记录。
+  - `docs/adr/0010_Pgvector_Core_Profile.md`（**改**）：状态 `提议 → 已接受`，附「执行结果」一节。
+  - 本文件（**改**）：前沿行 + 本段。
+- **关键实测**：
+  - 备份演练：`consistency/rollback/faults` 三项 **PASS**，63 张表 `to_jsonb` 摘要零差异，3 类故障注入按预期显式失败，4 个演练库清理干净；换镜新增的向量专项 —— `vector(3)` + HNSW 索引 dump/restore 往返后近邻查询与源库逐位一致。
+  - ANN（2 万 × 128 维、k=10、100 查询）：HNSW `ef=40/64/128` → **0.998 / 0.999 / 1.000**；IVFFlat `probes=1/8/32` → **0.971 / 1.000 / 1.000**；精确全扫描 p50≈15ms，HNSW p50 4.8–13.2ms。
+- **两条必须写进实现的限制**：①`WHERE workspace_id=...` 的 post-filter 变体在 50% 过滤率下**只返回 5/10 行**（pgvector 0.8 未开 `hnsw.iterative_scan`），recall 恒 0.5 且调大 `ef_search` 无效 → 必须用前置过滤（分区/子表）或显式开迭代扫描；②本基准只证明索引近似误差与延迟，向量是合成数据不是真实 embedding，**PoC-09 语义质量仍 `NOT_RUN`、DG-4 不解除**。
+- **过程中被数据推翻的三次假设**（方法教训）：均匀随机向量测不出 ANN 差异（recall≈1.0 是假象）→ 改聚簇数据；抖动幅度不除 `sqrt(dim)` 会把簇结构抹平（recall 退化到 0.5 量级）→ 按维度归一；小规模下规划器根本不走索引（recall 恒 1.0）→ 测量期强制 `enable_seqscan=off` 并把 `index_used` 写进证据。
+- **门禁**：ruff `All checks passed`；新增测试 5 passed（1.77s）；全量回归 **1011 passed / 0 failed / 8 skipped in 609.97s**（W12 基线 1006 + 新增 5）；秘密扫描 0 命中。
+- **判定**：ADR-0010 四条验证条件全满足 → **ADR-0010 转「已接受」**；G5 的 ANN 阻塞项解除，但 G5 仍不成立（阈值校准属 ADR-0014，未批），G-P0/G-FULL 状态不变。
+- **提交状态**：**待用户裁决**（分支 `feature/w13-adr0010`；全量回归重生成的 6 份 tracked 证据按既有做法 `git stash` 隔离，不入提交）。
+- **下一步（唯一推荐顺序）**：① 用户裁决提交/推送/合入 `dev`；② ADR-0014 阈值校准需产品侧批准后方可补 G5 的最后一项；③ 其余 13 份 ADR 待法务/产品/安全裁决；④ 之后才是机制批（M1/M2/M3）与真实后端批。
