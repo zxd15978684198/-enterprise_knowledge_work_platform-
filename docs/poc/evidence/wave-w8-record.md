@@ -86,6 +86,16 @@
 | ruff 全仓（`experiments tests docs` + phase0 配置） | **76 条既有告警，非本波引入** | 逐文件核对：分布在 `test_task_coordination.py`(9)、`test_bsk_recovery.py`(9) 等 W1–W7 旧文件；**T26 三个文件 0 错**。与前几波「只扫本波改动文件」的门禁口径一致，作为既有债务记入 `IMPLEMENTATION_STATUS.md` |
 | T25 ANN 结论 | **不改判** | T25 在 pgvector 修复前跑，ANN 仍为 NOT_RUN；pgvector 0.8.7 现已可用，属**可补做**项（已记入状态文件待办） |
 
-## 4. 提交决策
+## 4. 提交决策（2026-10-29 13:0x 回填）
 
-> 待用户确认后回填真实 SHA / 推送态 / 未提交清单。
+用户选择：**提交 + 推送 + 开 W9**（不合入 `dev`）。
+
+| 项 | 真实值 |
+| --- | --- |
+| feat 提交 | `cf3b498` `feat(phase0): close W8 - RAG graph, verifiable citations and single-transaction terminal events (T26)`（5 文件 +5217） |
+| docs 提交 | `047a856` `docs(phase0): record W8 gate result and advance plan frontier to W9`（5 文件 +174/−59，含本记录 §2/§3、计划前沿、状态文件与两个重生成的 tracked 证据 JSON） |
+| 推送 | `git push -u origin feature/w8-t26` → exit 0，远端新建 `origin/feature/w8-t26`，顶点 `047a856`；GitHub 提示可开 PR |
+| 提交前检查 | 两笔 `git diff --cached --check` 均 exit 0 |
+| 未合入 | `dev` 仍为 `9d3252a`（用户未选合并项） |
+| 未提交清单 | 仅既有无关项：`.idea/`、`CLAUDE.md`、`docs/plans/README.md`、`docs/teacher/`（均长期未入库，非本波产物） |
+| 局限 | 两个 tracked 证据 JSON（`poc01_owner_process_level.json`、`retrieval-baseline.json`）被全量回归重写（仅时间戳/PID/branch/dirty_sha256 抖动），随 docs 提交一并纳入；根因（进程级用例写死 tracked 路径）仍待后续改为写 `.pytest_cache/` |
