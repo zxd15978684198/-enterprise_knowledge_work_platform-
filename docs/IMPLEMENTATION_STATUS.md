@@ -1,6 +1,6 @@
 # PyKnora 实施状态
 
-更新日期：2026-10-29（Asia/Shanghai）。当前为 **Phase 0 实验阶段收口**：W1–W11 十一个波次已执行完成，并连同四条修复分支（`fix/w5-t17`、`fix/w5-t18`、`fix/w7r-t05-t09`、`fix/w1-t02-pgvector`）与 W10 内的 ruff 收口提交按序合入 `dev`。P0-T01–P0-T32 共 32 项任务级全部执行完毕（绝大多数为 **PASS（限域）**，T01 为文档交付，T17/T18 经修复分支收口）。**两道出口门均不成立**：G-P0 = 5 门 0 门 PASS（G1–G4 = PARTIAL，G5 = NOT_RUN，见 `docs/poc/evidence/P0_Core_Gate_Review.md`）；G-FULL = 九项 PoC **全部 PARTIAL、0 项无保留 PASS**（见 `docs/poc/evidence/Phase0_Full_Gate_Review.md`）。**Phase 0 不得标记为完整完成**，可按 `05_Phase0_Acceptance.md:81-82` 走「受限范围准入」三方评审。ADR 仍为 Proposed；所有结论仅为实验环境内验证，不代表 ADR 已接受或可生产。
+更新日期：2026-10-29（Asia/Shanghai）。当前为 **Phase 0 实验阶段收口**：W1–W11 十一个波次与 W12（ADR 立项批）已执行完成，并连同四条修复分支（`fix/w5-t17`、`fix/w5-t18`、`fix/w7r-t05-t09`、`fix/w1-t02-pgvector`）与 W10 内的 ruff 收口提交按序合入 `dev`。P0-T01–P0-T32 共 32 项任务级全部执行完毕（绝大多数为 **PASS（限域）**，T01 为文档交付，T17/T18 经修复分支收口）。**两道出口门均不成立**：G-P0 = 5 门 0 门 PASS（G1–G4 = PARTIAL，G5 = NOT_RUN，见 `docs/poc/evidence/P0_Core_Gate_Review.md`）；G-FULL = 九项 PoC **全部 PARTIAL、0 项无保留 PASS**（见 `docs/poc/evidence/Phase0_Full_Gate_Review.md`）。**Phase 0 不得标记为完整完成**，可按 `05_Phase0_Acceptance.md:81-82` 走「受限范围准入」三方评审。ADR 由 W12 扩到 **14 份（0007–0014 为本轮新增）**，覆盖缓存/队列许可、psycopg LGPL、P0/P1 单活部署范围、pgvector 进 core、身份域 C-07、真实后端豁免、浏览器双通道定位、质量阈值批准流程；状态仍全部为 Proposed，接受权在法务/产品/安全，不由工程侧自行升级。所有结论仅为实验环境内验证，不代表可生产。
 
 ## 阶段收口：W1–W5 全部合入 dev（2026-10-28）
 
@@ -394,3 +394,22 @@
 - **判定**：**G-FULL 不成立 → Phase 0 不得标记为完整完成**；九项 PoC 全部 PARTIAL，可提出「受限范围准入」供产品/安全/架构三方评审。
 - **提交状态**：已提交 `eb390db`，已推送 `feature/w11-t32`，已 `--no-ff` 合入 `dev`（`50b5cfd`）并推送（`65a2f89..50b5cfd`），本地/远端 `dev` 逐位一致。
 - **下一步（唯一推荐顺序）**：① ADR 立项批（新增 8 条建议，ADR-NEW-1/2/5 与 3/4/6/7/8）；② G5 补齐（pgvector 进 core → 重采 T02 证据 → 补跑 T25 ANN → 阈值校准）；③ 真实后端批（MinIO/Celery/DocReader/真实模型）；④ 机制批（M1/M2/M3 进脚本门禁）；⑤ P1 开发只能在受限准入签署后启动。
+
+## 本轮：W12 波次执行（ADR 立项批，2026-10-29）
+
+- **为什么 N=1**：8 份 ADR 共享同一编号、格式与证据口径且互相引用（0009 补 0006；0012 依赖 0010/0014；0013 影响 0012 的浏览器项），拆给多执行者会产生交叉引用与措辞漂移。Lead 自执行，分支 `feature/w12-adr` 从 `dev@557948b` 拉出，声明见 `docs/poc/evidence/wave-w12-record.md` §1。
+- **来源**：`docs/poc/evidence/Phase0_Full_Gate_Review.md` §6.1 的 8 条建议（ADR-NEW-1…8），本轮逐条编号落地为 ADR-0007–0014；**不新增决策内容，只把评审建议变成可裁决的正式记录**。
+- **交付（新增 8 + 改 2）**：
+  - `docs/adr/0007_Redis_License_Scope.md`：Redis 7.4 RSALv2/SSPLv1 三选一（接受 SSPL 边界 / 迁 Valkey / 剥离依赖），建议 B。
+  - `docs/adr/0008_Psycopg_LGPL_Usage.md`：LGPL-3.0 动态链接合规路径 + 许可门禁（`unknown` 即失败）+ NOTICE/可替换声明。
+  - `docs/adr/0009_Deployment_Single_Active_Scope.md`：P0/P1 单活边界（补充 ADR-0006），多实例须另立 ADR 且前置宿主持锁代理 PoC；发布文档三行残余风险模板。
+  - `docs/adr/0010_Pgvector_Core_Profile.md`：pgvector 进 core 硬前提、T02 证据重采顺序（备份→重采→ANN→阈值）、禁止静默换镜像。
+  - `docs/adr/0011_Identity_Domain_C07.md`：C-07 三选一（内部 principal / OIDC 委托 / 维持 BLOCKED），工程侧固定「后端解析 principal + 字段不预冻结」两条不变量。
+  - `docs/adr/0012_Real_Backend_Scope.md`：P0 豁免真实后端只能是受限准入；P1 接入顺序 MinIO→Celery→provider→ANN，每项须重跑对应 PoC。
+  - `docs/adr/0013_Browser_Channel_Positioning.md`：Playwright 是 P0 必需还是 P1 可选；固定 port 契约一致、禁冒充、安全边界不放宽。
+  - `docs/adr/0014_Quality_Threshold_Approval.md`：阈值 append-only 批准记录、批准权归属、未批准不生效、改阈值留旧结果、方法先于数值。
+  - `docs/adr/README.md`（改）：索引扩到 14 行 + 按裁决方（法务/产品/安全/工程）分组的待评审清单。
+  - 本文件（改）：前沿行 + 本段。
+- **判定**：波次目标是「把建议立项为可裁决记录」，**不是接受决策**。完成后 ADR 仍全部 `Proposed`，Phase 0 两道门的状态不变（G-P0 0/5、G-FULL 9 项全 PARTIAL）。
+- **提交状态**：待回填。
+- **下一步**：按 `docs/adr/README.md` 的分组，请法务/产品/安全分别对 0007/0008、0009/0012/0013、0011/0014 给出裁决；0010 需工程前置授权后方可开始 G5 补齐（重采 T02 → 补跑 T25 ANN → 阈值校准）。
