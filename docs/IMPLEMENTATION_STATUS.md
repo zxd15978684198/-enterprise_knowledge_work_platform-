@@ -310,3 +310,12 @@
   - `63cee71` Merge `feature/w7-t25-t27-t30`（W7 交付，16 文件 +9862）
 - **修复满套件偶发失败**：`tests/phase0/test_control_site.py::test_arrival_log_gives_final_endpoint_for_outbound_vector` 原断言「最后两条到达记录」，全量并发落盘时会被其它用例请求插入而偶发变红（W2 起潜伏，913 用例规模下暴露）；改为以 path 唯一的 `/js/beacon` 为锚点、回看其之前是否存在 `/static/iframe.html`，证明的仍是「顺序保留」原命题。
 - **已知遗留（不阻塞）**：`tests/phase0/test_checkpoint_owner.py` 的进程级用例会重写 tracked 证据 `docs/poc/evidence/poc01_owner_process_level.json`（时间戳/PID 抖动），本轮以 stash `regen-poc01-owner-evidence-T05R-run` 暂存未入库；后续应改为写临时路径。
+
+## 本轮：单开修复分支 `fix/w5-t18` 完成 P0-T18（2026-10-29）
+
+- **为什么单开**：T18 原在 W6 记 `⊘ BLOCKED`（依赖 T17 真设备/真协议），W6/W7 已收口；按用户指示新开 `fix/w5-t18`（分支名用 `/`，git ref 不允许 `:`），从 `dev`（`34337c8`）拉出，不改动已合并波次。
+- **交付**：`experiments/phase0/browserskill_probe/recovery.py`（900 行）、`tests/phase0/test_bsk_recovery.py`（738 行）、`docs/poc/evidence/poc05-recovery.md`（266 行），sha256 见 `fix-w5-t18-record.md` §7。
+- **门禁（Lead 独立复跑）**：单测 `45 用例 / 7 skipped（BSK_LIVE 门控，带 NOT_RUN 理由）`；真机（`BSK_LIVE=1` + CPython 3.13）`44 passed / 1 skipped`；全量 `958 tests / 0 failed / 0 errors / 8 skipped / 458.707s`；`ruff` `All checks passed!`；秘密扫描 0；越界检查仅计划状态刷新 + 本记录 + 两处回归重生成证据。
+- **判定**：**PASS（限域）**——真机 `tab borrow` 需人工确认记 `NOT_RUN`；`LeaseRegistry` 仍是进程内状态（多副本不可用）、网关重启 epoch 归零；`bsk` 自身无 fencing，唯一性由网关单点保证。
+- **提交状态**：feat 交付提交 `cfdc99c`（3 文件 +1904）；本记录 + 计划状态刷新 + 两处回归重生成证据随其后一笔 docs 提交；分支 `fix/w5-t18` 已推送，并以 `--no-ff` 合入 `dev`（合并 SHA 见本节末尾回填）。
+- **下一步**：仅剩 **5 项未开始**（T26、T28、T29、T31、T32）。T26 的直接前置（T25/T05/T21）均已 PASS（限域），是下一个可开工项；但本机 PostgreSQL 无 `vector` 扩展（T25 已记 ANN `NOT_RUN`），开工前需先定限域口径。
