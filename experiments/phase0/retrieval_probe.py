@@ -67,6 +67,7 @@ from psycopg.pq import TransactionStatus
 from psycopg.rows import dict_row
 
 import scope
+from evidence_dir import evidence_dir
 
 __all__ = [
     "APP_ROLE",
@@ -124,7 +125,8 @@ BM25_B: Final = 0.75
 VECTOR_MIN_SCORE: Final = 0.10
 
 REPO_ROOT: Final = Path(__file__).resolve().parents[2]
-EVIDENCE_PATH: Final = REPO_ROOT / "docs" / "poc" / "evidence" / "retrieval-baseline.json"
+EVIDENCE_DIR: Final = evidence_dir()
+EVIDENCE_PATH: Final = EVIDENCE_DIR / "retrieval-baseline.json"
 
 _UUID_NS: Final = uuid5(NAMESPACE_URL, "https://pyknora.local/phase0/t25")
 _TOPICS: Final = ("topic00", "topic01", "topic02")

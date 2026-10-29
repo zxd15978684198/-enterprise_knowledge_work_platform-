@@ -56,13 +56,14 @@ import contracts
 import safe_trace
 import scope
 import tool_registry
+from evidence_dir import evidence_dir
 
 # ---------------------------------------------------------------------------
 # 常量
 # ---------------------------------------------------------------------------
 
 REPO_ROOT: Final = Path(__file__).resolve().parents[2]
-EVIDENCE_DIR: Final = REPO_ROOT / "docs" / "poc" / "evidence"
+EVIDENCE_DIR: Final = evidence_dir()
 MATRIX_PATH: Final = EVIDENCE_DIR / "security-matrix.md"
 EVIDENCE_PATH: Final = EVIDENCE_DIR / "security-probes.json"
 RAG_BASELINE_PATH: Final = EVIDENCE_DIR / "rag-citations.json"
