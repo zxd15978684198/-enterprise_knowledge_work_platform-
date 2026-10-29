@@ -1,0 +1,353 @@
+{
+  "generated_at": "2026-10-29T04:44:24.616125+00:00",
+  "by_kind": {
+    "answerable": {
+      "cases": 40,
+      "completed": 40,
+      "refused": 0,
+      "citations": 40,
+      "false_citations": 0
+    },
+    "no_evidence": {
+      "cases": 20,
+      "completed": 20,
+      "refused": 20,
+      "citations": 0,
+      "false_citations": 0
+    },
+    "cross_space": {
+      "cases": 20,
+      "completed": 20,
+      "refused": 20,
+      "citations": 0,
+      "false_citations": 0
+    },
+    "stale_version": {
+      "cases": 20,
+      "completed": 20,
+      "refused": 20,
+      "citations": 0,
+      "false_citations": 0
+    }
+  },
+  "schema": "p0_t26",
+  "model_port": "DeterministicModel",
+  "limitation": "真实 chat 模型链路 NOT_RUN；引用准确率为替身模型下的结构测量",
+  "sample_count": 100,
+  "behaviour_match_rate": 1.0,
+  "citation_accuracy": 1.0,
+  "citations_total": 40,
+  "fabricated_citations": 0,
+  "wrong_citations": 0,
+  "forbidden_citations": 0,
+  "unauthorized_citations": 0,
+  "completed_runs": 100,
+  "refused_runs": 60,
+  "latency_ms": {
+    "p50": 819.646,
+    "p95": 1121.59,
+    "max": 1690.027
+  },
+  "cases": [
+    {
+      "case_id": "answerable-000",
+      "kind": "answerable",
+      "status": "completed",
+      "answer_kind": "grounded",
+      "refused": false,
+      "citations": 1,
+      "false_citations": 0,
+      "diagnostics": [
+        "retrieval_round=1 hits=6",
+        "enough=True top_score=0.032787",
+        "citations_valid=1 rejected=0"
+      ],
+      "latency_ms": 1111.448
+    },
+    {
+      "case_id": "answerable-001",
+      "kind": "answerable",
+      "status": "completed",
+      "answer_kind": "grounded",
+      "refused": false,
+      "citations": 1,
+      "false_citations": 0,
+      "diagnostics": [
+        "retrieval_round=1 hits=6",
+        "enough=True top_score=0.032787",
+        "citations_valid=1 rejected=0"
+      ],
+      "latency_ms": 891.147
+    },
+    {
+      "case_id": "answerable-002",
+      "kind": "answerable",
+      "status": "completed",
+      "answer_kind": "grounded",
+      "refused": false,
+      "citations": 1,
+      "false_citations": 0,
+      "diagnostics": [
+        "retrieval_round=1 hits=6",
+        "enough=True top_score=0.032787",
+        "citations_valid=1 rejected=0"
+      ],
+      "latency_ms": 883.45
+    },
+    {
+      "case_id": "answerable-003",
+      "kind": "answerable",
+      "status": "completed",
+      "answer_kind": "grounded",
+      "refused": false,
+      "citations": 1,
+      "false_citations": 0,
+      "diagnostics": [
+        "retrieval_round=1 hits=6",
+        "enough=True top_score=0.032787",
+        "citations_valid=1 rejected=0"
+      ],
+      "latency_ms": 886.072
+    },
+    {
+      "case_id": "answerable-004",
+      "kind": "answerable",
+      "status": "completed",
+      "answer_kind": "grounded",
+      "refused": false,
+      "citations": 1,
+      "false_citations": 0,
+      "diagnostics": [
+        "retrieval_round=1 hits=6",
+        "enough=True top_score=0.032787",
+        "citations_valid=1 rejected=0"
+      ],
+      "latency_ms": 873.187
+    },
+    {
+      "case_id": "answerable-005",
+      "kind": "answerable",
+      "status": "completed",
+      "answer_kind": "grounded",
+      "refused": false,
+      "citations": 1,
+      "false_citations": 0,
+      "diagnostics": [
+        "retrieval_round=1 hits=6",
+        "enough=True top_score=0.032787",
+        "citations_valid=1 rejected=0"
+      ],
+      "latency_ms": 1149.969
+    },
+    {
+      "case_id": "answerable-006",
+      "kind": "answerable",
+      "status": "completed",
+      "answer_kind": "grounded",
+      "refused": false,
+      "citations": 1,
+      "false_citations": 0,
+      "diagnostics": [
+        "retrieval_round=1 hits=6",
+        "enough=True top_score=0.032787",
+        "citations_valid=1 rejected=0"
+      ],
+      "latency_ms": 896.385
+    },
+    {
+      "case_id": "answerable-007",
+      "kind": "answerable",
+      "status": "completed",
+      "answer_kind": "grounded",
+      "refused": false,
+      "citations": 1,
+      "false_citations": 0,
+      "diagnostics": [
+        "retrieval_round=1 hits=6",
+        "enough=True top_score=0.032787",
+        "citations_valid=1 rejected=0"
+      ],
+      "latency_ms": 1261.174
+    },
+    {
+      "case_id": "answerable-008",
+      "kind": "answerable",
+      "status": "completed",
+      "answer_kind": "grounded",
+      "refused": false,
+      "citations": 1,
+      "false_citations": 0,
+      "diagnostics": [
+        "retrieval_round=1 hits=6",
+        "enough=True top_score=0.032787",
+        "citations_valid=1 rejected=0"
+      ],
+      "latency_ms": 1050.185
+    },
+    {
+      "case_id": "answerable-009",
+      "kind": "answerable",
+      "status": "completed",
+      "answer_kind": "grounded",
+      "refused": false,
+      "citations": 1,
+      "false_citations": 0,
+      "diagnostics": [
+        "retrieval_round=1 hits=6",
+        "enough=True top_score=0.032787",
+        "citations_valid=1 rejected=0"
+      ],
+      "latency_ms": 1033.417
+    },
+    {
+      "case_id": "answerable-010",
+      "kind": "answerable",
+      "status": "completed",
+      "answer_kind": "grounded",
+      "refused": false,
+      "citations": 1,
+      "false_citations": 0,
+      "diagnostics": [
+        "retrieval_round=1 hits=6",
+        "enough=True top_score=0.032787",
+        "citations_valid=1 rejected=0"
+      ],
+      "latency_ms": 1037.938
+    },
+    {
+      "case_id": "answerable-011",
+      "kind": "answerable",
+      "status": "completed",
+      "answer_kind": "grounded",
+      "refused": false,
+      "citations": 1,
+      "false_citations": 0,
+      "diagnostics": [
+        "retrieval_round=1 hits=6",
+        "enough=True top_score=0.032787",
+        "citations_valid=1 rejected=0"
+      ],
+      "latency_ms": 890.251
+    },
+    {
+      "case_id": "answerable-012",
+      "kind": "answerable",
+      "status": "completed",
+      "answer_kind": "grounded",
+      "refused": false,
+      "citations": 1,
+      "false_citations": 0,
+      "diagnostics": [
+        "retrieval_round=1 hits=6",
+        "enough=True top_score=0.032787",
+        "citations_valid=1 rejected=0"
+      ],
+      "latency_ms": 895.05
+    },
+    {
+      "case_id": "answerable-013",
+      "kind": "answerable",
+      "status": "completed",
+      "answer_kind": "grounded",
+      "refused": false,
+      "citations": 1,
+      "false_citations": 0,
+      "diagnostics": [
+        "retrieval_round=1 hits=6",
+        "enough=True top_score=0.032787",
+        "citations_valid=1 rejected=0"
+      ],
+      "latency_ms": 928.278
+    },
+    {
+      "case_id": "answerable-014",
+      "kind": "answerable",
+      "status": "completed",
+      "answer_kind": "grounded",
+      "refused": false,
+      "citations": 1,
+      "false_citations": 0,
+      "diagnostics": [
+        "retrieval_round=1 hits=6",
+        "enough=True top_score=0.032787",
+        "citations_valid=1 rejected=0"
+      ],
+      "latency_ms": 1032.899
+    },
+    {
+      "case_id": "answerable-015",
+      "kind": "answerable",
+      "status": "completed",
+      "answer_kind": "grounded",
+      "refused": false,
+      "citations": 1,
+      "false_citations": 0,
+      "diagnostics": [
+        "retrieval_round=1 hits=6",
+        "enough=True top_score=0.032787",
+        "citations_valid=1 rejected=0"
+      ],
+      "latency_ms": 1114.13
+    },
+    {
+      "case_id": "answerable-016",
+      "kind": "answerable",
+      "status": "completed",
+      "answer_kind": "grounded",
+      "refused": false,
+      "citations": 1,
+      "false_citations": 0,
+      "diagnostics": [
+        "retrieval_round=1 hits=6",
+        "enough=True top_score=0.032787",
+        "citations_valid=1 rejected=0"
+      ],
+      "latency_ms": 919.744
+    },
+    {
+      "case_id": "answerable-017",
+      "kind": "answerable",
+      "status": "completed",
+      "answer_kind": "grounded",
+      "refused": false,
+      "citations": 1,
+      "false_citations": 0,
+      "diagnostics": [
+        "retrieval_round=1 hits=6",
+        "enough=True top_score=0.032787",
+        "citations_valid=1 rejected=0"
+      ],
+      "latency_ms": 875.049
+    },
+    {
+      "case_id": "answerable-018",
+      "kind": "answerable",
+      "status": "completed",
+      "answer_kind": "grounded",
+      "refused": false,
+      "citations": 1,
+      "false_citations": 0,
+      "diagnostics": [
+        "retrieval_round=1 hits=6",
+        "enough=True top_score=0.032787",
+        "citations_valid=1 rejected=0"
+      ],
+      "latency_ms": 948.3
+    },
+    {
+      "case_id": "answerable-019",
+      "kind": "answerable",
+      "status": "completed",
+      "answer_kind": "grounded",
+      "refused": false,
+      "citations": 1,
+      "false_citations": 0,
+      "diagnostics": [
+        "retrieval_round=1 hits=6",
+        "enough=True top_score=0.032787",
+        "citations_valid=1 rejected=0"
+      ],
+      "latency_ms": 957.435
+    }
+  ]
+}

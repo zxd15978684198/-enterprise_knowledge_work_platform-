@@ -328,5 +328,20 @@
 - **门禁**：`test_environment.py` **13 passed**；全量 `tests/phase0` **959 passed / 0 failed / 0 errors / 8 skipped**（`time=269.236s`，8 个 skip 均为 BrowserSkill 真机用例并写明 `NOT_RUN` 理由）；`ruff` `All checks passed!`；`compose config -q` exit 0；core 两容器 `Up (healthy)`。
 - **判定**：**PASS**（环境修复，非 PoC 判定；不改变 T25 已记的 ANN `NOT_RUN`，如需升级须重跑 T25 才有新证据）。
 - **残余风险**：①全量回归会重写两个 tracked 证据 JSON（`poc01_owner_process_level.json`、`retrieval-baseline.json`，时间戳/PID/timing 抖动），本轮随提交纳入，后续应改为写 `.pytest_cache/`；②`vector` 扩展按库安装，新库迁移/夹具需自带 `CREATE EXTENSION vector`。
-- **提交状态**：待用户确认后提交到 `fix/w1-t02-pgvector`（未提交、未推送、未合并 `dev`）。
-- **下一步**：T26 的环境前置已解除，可按原限域口径开工（真实向量检索可做，需在测试库先 `CREATE EXTENSION vector`）。
+- **提交状态**：已提交 `c44ce5d`（`compose.yaml` + 环境测试 + `environment.md` §14）与 `7c8a585`（波次记录 + 本状态文件回填），已推送 `origin/fix/w1-t02-pgvector`，并以 `--no-ff` 合入 `dev`（合并 `cc45265`，父 `f35443c`），后续回填提交 `9d3252a` 为 `dev` 顶点。
+- **下一步**：T26 的环境前置已解除，W8 已在该基础上完成（见下一节）。
+
+## 本轮：W8 波次执行（P0-T26：LangGraph RAG、可核验引用、终态一次事务，2026-10-29）
+
+- **为什么单任务波次**：T26 是 W8 唯一就绪项（T28/T29 依赖 T26）。分支 `feature/w8-t26` 从 `dev@9d3252a` 拉出，`N=1`；声明见 `docs/poc/evidence/wave-w8-record.md` §1。
+- **派发事故**：首派 `w3-t05-checkpoint` 于 11:16 异常退出且**未留任何文件**（复核四个交付路径均不存在）；11:20 改派 `w3-t07-outbox`（复用 inactive 成员，`N` 不变），12:15 交付。
+- **交付（5 份，全部新增未跟踪，未改受保护文件）**：
+  - `experiments/phase0/events_probe.py` 1953 行 `d01a0ef0…af4ac0a`：schema `p0_t26` 内联 DDL（16 表 / 12 种 event_type / 4 触发器）、run/message 状态机、terminal 部分唯一索引、finalize 单事务、generation CAS、游标 HMAC + 过期 410、P1 续传 `CAPABILITY_UNSUPPORTED`。
+  - `experiments/phase0/rag_probe.py` 1797 行 `7a141be7…0c4a334c`：真实 LangGraph `StateGraph` 9 节点 + custom stream、FTS+向量 RRF、filter-in-query 可见性、`ModelPort`/`Reranker`/`TokenSink` 可注入、引用解析与审计、100 例评测。
+  - `tests/phase0/test_rag_events.py` 910 行（21 用例）`cb07668b…bc6779e`；`docs/poc/evidence/poc09-report.md` 204 行；`docs/poc/evidence/rag-citations.json` 353 行（100 例明细）。
+- **门禁（Lead 独立复跑，全部实跑）**：任务级 pytest **21 passed in 157.18s**（子 agent 自报 162.22s，一致）；收集数 **980**（= W7 后基线 959 + 21）；全量 **972 passed / 0 failed / 0 errors / 8 skipped / 691.173s**（junit `w8_gate.xml`）；本波 3 个 `.py` 的 `ruff` `All checks passed!`；秘密扫描 **0**；受跟踪改动 **0**、新增仅声明内 6 个文件；`p0_t26` 已 teardown（余 `p0_t02_probe`/`p0_t05`/`p0_t27` 为 W1/W3/W7 遗留）；5500/5501/5600/5610 **0 监听**；core 两容器 healthy；仓库根无临时目录。
+- **实测指标（100 例：answerable 40 / no_evidence 20 / cross_space 20 / stale_version 20）**：`behaviour_match_rate=1.0`、`citation_accuracy=1.0`（40/40 命中 gold）、`citations_total=40`、`fabricated=0`、`wrong=0`、`forbidden=0`、`unauthorized=0`、`completed=100`、`refused=60`；延迟 `p50=937.4ms / p95=1495.2ms / max=2194.9ms`。关键负例：50 次重复 finalize 仅 1 条 terminal、部分 token 后 DB 失败无 `completed`、pg 层第二条 terminal 触发 `UniqueViolation`、取消后迟到 finalize → `RUN_ALREADY_TERMINAL`。
+- **判定**：**PASS（限域）**。`NOT_RUN`：真实 chat 模型链路（无厂商 key，替身 `ModelPort`）、真实 MinIO/S3、pgvector ANN（不改判 T25）、Redis DB 14 事件投递（事件走 PG 事实表）、删除/取消/重建/源撤销、长时 soak/并发压测/SSE 断网重连。`PARTIAL`：引用人工核验（结构化校验已过、语义需真实模型 + 人工 gold）、RLS 跨空间（用 SQL 过滤 + `chunk_visibility`，未复用 T03 的 `p0_t03` RLS）、延迟（探针装置开销，非生产指标）。`0.95` 引用阈值仍是候选未评审，**未**当作 PASS 依据。
+- **已知债务**：`ruff` 按 phase0 配置扫 `experiments tests docs` 有 **76 条既有告警**（`test_task_coordination.py` 9、`test_bsk_recovery.py` 9、`test_dag_validation.py` 7 等 W1–W7 旧文件），**T26 三个文件 0 错**；前几波门禁只扫本波改动文件，故未暴露。是否批量清理需单独决策。
+- **提交状态**：**待用户确认**（分支 `feature/w8-t26` HEAD 仍 `9d3252a`，交付物均未 `git add`）。
+- **下一步**：确认提交后可开 W9 = T28 + T29（`N=2`）。可补做项：pgvector 已就绪，T25 的 ANN 对照可补跑改判；T26 拿到真实模型 key 后可用同一 100 例复跑。
