@@ -18,7 +18,9 @@ name: ${PHASE0_COMPOSE_PROJECT:-pyknora-phase0}
 
 services:
   postgres:
-    image: postgres:17-alpine@sha256:266d3c257594e195b309ae9d1805e54c788f1d7b375f56bf6c367aac6c917e7b
+    # pgvector/pgvector:pg17 = 官方 PostgreSQL 17 + pgvector 扩展（同 major，可直接复用既有数据卷）。
+    # 换用理由与证据：docs/poc/evidence/fix-w1-t02-pgvector-record.md
+    image: pgvector/pgvector:pg17@sha256:ac08538c6f8b9904c33c8224c5e5706dbe760aca29db1d096972b4052c22a75d
     profiles: ["core"]
     environment:
       # 凭证与库名必须由使用者显式提供（`${VAR:?msg}`）：缺变量时 compose 直接失败，

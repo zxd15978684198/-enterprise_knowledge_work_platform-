@@ -408,4 +408,23 @@ T02 判定由 **PARTIAL → PASS**：DoD 三项（D0 可重建、E1/E2 真连通
 
 ---
 
-**owner**：w1-t02-env（执行）/ lead（门禁硬化）　Wave W1，T02　**status**：PASS（残余见 §9/§10）
+## 14. 后续变更（2026-10-29，修复分支 `fix/w1-t02-pgvector`）
+
+> 本节只追加、不改写上文历史输出。上文 §1/§5/§13 中的 `postgres:17-alpine@sha256:266d3c25…` 与 `PostgreSQL 17.11 ... musl` 记录的是 W1 当时的实测，**现已被替换**。
+
+| 项 | 变更前（W1，2026-10-27） | 变更后（2026-10-29） |
+| --- | --- | --- |
+| postgres 镜像 | `postgres:17-alpine@sha256:266d3c25…` | `pgvector/pgvector:pg17@sha256:ac08538c6f8b9904c33c8224c5e5706dbe760aca29db1d096972b4052c22a75d` |
+| 服务端版本串 | `PostgreSQL 17.11 on x86_64-pc-linux-musl`（Alpine） | `PostgreSQL 17.11 (Debian 17.11-1.pgdg12+2) on x86_64-pc-linux-gnu` |
+| pgvector 可用性 | ❌ 无 `vector` 扩展（W5 记录为缺口 ③，检索 ANN 只能 NOT_RUN） | ✅ `vector` 0.8.7 可用；`CREATE EXTENSION vector` 实测通过 |
+| 数据卷 | `phase0-pgdata`（PG17） | 同一卷原地复用（major 未变），既有 schema 保留 |
+
+变更理由、探针输出与判定见 `docs/poc/evidence/fix-w1-t02-pgvector-record.md`；`tests/phase0/test_environment.py` 已新增静态断言 `test_postgres_image_ships_pgvector_extension`，防止镜像被换回无扩展版本。
+
+**换镜像后的回归结论（2026-10-29 实跑）**：`tests/phase0/test_environment.py` 13 passed；全量 `tests/phase0` **959 passed / 0 failed / 0 errors / 8 skipped**（`time=269.236s`，8 个 skip 全是 BrowserSkill 真机用例且 `skipped.message` 写明 `NOT_RUN` 理由）；`ruff check experiments/phase0 tests/phase0` → `All checks passed!`；core 两容器 `Up (healthy)`。即：换镜像未破坏任何既有组件，`vector` 扩展在 `pyknora` 库实测可建、HNSW 索引可用。
+
+**给后续任务的接口约定**：`vector` 扩展是**按库**安装的，新库需自带 `CREATE EXTENSION vector`（本记录只在 `pyknora` 库建过探针并已清理），否则会报 `type "vector" does not exist`。
+
+---
+
+**owner**：w1-t02-env（执行）/ lead（门禁硬化）　Wave W1，T02　**status**：PASS（残余见 §9/§10；镜像与 PG 发行版已于 2026-10-29 升级，见 §14）

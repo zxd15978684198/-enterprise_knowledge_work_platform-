@@ -319,3 +319,14 @@
 - **判定**：**PASS（限域）**——真机 `tab borrow` 需人工确认记 `NOT_RUN`；`LeaseRegistry` 仍是进程内状态（多副本不可用）、网关重启 epoch 归零；`bsk` 自身无 fencing，唯一性由网关单点保证。
 - **提交状态**：feat 交付提交 `cfdc99c`（3 文件 +1904）；本记录 + 计划状态刷新 + 两处回归重生成证据随其后一笔 docs 提交；分支 `fix/w5-t18` 已推送（远端顶点 `fd19151`），并以 `--no-ff` 合入 `dev`（合并提交 `f35443c`，父 `34337c8` + `fd19151`），`origin/dev` 已更新到 `f35443c`。
 - **下一步**：仅剩 **5 项未开始**（T26、T28、T29、T31、T32）。T26 的直接前置（T25/T05/T21）均已 PASS（限域），是下一个可开工项；但本机 PostgreSQL 无 `vector` 扩展（T25 已记 ANN `NOT_RUN`），开工前需先定限域口径。
+
+## 本轮：修复 `fix/w1-t02-pgvector` —— PG 镜像升级到自带 pgvector（2026-10-29）
+
+- **为什么做**：上一节指出的「本机 PG 无 `vector` 扩展 → T26 只能做结构/权限验证」是环境缺口（W5 缺口 ③）。按用户选择（B = 升级 postgres 镜像）单开 `fix/w1-t02-pgvector`，从 `dev`（`5809d80`）拉出，不动已合并波次。
+- **改了什么**：`experiments/phase0/compose.yaml` 的 postgres 镜像 `postgres:17-alpine@sha256:266d3c25…` → `pgvector/pgvector:pg17@sha256:ac08538c6f8b9904c33c8224c5e5706dbe760aca29db1d096972b4052c22a75d`（同 major 17，数据卷原地复用）；`tests/phase0/test_environment.py` 增加静态断言 `test_postgres_image_ships_pgvector_extension`（仓库名/tag major/digest 三重固定，防回退）；`docs/poc/evidence/environment.md` 追加 §14 标注旧值已历史化。
+- **实测**：容器重建后 `healthy 10s`；服务端 `PostgreSQL 17.11 (Debian 17.11-1.pgdg12+2) on x86_64-pc-linux-gnu`；`CREATE EXTENSION vector` → `extversion 0.8.7`；`vector(128)` 表 + `hnsw (embedding vector_cosine_ops)` 索引 + `<=>` top-3 查询全部成功且已清理；既有 schema（`p0_t02_probe`/`p0_t05`/`p0_t27`/`public`）在复用卷上完好。
+- **门禁**：`test_environment.py` **13 passed**；全量 `tests/phase0` **959 passed / 0 failed / 0 errors / 8 skipped**（`time=269.236s`，8 个 skip 均为 BrowserSkill 真机用例并写明 `NOT_RUN` 理由）；`ruff` `All checks passed!`；`compose config -q` exit 0；core 两容器 `Up (healthy)`。
+- **判定**：**PASS**（环境修复，非 PoC 判定；不改变 T25 已记的 ANN `NOT_RUN`，如需升级须重跑 T25 才有新证据）。
+- **残余风险**：①全量回归会重写两个 tracked 证据 JSON（`poc01_owner_process_level.json`、`retrieval-baseline.json`，时间戳/PID/timing 抖动），本轮随提交纳入，后续应改为写 `.pytest_cache/`；②`vector` 扩展按库安装，新库迁移/夹具需自带 `CREATE EXTENSION vector`。
+- **提交状态**：待用户确认后提交到 `fix/w1-t02-pgvector`（未提交、未推送、未合并 `dev`）。
+- **下一步**：T26 的环境前置已解除，可按原限域口径开工（真实向量检索可做，需在测试库先 `CREATE EXTENSION vector`）。

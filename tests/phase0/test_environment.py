@@ -243,6 +243,25 @@ def test_compose_core_services_are_digest_pinned_and_loopback_only() -> None:
 
 
 # --------------------------------------------------------------------------- #
+# 8.1 postgres 镜像必须自带 pgvector（T26 检索/引用依赖；不允许运行时 pip/编译）
+# --------------------------------------------------------------------------- #
+def test_postgres_image_ships_pgvector_extension() -> None:
+    data = yaml.safe_load(COMPOSE.read_text(encoding="utf-8"))
+    image = data["services"]["postgres"]["image"]
+    repository, _, tag = image.partition(":")
+    assert repository == "pgvector/pgvector", (
+        f"postgres 必须使用自带 pgvector 的官方镜像，实际仓库 {repository!r}；"
+        "理由与证据见 docs/poc/evidence/fix-w1-t02-pgvector-record.md"
+    )
+    major_tag = tag.split("@", 1)[0]
+    assert major_tag == "pg17", (
+        f"pgvector 镜像的 PG major 必须与既有数据卷一致（pg17），实际 {major_tag!r}"
+    )
+    # 仍是 tag@sha256 固定，不允许 latest 或裸 tag
+    assert DIGEST_IMAGE.match(image), f"pgvector 镜像也必须 digest 固定，实际 {image}"
+
+
+# --------------------------------------------------------------------------- #
 # 9. 未就绪 profile 必须显式标注（queue/parser/browser/control-site），不虚构镜像
 # --------------------------------------------------------------------------- #
 def test_not_ready_profiles_are_declared_not_implemented() -> None:
