@@ -17,6 +17,7 @@ from pyknora.db import session_scope
 from pyknora.ingest.chunker import split_text
 from pyknora.ingest.parsers import ParseError, parse_bytes
 from pyknora.models import Chunk, Document
+from pyknora.ports.models import get_embedding_port
 from pyknora.storage import get_storage
 
 logger = logging.getLogger(__name__)
@@ -60,6 +61,9 @@ async def process_document(document_id: uuid.UUID) -> str:
             if not chunks:
                 raise ParseError("分块结果为空")
 
+            embedder = get_embedding_port()
+            vectors = embedder.embed([chunk.content for chunk in chunks])
+
             await session.execute(delete(Chunk).where(Chunk.document_id == document.id))
             session.add_all(
                 [
@@ -70,6 +74,7 @@ async def process_document(document_id: uuid.UUID) -> str:
                         content=chunk.content,
                         char_count=chunk.char_count,
                         page=chunk.page,
+                        embedding=vectors[chunk.ordinal],
                     )
                     for chunk in chunks
                 ]

@@ -53,7 +53,12 @@ def database() -> Iterator[None]:
 
 @pytest.fixture(autouse=True)
 async def _clean_tables(database: None) -> AsyncIterator[None]:
-    """每个用例前清空业务表，保证隔离。"""
+    """每个用例前清空业务表，保证隔离；用例后释放连接池。
+
+    为什么要在用例结束时 dispose：pytest-asyncio 为每个用例新建 event loop，而
+    SQLAlchemy 引擎是进程级单例。池里留着上个 loop 打开的 asyncpg 连接，下个用例
+    复用时就会抛 ``RuntimeError: Event loop is closed`` / ``AttributeError: ... send``。
+    """
 
     from sqlalchemy import text
 
@@ -64,6 +69,9 @@ async def _clean_tables(database: None) -> AsyncIterator[None]:
             text("TRUNCATE app.memberships, app.workspaces, app.users RESTART IDENTITY CASCADE")
         )
     yield
+    from pyknora.db import dispose_engine
+
+    await dispose_engine()
 
 
 @pytest.fixture

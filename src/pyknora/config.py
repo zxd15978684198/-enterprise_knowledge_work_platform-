@@ -53,6 +53,45 @@ class Settings(BaseSettings):
     chunk_overlap: int = Field(default=120, ge=0, le=1000, description="分块重叠字符数")
     max_chunks_per_document: int = Field(default=2000, ge=1, description="单文档分块上限")
 
+    # —— 检索与 RAG（W20）——
+    embedding_provider: str = Field(
+        default="local", description="local = 字符 n-gram 哈希替身；真实模型适配器尚未接入"
+    )
+    embedding_dim: int = Field(
+        default=1024,
+        ge=8,
+        description="向量维度，必须与 db/migrations/0003 中 vector(1024) 一致",
+    )
+    chat_provider: str = Field(
+        default="local", description="local = 抽取式替身；真实生成模型适配器尚未接入"
+    )
+    retrieval_candidate_k: int = Field(
+        default=40, ge=1, le=500, description="每路召回候选数（向量 / 词法各取这么多）"
+    )
+    retrieval_top_k: int = Field(default=8, ge=1, le=100, description="融合后返回条数")
+    rrf_k: int = Field(default=60, ge=1, description="RRF 平滑常数 k")
+    retrieval_min_similarity: float = Field(
+        default=0.10,
+        ge=0.0,
+        le=1.0,
+        description=(
+            "向量路候选的余弦相似度下限；低于它的分块不进融合。"
+            "0.10 是对本地 n-gram 哈希替身实测出来的经验值（相关 ~0.22–0.25、无关 ~0.00–0.02），"
+            "换成真实 embedding 后必须重新标定"
+        ),
+    )
+    rag_max_context_chunks: int = Field(default=6, ge=1, le=50, description="送进模型的片段上限")
+    rag_history_turns: int = Field(default=6, ge=0, le=50, description="拼进提示的历史消息条数")
+    rag_min_similarity: float = Field(
+        default=0.0,
+        ge=0.0,
+        le=1.0,
+        description=(
+            "证据充分性阈值（向量余弦相似度）；0 表示关闭。"
+            "W20 未校准：真实 embedding 未接入，阈值的生产取值待 ADR-0014 DG-3/DG-4 裁决"
+        ),
+    )
+
     @property
     def sync_database_url(self) -> str:
         """迁移与运维脚本使用的同步连接串（psycopg 3）。"""
