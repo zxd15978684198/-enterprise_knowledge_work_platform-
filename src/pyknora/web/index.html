@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PyKnora · 企业知识工作台</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <h1>PyKnora</h1>
+      <span class="sub" id="whoami">未登录</span>
+    </header>
+
+    <main>
+      <section id="auth" class="card">
+        <h2>登录 / 注册</h2>
+        <div class="row">
+          <input id="email" type="email" placeholder="邮箱" autocomplete="username" />
+          <input id="password" type="password" placeholder="口令（≥8 位）" autocomplete="current-password" />
+          <button id="btn-login">登录</button>
+          <button id="btn-register" class="ghost">注册</button>
+        </div>
+        <p class="hint">仅用于本地开发：默认模型为抽取式替身，答案来自命中的文档片段。</p>
+      </section>
+
+      <section id="workspace-area" class="card hidden">
+        <h2>工作区</h2>
+        <div class="row">
+          <select id="workspace-select"></select>
+          <input id="workspace-name" placeholder="新工作区名称" />
+          <button id="btn-create-workspace" class="ghost">新建</button>
+        </div>
+      </section>
+
+      <section id="kb-area" class="card hidden">
+        <h2>知识库</h2>
+        <div class="row">
+          <select id="kb-select"></select>
+          <input id="kb-name" placeholder="新知识库名称" />
+          <button id="btn-create-kb" class="ghost">新建</button>
+        </div>
+        <div class="row">
+          <input id="file" type="file" accept=".txt,.md,.html,.pdf,.docx" />
+          <button id="btn-upload">上传并入库</button>
+        </div>
+        <div class="row">
+          <input id="url" type="url" placeholder="或从 https://… 导入网页" />
+          <button id="btn-import-url" class="ghost">URL 导入</button>
+        </div>
+      </section>
+
+      <section id="ask-area" class="card hidden">
+        <h2>提问</h2>
+        <div class="row">
+          <input id="question" placeholder="例如：RG-01 风险的控制目标是什么？" />
+          <button id="btn-ask">提问</button>
+        </div>
+        <article id="answer" class="answer hidden">
+          <div id="answer-meta" class="meta"></div>
+          <p id="answer-text"></p>
+          <ol id="citations"></ol>
+        </article>
+      </section>
+
+      <section id="log" class="card hidden">
+        <h2>事件日志</h2>
+        <pre id="log-body"></pre>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

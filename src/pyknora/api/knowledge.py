@@ -12,7 +12,7 @@ from pyknora.config import get_settings
 from pyknora.deps import CurrentUser, SessionDep, WorkspaceContext
 from pyknora.errors import ApiError
 from pyknora.ingest.parsers import is_supported
-from pyknora.ingest.pipeline import process_document
+from pyknora.ingest.pipeline import dispatch_ingest
 from pyknora.ingest.url_fetch import UrlFetchError, fetch_url
 from pyknora.models import (
     Chunk,
@@ -307,7 +307,7 @@ async def upload_document(
     session.add(document)
     await session.commit()
 
-    await process_document(document.id)
+    await dispatch_ingest(session, document)
     refreshed = await session.get(Document, document.id)
     assert refreshed is not None
     await session.refresh(refreshed)
@@ -376,7 +376,7 @@ async def import_document_from_url(
     session.add(document)
     await session.commit()
 
-    await process_document(document.id)
+    await dispatch_ingest(session, document)
     refreshed = await session.get(Document, document.id)
     assert refreshed is not None
     await session.refresh(refreshed)
@@ -455,7 +455,7 @@ async def reprocess_document(
     document.error = None
     await session.commit()
 
-    await process_document(document.id)
+    await dispatch_ingest(session, document)
     refreshed = await session.get(Document, document.id)
     assert refreshed is not None
     await session.refresh(refreshed)

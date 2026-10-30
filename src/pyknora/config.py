@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from typing import Literal
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -43,6 +44,12 @@ class Settings(BaseSettings):
     )
 
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
+
+    # —— 静态前端（W22）——
+    web_dir: str = Field(
+        default="",
+        description="前端静态目录；留空表示用包内 src/pyknora/web（镜像里用绝对路径覆盖）",
+    )
 
     # —— 文档入库（W19）——
     upload_dir: str = Field(
@@ -107,6 +114,30 @@ class Settings(BaseSettings):
             "仅测试与本地联调可显式置 True，生产中打开等于关闭 SSRF 防护"
         ),
     )
+
+    # —— 对象存储与队列（W22）——
+    storage_backend: Literal["local", "s3"] = Field(
+        default="local",
+        description="local = 本地目录（开发/测试）；s3 = 任意 S3 兼容端点（MinIO），生产部署用",
+    )
+    s3_endpoint_url: str = Field(
+        default="http://127.0.0.1:9000", description="S3 兼容端点（MinIO 默认 9000 端口）"
+    )
+    s3_access_key: str = Field(default="pyknora", description="S3 access key；生产必须覆盖")
+    s3_secret_key: str = Field(
+        default="pyknora-dev-secret", description="S3 secret key；生产必须覆盖，不得提交真实值"
+    )
+    s3_bucket: str = Field(default="pyknora", description="对象桶名，启动时自动创建")
+    s3_region: str = Field(default="us-east-1", description="S3 region（MinIO 不校验，但需给值）")
+    s3_presign_seconds: int = Field(
+        default=900, ge=30, le=86400, description="预签名 URL 有效期（秒）"
+    )
+    ingest_mode: Literal["inline", "queue"] = Field(
+        default="inline",
+        description="inline = 请求内同步入库（开发/测试）；queue = 丢给 Celery worker（部署形态）",
+    )
+    celery_task_time_limit: int = Field(default=900, ge=30, description="单任务硬超时（秒）")
+    celery_task_soft_time_limit: int = Field(default=840, ge=30, description="单任务软超时（秒）")
 
     @property
     def sync_database_url(self) -> str:

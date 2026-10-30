@@ -103,6 +103,26 @@ async def process_document(document_id: uuid.UUID) -> str:
             return "failed"
 
 
+async def dispatch_ingest(session: object, document: Document) -> None:
+    """按 ``PYKNORA_INGEST_MODE`` 选择入库执行方式。
+
+    * ``inline``（默认）：当前请求内同步执行，接口返回时文档已 ``ready`` / ``failed``；
+    * ``queue``：文档置 ``queued`` 并投递给 Celery，接口立即返回，worker 后续推进状态。
+    """
+
+    settings = get_settings()
+    if settings.ingest_mode != "queue":
+        await process_document(document.id)
+        return
+
+    from pyknora.queue import enqueue_ingest
+
+    document.status = "queued"
+    document.error = None
+    await session.commit()  # type: ignore[attr-defined]
+    enqueue_ingest(document.id)
+
+
 async def recount_chunks(document_id: uuid.UUID) -> int:
     """统计分块数（诊断与测试用）。"""
 
