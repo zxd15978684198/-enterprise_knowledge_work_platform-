@@ -13,6 +13,7 @@ from pyknora.deps import CurrentUser, SessionDep, WorkspaceContext
 from pyknora.errors import ApiError
 from pyknora.ingest.parsers import is_supported
 from pyknora.ingest.pipeline import process_document
+from pyknora.ingest.url_fetch import UrlFetchError, fetch_url
 from pyknora.models import (
     Chunk,
     Document,
@@ -28,6 +29,7 @@ from pyknora.schemas import (
     KnowledgeBaseCreate,
     KnowledgeBaseOut,
     KnowledgeBaseUpdate,
+    UrlImportIn,
 )
 from pyknora.storage import checksum, get_storage
 
@@ -297,6 +299,75 @@ async def upload_document(
         filename=filename,
         mime_type=file.content_type or "application/octet-stream",
         size_bytes=len(data),
+        checksum=digest,
+        storage_key=storage_key,
+        status="pending",
+        created_by=user.id,
+    )
+    session.add(document)
+    await session.commit()
+
+    await process_document(document.id)
+    refreshed = await session.get(Document, document.id)
+    assert refreshed is not None
+    await session.refresh(refreshed)
+    return DocumentOut.model_validate(refreshed)
+
+
+@router.post(
+    "/knowledge-bases/{kb_id}/documents/from-url",
+    response_model=DocumentOut,
+    status_code=status.HTTP_201_CREATED,
+    summary="从 URL 受控导入（SSRF 防护 + 大小/类型限制）",
+)
+async def import_document_from_url(
+    kb_id: uuid.UUID,
+    payload: UrlImportIn,
+    user: CurrentUser,
+    session: SessionDep,
+    response: Response,
+) -> DocumentOut:
+    """抓取一个 http(s) 地址并入库。
+
+    安全边界见 :mod:`pyknora.ingest.url_fetch`：scheme 白名单、DNS 解析后私网拦截、
+    逐跳重定向复校验、响应大小与内容类型上限。失败一律以统一错误体返回，不泄露内网信息。
+    """
+
+    kb, _ = await _load_kb(session, user, kb_id)
+
+    try:
+        page = await fetch_url(payload.url)
+    except UrlFetchError as exc:
+        raise ApiError(exc.code, exc.message, status_code=exc.status_code) from exc
+
+    digest = checksum(page.data)
+    existing = await session.scalar(
+        select(Document).where(
+            Document.knowledge_base_id == kb.id,
+            Document.checksum == digest,
+            Document.deleted_at.is_(None),
+        )
+    )
+    if existing is not None:
+        # 幂等：同一知识库内相同内容（无论来自上传还是 URL）只留一行
+        response.status_code = status.HTTP_200_OK
+        return DocumentOut.model_validate(existing)
+
+    filename = page.filename
+    document_id = uuid.uuid4()
+    storage_key = f"{kb.workspace_id}/{document_id}/{filename}"
+    get_storage().put(storage_key, page.data)
+
+    document = Document(
+        id=document_id,
+        workspace_id=kb.workspace_id,
+        knowledge_base_id=kb.id,
+        title=(payload.title or filename.rsplit(".", 1)[0])[:_MAX_TITLE],
+        source_type="url",
+        source_url=page.final_url,
+        filename=filename,
+        mime_type=page.content_type,
+        size_bytes=len(page.data),
         checksum=digest,
         storage_key=storage_key,
         status="pending",

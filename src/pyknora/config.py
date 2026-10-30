@@ -92,6 +92,22 @@ class Settings(BaseSettings):
         ),
     )
 
+    # —— 单 URL 受控导入（W21）——
+    url_fetch_timeout_seconds: float = Field(
+        default=15.0, gt=0, le=120, description="单次抓取总超时（秒）"
+    )
+    url_max_bytes: int = Field(
+        default=5 * 1024 * 1024, ge=1, description="URL 抓取响应字节上限，默认 5 MiB"
+    )
+    url_max_redirects: int = Field(default=3, ge=0, le=10, description="允许跟随的重定向跳数上限")
+    url_allow_private_network: bool = Field(
+        default=False,
+        description=(
+            "是否允许访问回环/私网/链路本地地址。默认 False（生产语义）；"
+            "仅测试与本地联调可显式置 True，生产中打开等于关闭 SSRF 防护"
+        ),
+    )
+
     @property
     def sync_database_url(self) -> str:
         """迁移与运维脚本使用的同步连接串（psycopg 3）。"""
