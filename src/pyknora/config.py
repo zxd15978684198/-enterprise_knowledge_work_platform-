@@ -44,6 +44,15 @@ class Settings(BaseSettings):
 
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
 
+    # —— 文档入库（W19）——
+    upload_dir: str = Field(
+        default="data/uploads", description="本地对象存储根目录（W22 换 MinIO 时改为桶名）"
+    )
+    max_upload_bytes: int = Field(default=25 * 1024 * 1024, description="单文件上限，默认 25 MiB")
+    chunk_size: int = Field(default=800, ge=100, le=4000, description="分块目标字符数")
+    chunk_overlap: int = Field(default=120, ge=0, le=1000, description="分块重叠字符数")
+    max_chunks_per_document: int = Field(default=2000, ge=1, description="单文档分块上限")
+
     @property
     def sync_database_url(self) -> str:
         """迁移与运维脚本使用的同步连接串（psycopg 3）。"""

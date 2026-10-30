@@ -19,3 +19,5 @@ references/**
 .pytest_cache/
 .ruff_cache/
 pytest-of-*/
+
+data/
