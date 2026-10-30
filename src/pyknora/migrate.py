@@ -47,7 +47,15 @@ def discover(migrations_dir: Path) -> list[Path]:
 
 
 def _checksum(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    """迁移文件校验和（**行尾归一化后**计算）。
+
+    仓库在 Windows 检出为 CRLF、Linux 为 LF，若直接对原始字节做 sha256，同一次提交
+    在不同平台会算出不同校验和，runner 会把「换行符差异」误判成「迁移文件被篡改」。
+    W20 起统一按 ``\\n`` 归一化，跨平台稳定。
+    """
+
+    data = path.read_bytes().replace(b"\r\n", b"\n")
+    return hashlib.sha256(data).hexdigest()
 
 
 def _applied(conn: psycopg.Connection) -> dict[str, str]:

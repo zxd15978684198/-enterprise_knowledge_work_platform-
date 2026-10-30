@@ -5,7 +5,7 @@
 | 阶段 | 范围 | 状态 |
 | --- | --- | --- |
 | Phase 0 | 架构验证与 PoC（32 项 P0 任务） | 已完成（见 `docs/poc/`） |
-| **Phase 1** | **P0 MVP：认证、知识库、文档、混合检索、RAG+SSE、单 URL 导入** | **进行中（W18 已完成）** |
+| **Phase 1** | **P0 MVP：认证、知识库、文档、混合检索、RAG+SSE、单 URL 导入** | **进行中（W18–W20 已完成）** |
 | Phase 2–4 | Agent / Research / 企业知识整理 / P2 扩展 | 未开始（用户已明确不做） |
 
 进度与逐波次证据：`docs/IMPLEMENTATION_STATUS.md`、`docs/phase1/PLAN_Phase1_MVP.md`、`docs/phase1/wave-wN-record.md`。
@@ -50,7 +50,7 @@ uv run ruff format --check src tests
 docker compose -f deploy/compose/docker-compose.yml config
 ```
 
-## 已实现 API（W18–W19）
+## 已实现 API（W18–W20）
 
 | 方法 | 路径 | 说明 |
 | --- | --- | --- |
@@ -73,12 +73,26 @@ docker compose -f deploy/compose/docker-compose.yml config
 | DELETE | `/api/v1/documents/{document_id}` | 软删除文档并清空分块 |
 | GET | `/api/v1/documents/{document_id}/chunks` | 分块分页（`limit`/`offset`） |
 | POST | `/api/v1/documents/{document_id}/reprocess` | 重新解析入库（`version` +1） |
+| POST | `/api/v1/retrieval/search` | 混合检索（向量 + 词法 + RRF，返回 `vector_rank`/`lexical_rank`） |
+| GET | `/api/v1/workspaces/{workspace_id}/models` | 模型配置列表（`kind` 可选过滤） |
+| POST | `/api/v1/workspaces/{workspace_id}/models` | 新建模型配置（凭据只存环境变量名） |
+| GET | `/api/v1/models/{model_id}` | 模型配置详情 |
+| PATCH | `/api/v1/models/{model_id}` | 改配置（改名/模型/维度/默认） |
+| DELETE | `/api/v1/models/{model_id}` | 删除模型配置 |
+| POST | `/api/v1/models/{model_id}/test` | 连接测试（`local` 直连；其他 provider 返回 `ok=false` 与原因） |
+| GET | `/api/v1/workspaces/{workspace_id}/conversations` | 会话列表 |
+| POST | `/api/v1/workspaces/{workspace_id}/conversations` | 新建会话（可绑定知识库） |
+| GET | `/api/v1/conversations/{conversation_id}` | 会话详情（含消息） |
+| DELETE | `/api/v1/conversations/{conversation_id}` | 删除会话（连带消息与事件） |
+| POST | `/api/v1/conversations/{conversation_id}/messages` | 提问并同步返回答案 + 引用（`insufficient_evidence` 显式终止） |
+| POST | `/api/v1/conversations/{conversation_id}/messages/stream` | SSE 流式问答（`retrieval → message.delta* → message.completed`） |
+| GET | `/api/v1/conversations/{conversation_id}/events` | 事件重放（`since_seq` 增量） |
 
 约定：业务接口默认要求 `Authorization: Bearer <token>`；错误统一为 `{"error": {"code", "message", "details"}}`，响应头带 `X-Request-Id`。
 
 上传行为：支持 `txt/md/html/pdf/docx`；同知识库内**内容 sha256 相同则幂等复用**（返回 `200` 与既有文档，非 409）；解析与分块在上传请求内同步完成，成功后 `status=ready`，失败则 `status=failed` 且 `error` 给出原因。
 
-尚未实现（计划内）：检索与问答 SSE（W20）、URL 导入（W21）、前端与一键部署（W22，同时接入 Celery/MinIO）。
+尚未实现（计划内）：URL 导入（W21）、前端与一键部署（W22，同时接入 Celery/MinIO）；真实 embedding/chat 供应商适配器、embedding 相似度阈值的生产标定（ADR-0014 DG-3/DG-4）均未完成。
 
 ## 目录结构
 

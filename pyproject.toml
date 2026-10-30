@@ -18,6 +18,7 @@ dependencies = [
     "email-validator>=2.2",
     "asyncpg>=0.32.0",
     "python-multipart>=0.0.32",
+    "pgvector>=0.3.6",
 ]
 
 [dependency-groups]

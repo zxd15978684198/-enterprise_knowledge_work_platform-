@@ -74,12 +74,10 @@ class WorkspaceContext:
             )
 
 
-async def get_workspace_context(
-    workspace_id: uuid.UUID,
-    session: SessionDep,
-    user: CurrentUser,
+async def load_workspace_context(
+    session: AsyncSession, user: User, workspace_id: uuid.UUID
 ) -> WorkspaceContext:
-    """校验成员身份；非成员与不存在同返回 404，避免泄漏工作区是否存在。"""
+    """校验成员身份（供 body/query 传 workspace_id 的场景复用）。"""
 
     stmt = (
         select(Workspace, Membership)
@@ -95,6 +93,16 @@ async def get_workspace_context(
         raise ApiError("not_found", "工作区不存在", status_code=status.HTTP_404_NOT_FOUND)
     workspace, membership = row
     return WorkspaceContext(workspace=workspace, membership=membership)
+
+
+async def get_workspace_context(
+    workspace_id: uuid.UUID,
+    session: SessionDep,
+    user: CurrentUser,
+) -> WorkspaceContext:
+    """路径参数版本：校验成员身份；非成员与不存在同返回 404，避免泄漏工作区是否存在。"""
+
+    return await load_workspace_context(session, user, workspace_id)
 
 
 WorkspaceDep = Annotated[WorkspaceContext, Depends(get_workspace_context)]

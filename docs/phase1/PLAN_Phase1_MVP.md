@@ -35,14 +35,14 @@ Phase 0 的 `experiments/phase0/` 是验证代码，**不迁移**到 `src/`；Ph
 | --- | --- | --- |
 | **W18** | 骨架：配置/日志/DB/迁移 runner；身份（users/workspaces/memberships）；`/health`、`/auth/*`、`/workspaces`；pytest 基建；Dockerfile + compose | `uv run uvicorn` 可起；三组 API 的测试全绿；`docker compose config` 通过 |
 | **W19** | 知识库与文档：`/knowledge-bases*`、文档上传（PDF/DOCX/TXT/MD/HTML）、解析与 chunks 落库、`/documents/{id}`、`/documents/{id}/chunks`、`/reprocess`；**同步内联入库**（Celery/Redis 推迟到 W22），对象存储用本地实现（MinIO 推迟到 W22） | 上传→解析→chunk 全链路；同区内容 sha256 幂等；reprocess 版本 +1 且旧分块被替换 |
-| **W20** | 混合检索 + RAG + SSE：`/retrieval/search`（向量 + FTS + RRF）、`/conversations*`、`/conversations/{id}/events`；引用结构与「证据不足」终止 | 检索指标与 Phase 0 基线同量级；SSE 事件序列符合 `PRD:503` |
+| **W20** | 混合检索 + RAG + SSE + 模型配置：`/retrieval/search`（向量 + FTS + RRF）、`/models*`（最小 CRUD + 连接测试）、`/conversations*`、`/conversations/{id}/events`；引用结构与「证据不足」终止 | 检索指标与 Phase 0 基线同量级；SSE 事件序列符合 `PRD:503` |
 | **W21** | 单 URL 受控入库：`/knowledge-bases/{kb_id}/imports/url`、SSRF 每跳校验、抓取→解析→入库 | 内网/回环/重定向到内网被拒；正常网页可入库 |
 | **W22** | 部署与前端：`docker compose up` 一键起（api/worker/postgres/redis/minio）+ **Celery worker/Redis 队列与 MinIO 对象存储接入**；最小前端（登录、KB 列表、上传、问答 + 引用）；端到端脚本 | 空机器 `docker compose up -d` 后健康；E2E 脚本通过 |
 | **W23** | 收口：README/运维手册、指标与日志、安全回归、债务清单 | 全量测试绿；文档可交接 |
 
 波次规程沿用 Phase 0：每波次先落声明块（`docs/phase1/wave-wN-record.md`：N、写权白名单、资源槽、验收标准），完成后回填 §2/§3/§4，门禁通过后才提交。
 
-**进度**：W18 已完成（骨架 + 身份/工作区 + 迁移 + 容器化，`uv run pytest` 14 passed，见 `docs/phase1/wave-w18-record.md`）；**W19 已完成**（知识库与文档入库：5 格式解析 + 分块 + 落库 + 幂等去重，`uv run pytest` 23 passed，见 `docs/phase1/wave-w19-record.md`）。下一波次 W20（混合检索 + RAG + SSE）。
+**进度**：W18 已完成（骨架 + 身份/工作区 + 迁移 + 容器化，`uv run pytest` 14 passed，见 `docs/phase1/wave-w18-record.md`）；**W19 已完成**（知识库与文档入库：5 格式解析 + 分块 + 落库 + 幂等去重，`uv run pytest` 23 passed，见 `docs/phase1/wave-w19-record.md`）；**W20 已完成**（混合检索 + RAG + SSE + 模型配置最小版，`uv run pytest` 39 passed，见 `docs/phase1/wave-w20-record.md`；真实 embedding/chat 供应商与阈值标定仍 NOT_RUN）。下一波次 W21（单 URL 受控入库）。
 
 ## 4. 验收标准（Phase 1 出口）
 
@@ -56,7 +56,7 @@ Phase 0 的 `experiments/phase0/` 是验证代码，**不迁移**到 `src/`；Ph
 ## 5. 已知债务与不做项（明确记录，不隐藏）
 
 - RLS：W18–W21 采用查询层过滤（应用层强制 `workspace_id`），数据库 RLS 作为后续加固项（Phase 0 已在 `p0_` schema 验证可行性）。
-- 模型管理 `/models` 在 W20 实现最小版本（增删改查 + 连接测试），不含多 Provider 适配器插件体系。
+- 模型管理 `/models` 已在 W20 落地最小版本（增删改查 + 连接测试），仍不含多 Provider 适配器插件体系；真实供应商适配器与 embedding 相似度阈值的生产标定（ADR-0014 DG-3/DG-4）均未完成。
 - 断线恢复、Rerank、查询重写属 P1，不实现。
 - 认证只做邮箱口令 + JWT，不含 OAuth/SSO/邀请流。
 - 审计日志只记录最小字段（操作者、动作、资源、时间、结果），不含敏感载荷。
