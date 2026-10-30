@@ -595,4 +595,4 @@
 - **实测门禁**：`ruff check src tests scripts db` `All checks passed!`；`ruff format --check` 50 files；`uv run pytest tests` **120 passed / 0 failed / 0 skipped / 32.465s**（W22 基线 105 + 新增 15）；真实 `python -m pyknora.serve --port 8019` 冒烟：无令牌 403、带令牌 200，`/health` 后指标 `total=3` 且路由模板正常归类。
 - **执行中修掉的真问题**：①FastAPI 嵌套 `include_router` 使 `scope["route"].path` 只有内层前缀（实测 `/metrics` 而非 `/api/v1/metrics`）→ 改为对真实路径折低基数模板；②配置长描述触发 E501 → 换行；③安全回归首版把错误码写成 `unauthorized`，与实现（`unauthenticated`/`invalid_token`）不符 → 按真实实现改正，不动实现。
 - **判定**：W23 验收 ①–⑫ 满足；**Phase 1（P0 MVP）W18–W23 六个波次全部执行完毕**。但「Phase 1 出口达标」仍不成立：D-01 真实供应商 `NOT_RUN`、D-02 检索指标未标定、D-06/D-07 等加固项未做，Phase 0 的 G-P0/G-FULL 两道门亦未通过（D-16）。
-- **提交状态**：**已提交、已推送、已合入 `dev`**（回填见下）。
+- **提交状态**：**已提交、已推送、已合入 `dev`**（`e2f54e2` feat → `504573c` docs；分支顶点 `504573c`；`--no-ff` 合入 `dev` = **`78f2e92`** 并推送）。

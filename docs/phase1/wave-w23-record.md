@@ -83,5 +83,6 @@
 ## 4. 提交记录
 
 - 分支：`feature/p1-w23-closeout`（base `dev@ddafbf3`）。
-- 提交：**待回填**。
-- 合入：**待回填**。
+- 提交：`e2f54e2` feat（7 文件：指标实现 + 端点 + 装配 + 2 份测试）、`504573c` docs（6 文件：RUNBOOK + DEBT + 状态/计划/README/本记录）；分支 `feature/p1-w23-closeout` 顶点 **`504573c`**，已推送 `origin`。
+- 合入：`--no-ff` 合入 `dev` = **`78f2e92`**（无冲突）；随后本回填提交再推 `dev`。
+- 推送实证：`git push -u origin feature/p1-w23-closeout` exit 0（`* [new branch]`）。
