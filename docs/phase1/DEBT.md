@@ -40,7 +40,7 @@
 | D-16 | Phase 0 出口门仍不成立 | G-P0 = 5 门 0 门 PASS；G-FULL 九项 PoC 全 `PARTIAL` | 不能宣称 Phase 0 通过 | 走 `05_Phase0_Acceptance.md:81-82` 受限准入评审 | 需要对外交付时 | OPEN | W10/W11 记录 |
 | D-17 | 13 份 ADR 仍 `Proposed` | 仅 ADR-0010 已接受 | 决策未固化，后续易反复 | 按裁决方分组逐份评审 | 进入 P1 前 | OPEN | `docs/adr/` |
 | D-18 | 证据 hash 口径两套 | blob(LF) 与 worktree(CRLF) 两种记录并存（W16 实测 drift=47） | 用 hash 判"是否漂移"会误报 | 统一声明为 blob 口径并回填 | 需要复核证据时 | OPEN | W16 记录 §3.2 |
-| D-19 | 无 `.env.example` | Compose 用 `x-app-env` 内联默认值 | 新环境需照 README 抄配置 | 补 `.env.example` 并加注释 | 交接/部署前 | OPEN | W22 记录 §2.1 |
+| D-19 | `.env.example` 字段不全 | 根 `.env.example` 原只有 5 个字段（W1 遗留），W19–W23 新增的入库/检索/URL 抓取/存储/队列/指标配置均未列出 | 新环境需翻代码或 README 猜变量名 | **已补全**（2026-10-30）：39 个生效字段 + 12 个注释项，覆盖 `Settings` 全部 43 个字段；脚本校验「缺失=0、多余=0、可解析」，D-01/D-02 预留块单列且标明当前不生效 | 交接/部署前 | CLOSED（2026-10-30） | W22 记录 §2.1、本轮补全 |
 
 ## 5. 使用方式
 
