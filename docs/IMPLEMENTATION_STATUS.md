@@ -1,6 +1,6 @@
 # PyKnora 实施状态
 
-更新日期：2026-10-29（Asia/Shanghai）。Phase 0 实验阶段**收口完成**：W1–W15 十五个波次全部执行完毕，四条修复分支（`fix/w5-t17`、`fix/w5-t18`、`fix/w7r-t05-t09`、`fix/w1-t02-pgvector`）与 W10 的 ruff 收口提交按序合入 `dev`（`dev` 顶点 `2c00b84`），**W14（机制批 M1/M2/M3）与 W15（D5 缺口补齐）已完成并经 `--no-ff` 合入 `dev`**；**W16 补建了 PoC-07 聚合验收报告 `docs/poc/evidence/poc07-report.md`**（判定 `PASS（限域）`，残限 D1–D7 原样保留），关闭 `Phase0_Full_Gate_Review.md:31` 登记的最后一个文件级输入缺口，但**门级判定不变**。P0-T01–P0-T32 三十二项任务级全部执行完毕（绝大多数 **PASS（限域）**；T01 为文档交付，T17/T18 经修复分支收口，PoC-09 为 `PARTIAL`）。**两道出口门仍不成立**：G-P0 = 5 门 0 门 PASS（G1–G4 = `PARTIAL`；G5 的「ANN 不可用」已由 W13 解除，但阈值校准归 ADR-0014 未批，故 G5 仍 `NOT_RUN`）；G-FULL = 九项 PoC **全部 `PARTIAL`、0 项无保留 PASS**。**Phase 0 不得标记为完整完成**，只能按 `05_Phase0_Acceptance.md:81-82` 走受限范围准入的三方评审。本轮新增三条**证据卫生机制**（不提升任何能力，只让结论可复核）：M1 把 `02_Phase0_PoC_Plan.md` 的状态列改为「依据到 `文件:行`」并写明唯一维护人；M2 用 `SHA256SUMS` + `evidence_manifest.json` 外部台账 + `evidence_meta.py` 校验 8 份证据 JSON（不注入、不改写历史）；M3 用 `verdict_lint.py` 4 条规则拦「限域写成通过」并固定 8 条存量基线。W15 补齐 T31 登记的 D5 输入缺口（SBOM/许可、远程扩展连接、证据指纹生命周期），并修复一个**结构性测试缺陷**：探针把证据写回 tracked 路径，导致台账用例在同一次回归里必然失败——改为测试会话重定向到临时目录后，全量回归 **1037 passed / 8 skipped / 576.82s**，且跑完仓库证据目录零改动。ADR 共 14 份（0007–0014），其中 **ADR-0010 已接受**，其余 13 份仍 `Proposed`。所有结论仅为实验环境内验证，不代表可生产。
+更新日期：2026-10-30（Asia/Shanghai）。Phase 0 实验阶段**收口完成**（W17 补测批已把 PoC-07 的 D3/D4 两条残限关闭，`dev` 顶点 `1989028`）：W1–W15 十五个波次全部执行完毕，四条修复分支（`fix/w5-t17`、`fix/w5-t18`、`fix/w7r-t05-t09`、`fix/w1-t02-pgvector`）与 W10 的 ruff 收口提交按序合入 `dev`（`dev` 顶点 `2c00b84`），**W14（机制批 M1/M2/M3）与 W15（D5 缺口补齐）已完成并经 `--no-ff` 合入 `dev`**；**W16 补建了 PoC-07 聚合验收报告 `docs/poc/evidence/poc07-report.md`**（判定 `PASS（限域）`，残限 D1–D7 原样保留），关闭 `Phase0_Full_Gate_Review.md:31` 登记的最后一个文件级输入缺口，但**门级判定不变**。P0-T01–P0-T32 三十二项任务级全部执行完毕（绝大多数 **PASS（限域）**；T01 为文档交付，T17/T18 经修复分支收口，PoC-09 为 `PARTIAL`）。**两道出口门仍不成立**：G-P0 = 5 门 0 门 PASS（G1–G4 = `PARTIAL`；G5 的「ANN 不可用」已由 W13 解除，但阈值校准归 ADR-0014 未批，故 G5 仍 `NOT_RUN`）；G-FULL = 九项 PoC **全部 `PARTIAL`、0 项无保留 PASS**。**Phase 0 不得标记为完整完成**，只能按 `05_Phase0_Acceptance.md:81-82` 走受限范围准入的三方评审。本轮新增三条**证据卫生机制**（不提升任何能力，只让结论可复核）：M1 把 `02_Phase0_PoC_Plan.md` 的状态列改为「依据到 `文件:行`」并写明唯一维护人；M2 用 `SHA256SUMS` + `evidence_manifest.json` 外部台账 + `evidence_meta.py` 校验 8 份证据 JSON（不注入、不改写历史）；M3 用 `verdict_lint.py` 4 条规则拦「限域写成通过」并固定 8 条存量基线。W15 补齐 T31 登记的 D5 输入缺口（SBOM/许可、远程扩展连接、证据指纹生命周期），并修复一个**结构性测试缺陷**：探针把证据写回 tracked 路径，导致台账用例在同一次回归里必然失败——改为测试会话重定向到临时目录后，全量回归 **1037 passed / 8 skipped / 576.82s**，且跑完仓库证据目录零改动。ADR 共 14 份（0007–0014），其中 **ADR-0010 已接受**，其余 13 份仍 `Proposed`。所有结论仅为实验环境内验证，不代表可生产。
 
 ## 阶段收口：W1–W5 全部合入 dev（2026-10-28）
 
@@ -483,3 +483,24 @@
 - **过程偏离（已留痕）**：为量化 hash 口径新建了 `experiments/phase0/w16_hash_audit.py`，**越出声明块写权**（明确写了「不写 `experiments/**`」）→ 跑完即删、无残留，数字保留、复现方法写进报告 §8。教训：声明块写权应覆盖「可能的一次性工具」，否则先用 `python -c` 内联或先改声明。
 - **提交状态**：**已提交、已推送、已合入 dev** —— `8570d68`（4 文件 +302/−2）→ `--no-ff` 合入 `420cb11`（`f9a7455..420cb11`），`dev` 本地 = 远端 = `420cb11`。
 - **下一步（推荐顺序）**：① 本波次提交 + 推送 + `--no-ff` 合入 `dev`；② 补测批：D3（100 轮竞争）+ D4（真实预算台账）；③ 证据 hash 回填批：47 条真漂移 + 统一口径（可写进 `evidence-integrity.md`）；④ `P0-T32`/`Phase0_Full_Gate_Review.md` 的输入缺口表述需同步「poc07 已补建」；⑤ 13 份 ADR 待法务/产品/安全裁决。
+
+## 本轮：W17 波次执行（PoC-07 残限补测 D3/D4，2026-10-30）
+
+- **为什么 `N=1`**：D3（改测试轮次）与 D4（换预算数据来源）写权不相交，理论上可 N=2；但两者都在同一 PG 实例上起真实事务、做清理，并行会让「并发干扰 vs 真缺陷」的归因变模糊，而单任务耗时都在分钟级。分支 `feature/w17-d3-d4` 从 `dev@1989028` 拉出，声明见 `docs/poc/evidence/wave-w17-record.md` §1。
+- **交付（新增 2 + 修改 5）**：
+  - `tests/phase0/test_replanning_ledger.py`（**新增**，5 例）：真实 `p0_t20` 台账 × `p0_t23` 调度事实的接线验收。
+  - `docs/poc/evidence/wave-w17-record.md`（**新增**）：声明块 + 派发 + 执行/门禁 + 提交决策。
+  - `experiments/phase0/evaluator_replanner.py`（**改**）：新增 `LedgerBudget`（只读 `BudgetPort` 实现，工作区不符即 `ReplanError`，`release()` 直接抛错）；顺带全文件 `ruff format`（41+/20−，纯排版）。
+  - `tests/phase0/test_task_coordination.py`（**改**）：D3 `rounds = 30` → `100`，claim 断言随 `rounds` 参数化。
+  - `poc07-report.md` / `poc02-replanning.md` / 本文件（**改**）：D3/D4 残限改写与前沿/本轮段。
+- **关键实测**：
+  - D3：`test_task_coordination.py` **28 passed**，100 轮 × 2 线程 × 4 节点 = **400 条 claim**，无重复领取、无提前执行、无旧 epoch 覆盖。
+  - D4：`test_replanning_ledger.py` **5 passed in 2.20s** —— 端口读数 == 账本 `available()` 且**在途预留同步扣减**；不足 → `budget_exhausted` + `blocked` 且预留/结算/事件三类计数**分毫未动**；充足 → 重规划照常 `applied`；跨工作区 → 拒绝。
+  - 全量回归：**1041 passed / 8 skipped / 1 failed in 459.92s**，唯一失败是 `verdict_lint.py` 报本波次记录缺 `## 2./3./4.`（文档结构未写完就跑了门禁），补齐后 `new=0`。
+- **被测试逼出来的三条接线事实（已写进测试注释）**：① `sch.connect()` 是 dict 行、`bl.connect()` 是元组行，同一断言要兼容两种；② `p0_t20` 有 append-only 触发器，**禁止 DELETE**，清理只能碰 `p0_t23`/`p0_t24`，账本靠独立 `run_id` 隔离；③ `budget_remaining_microunits` 只在「被拦」时落盘，放行写 `None`、`noop` 路径更在读预算前返回 —— 所以读数正确性必须由别的断言证明，不能靠这个字段。
+- **另修一处真实死锁**：清理若用 run 连接删 `p0_t20` 行，会与账本连接的 idle-in-transaction 持锁互等（实测卡死 15 分钟）。现在清理按连接分工并先 `rollback()` 释放读事务。
+- **门禁**：`ruff check` All passed、`ruff format --check` already formatted、`verdict_lint.py --check` `violations=8 new=0`、`evidence_meta.py --check` `with_problem=0`。
+- **判定**：PoC-07 **仍为 `PASS（限域）`**，但 **D3/D4 两条残限关闭**；门级判定**完全不变** —— G-P0 仍 4×`PARTIAL` + 1×`NOT_RUN`，G-FULL 仍九项全 `PARTIAL`。**不得据此宣称 Phase 0 通过。**
+- **过程偏离（已留痕）**：① 官方 PG 容器再次整体不在（只剩陌生 `pyknora-pg-p0`），按规程 `compose --profile core up -d` 拉回；② `pwsh` 运行器崩溃一次（`exit code 1073807364`），改用 `Start-Process` + 日志文件；③ 仓库根出现 3 个 `pyknora-evidence-*/`（`tempfile` 在本 venv 下返回仓库根，属既有坑），已删。
+- **提交状态**：**待用户裁决**（5 项改动 + 2 个新文件均未 `git add`）。
+- **下一步（推荐顺序）**：① 本波次提交 + 推送 + `--no-ff` 合入 `dev`；② 证据 hash 回填批（47 条真漂移 + 统一口径）；③ `Phase0_Full_Gate_Review.md` 等文档同步「D3/D4 已关闭」；④ 13 份 ADR 待法务/产品/安全裁决；⑤ G5 最后一项 = ADR-0014 阈值校准，需产品批准 `DG-3/DG-4`。

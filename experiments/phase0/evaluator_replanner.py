@@ -54,8 +54,10 @@ import psycopg
 from psycopg import errors as pg_errors
 from psycopg.pq import TransactionStatus
 
+import budget_ledger
 import dag_contracts as dag
 import task_scheduler as sch
+from contracts import WorkspaceScope
 
 __all__ = [
     "MAX_REPLANS",
@@ -68,6 +70,7 @@ __all__ = [
     "EvaluationReport",
     "Fingerprint",
     "GraphSnapshot",
+    "LedgerBudget",
     "NodeEvaluation",
     "Receipt",
     "ReplanConflictError",
@@ -421,8 +424,13 @@ def _evaluate_node(
 ) -> NodeEvaluation:
     acceptance = policy.acceptance_for(outcome.task_id, outcome.kind)
     seen = len(receipts)
-    base = {"task_id": outcome.task_id, "kind": outcome.kind, "status": outcome.status,
-            "fact_version": outcome.fact_version, "receipts_seen": seen}
+    base = {
+        "task_id": outcome.task_id,
+        "kind": outcome.kind,
+        "status": outcome.status,
+        "fact_version": outcome.fact_version,
+        "receipts_seen": seen,
+    }
 
     if outcome.status == "failed":
         return NodeEvaluation(verdict="failed", reasons=(REASON_STATUS_FAILED,), **base)
@@ -448,9 +456,7 @@ def _evaluate_node(
         reasons.append(REASON_FACT_VERSION_TOO_LOW)
     if acceptance.required_receipts > 0:
         ok_receipts = [
-            item
-            for item in receipts
-            if item.status == acceptance.accepted_receipt_status
+            item for item in receipts if item.status == acceptance.accepted_receipt_status
         ]
         if len(ok_receipts) < acceptance.required_receipts:
             failed_receipts = [item for item in receipts if item.status == "failed"]
@@ -504,9 +510,7 @@ def evaluation_digest(
                 "applied_version": item.applied_version,
                 "external_id": item.external_id,
             }
-            for item in sorted(
-                receipts, key=lambda r: (r.task_id, r.tool, r.external_id, r.status)
-            )
+            for item in sorted(receipts, key=lambda r: (r.task_id, r.tool, r.external_id, r.status))
         ],
         "policy": policy.digest_payload(),
     }
@@ -918,9 +922,7 @@ def load_graph_snapshot(
     topo = tuple(str(item) for item in row["topo_order"])
     missing = [task_id for task_id in topo if task_id not in dependencies]
     if missing:
-        raise ReplanError(
-            f"topo_order 含未知节点：{missing}", code=CODE_INVALID_REQUEST
-        )
+        raise ReplanError(f"topo_order 含未知节点：{missing}", code=CODE_INVALID_REQUEST)
     task_by_id = {str(item["task_id"]): item for item in tasks}
     nodes = tuple(
         dag.TaskNode(
@@ -1188,9 +1190,32 @@ class StaticBudget:
 
     def release(self, reservation_id: UUID) -> None:
         self.release_calls += 1
-        raise AssertionError(
-            f"重规划不得释放未知用量的预留（reservation={reservation_id}）"
-        )
+        raise AssertionError(f"重规划不得释放未知用量的预留（reservation={reservation_id}）")
+
+
+@dataclass(slots=True)
+class LedgerBudget:
+    """把 T20 真实预算账本（schema ``p0_t20``）接到 :class:`BudgetPort`。
+
+    与 :class:`StaticBudget` 的区别：读数来自真实账本 ``BudgetLedger.state()``，
+    因此「剩余额度」包含**在途预留**与**已结算消耗**，与模型调用闸门看到的是同一份事实。
+
+    本类**刻意不提供 ``release``**：重规划不释放未知用量预留这件事由接口形状保证，
+    而不是靠调用方自觉（``StaticBudget.release`` 只作为「若有人硬调就会失败」的守卫保留）。
+    """
+
+    ledger: budget_ledger.BudgetLedger
+    scope: WorkspaceScope
+
+    def remaining_microunits(self, workspace_id: UUID, run_id: UUID) -> int:
+        if workspace_id != self.scope.workspace_id:
+            raise ReplanError(
+                "工作区不匹配：请求 workspace_id="
+                f"{workspace_id} 与账本 scope={self.scope.workspace_id} 不一致",
+                code=CODE_INVALID_REQUEST,
+            )
+        state = self.ledger.state(scope=self.scope, run_id=run_id)
+        return int(state.available().cost_microunits)
 
 
 # ---------------------------------------------------------------------------
@@ -1433,9 +1458,7 @@ class Replanner:
                 from_revision=request.expected_revision,
                 to_revision=None,
                 affected=(),
-                reused=tuple(
-                    item.task_id for item in report.nodes if item.verdict == "satisfied"
-                ),
+                reused=tuple(item.task_id for item in report.nodes if item.verdict == "satisfied"),
                 replacements={},
                 skipped=(),
                 terminal_status="succeeded" if report.verdict == "satisfied" else "running",
@@ -1545,9 +1568,7 @@ class Replanner:
                 (workspace_id, run_id, current),
             )
 
-    def _load_replan(
-        self, workspace_id: UUID, run_id: UUID, digest: str
-    ) -> dict[str, Any] | None:
+    def _load_replan(self, workspace_id: UUID, run_id: UUID, digest: str) -> dict[str, Any] | None:
         row = self._conn.execute(
             f"SELECT result FROM {SCHEMA}.phase0_replans "
             "WHERE workspace_id = %s AND run_id = %s AND request_digest = %s",
