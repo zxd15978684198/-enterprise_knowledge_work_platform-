@@ -700,7 +700,8 @@ def test_concurrent_double_scheduler_claims_each_node_once(
     pg: psycopg.Connection[Any], migration_digest: str
 ) -> None:
     assert migration_digest
-    rounds = 30
+    # Backlog 条款字面要求 100 轮 ready/revision 竞争；W17/D3 从上游记录的 30 轮提到 100 轮。
+    rounds = 100
     duplicates: list[str] = []
     for round_index in range(rounds):
         workspace_id, run_id = uuid4(), uuid4()
@@ -749,7 +750,7 @@ def test_concurrent_double_scheduler_claims_each_node_once(
         f"SELECT count(*) AS n FROM {SCHEMA}.phase0_task_claims"
     ).fetchone()
     assert int(rows["n"]) == rounds * 4, (
-        "每轮 4 个节点各领一次 = 120 条 claim；出现更多即为双领取"
+        f"每轮 4 个节点各领一次 = {rounds * 4} 条 claim；出现更多即为双领取"
     )
 
 

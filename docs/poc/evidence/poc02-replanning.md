@@ -6,7 +6,7 @@
 | Owner | `w1-t02-env` |
 | Wave | W6（`feature/w6-t13-t24`） |
 | 基线 | `dev@cc4a475`，HEAD `cc4a475b46ee3422270e570ad45c7253f50ba6da` |
-| 状态 | **PASS**（1 项子契约 PARTIAL：T20 真实台账 → 用 `BudgetPort` 替身验证，见 §6） |
+| 状态 | **PASS**（原子契约 PARTIAL 已于 W17/D4 关闭：`Replanner` 可接真实 `p0_t20` `BudgetLedger`，见 §6 与 `wave-w17-record.md` §3.2） |
 | 记录时间 | 2026-10-28（Asia/Shanghai） |
 | 复现命令 | `uv run --project experiments/phase0 pytest -c experiments/phase0/pyproject.toml tests/phase0/test_replanning.py -q` |
 
@@ -101,12 +101,12 @@ RUFF_EXIT=0
 | 重规划切片 | 只登记未完成 + 替换节点 | 一致（`reused` 不写库；旧 revision 只读） |
 | 上限 | 第 3 次 `failed` 且无新 revision | 一致 |
 | 并发 | 只有一个赢家，另一方幂等返回 | 一致（advisory lock 后稳定） |
-| 预算 | 不足即 `blocked`，绝不 `release` | 一致（`StaticBudget.release` 被调用即抛错，实际 0 次） |
+| 预算 | 不足即 `blocked`，绝不 `release` | 一致（`StaticBudget.release` 被调用即抛错，实际 0 次；真实台账侧由 `LedgerBudget` 接线验证，W17/D4） |
 | 终态 | 成功/阻塞可区分 | 一致（`runs.terminal_status ∈ {running, succeeded, blocked, failed}`） |
 
 ## 6. 未执行 / 部分项（NOT_RUN / PARTIAL）
 
-1. **PARTIAL：T20 真实 `BudgetLedger` 台账未接入。** 本任务只用 `BudgetPort` + `StaticBudget` 验证“超额即 blocked、不 release”的契约，没有连 `p0_t20` 表做充值/结算。原因：派单限定只写 2 文件、且预算台账的写权在 T20；接口契约已冻结（`remaining_microunits` 只读）。
+1. **已关闭（W17/D4）：T20 真实 `BudgetLedger` 台账已接线。** 以下为关闭前的原记录，保留以说明来路：原为 **PARTIAL：T20 真实 `BudgetLedger` 台账未接入。** 本任务只用 `BudgetPort` + `StaticBudget` 验证“超额即 blocked、不 release”的契约，没有连 `p0_t20` 表做充值/结算。原因：派单限定只写 2 文件、且预算台账的写权在 T20；接口契约已冻结（`remaining_microunits` 只读）。
 2. **NOT_RUN：kill -9 打断（切 revision 前后）。** 需要真实进程中断编排，属波次级故障注入（T18/T13 领域）；本任务用“旧 revision 只读 + 幂等重入 + 并发 CAS”间接覆盖。
 3. **NOT_RUN：旧 revision 结果晚到**（同上，需要调度器端口回放；T23 的 `StaleEpoch` 已覆盖同类语义，T24 未重复测）。
 4. **NOT_RUN：HTTP/接口层**。本任务是编排内核，无 API 面。

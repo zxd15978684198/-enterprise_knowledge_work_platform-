@@ -62,8 +62,8 @@ experiments/phase0/.venv/Scripts/python.exe -m pytest \
 | 验收条款 | 结果 | 直接证据 | 备注 |
 | --- | --- | --- | --- |
 | ≥20 个非法计划 **100% 在执行前拒绝** | 通过（超额） | `test_dag_validation.py` 28 个参数化非法计划（环 / 自依赖 / 缺节点 / 超规模 / 越界 Scope），首错可定位 | 28 > 20 |
-| **100 轮** ready / revision 竞争，无提前执行、无双领取、无旧结果覆盖 | **未达字面要求** | 双 scheduler **30 轮** × 2 线程 × 4 节点 = 120 条 claim，无重复；旧 epoch 完成/引用 `STALE_*` 拒绝 | 30 轮 ≠ 100 轮，见 §5-D3 |
-| 已确认成功产物且 input/profile/policy 相同才复用，成本归父 run 一次 | 通过（限域） | `test_replan_replaces_only_unfinished_and_reuses_completed`：revision 2 节点集 `{B.r1, C}`、`A` 未重新登记、`reused == ("A",)` | 预算侧成本归父 run 用 `BudgetPort` 替身验证，真实台账未接线（§5-D4） |
+| **100 轮** ready / revision 竞争，无提前执行、无双领取、无旧结果覆盖 | 通过 | 双 scheduler **100 轮** × 2 线程 × 4 节点 = **400 条 claim**，无重复；旧 epoch 完成/引用 `STALE_*` 拒绝 | W17/D3 按条款字面补测（原为 30 轮），见 §5-D3 |
+| 已确认成功产物且 input/profile/policy 相同才复用，成本归父 run 一次 | 通过（限域） | `test_replan_replaces_only_unfinished_and_reuses_completed`：revision 2 节点集 `{B.r1, C}`、`A` 未重新登记、`reused == ("A",)` | 预算侧成本归父 run 已在真实 `p0_t20` 台账上验证（W17/D4，见 §5-D4） |
 | 重规划到上限必须停止 | 通过 | `test_third_replan_hits_limit_and_terminates_failed`：`replan_count == 2`、终态 `failed`、`revisions == [1,2,3]` | — |
 | Evaluator 缺证据不视通过；模型输出不能覆盖硬规则 | 通过 | `test_self_report_without_receipt_is_partial`（自述「已完成」无回执 → `partial` + `RECEIPT_MISSING`）；`test_success_is_decided_from_facts_and_receipts` | 判定输入是事实与回执，不是节点自述 |
 | 普通 RAG 不调用 Planner | 通过 | T22：RAG 路径 planner 调用计数 0 | — |
@@ -76,12 +76,12 @@ experiments/phase0/.venv/Scripts/python.exe -m pytest \
 | T22 | 合法九节点拓扑可复现 | 通过（`poc/04` 拓扑一致，72/72 边一致；曾误报 Mermaid 缺边，已澄清） |
 | T22 | 普通 RAG 路径 Planner 调用 0 | 通过 |
 | T23 | 未满足依赖提前执行 0 | 通过 |
-| T23 | 每逻辑节点同 epoch 双领取 0 | 通过（120 claim 无重复；CAS 保证） |
+| T23 | 每逻辑节点同 epoch 双领取 0 | 通过（400 claim 无重复；CAS 保证） |
 | T23 | 旧事实不会被 checkpoint 覆盖 | 通过（`STALE_*` 拒绝；事实先落库，checkpoint 失败只留 `state_ref_pending` 且重入不重跑） |
 | T23 | 所有 fixed 作业都走 Job port | 通过（真实 T08 Job port 集成） |
 | T24 | revision 只有一活动指针 | 通过 |
 | T24 | 已确认副作用重做 0 | 通过 |
-| T24 | 未知用量预留不释放 | 通过（`BudgetPort` 替身；见 D4） |
+| T24 | 未知用量预留不释放 | 通过（真实 `p0_t20` 台账，W17/D4；`StaticBudget` 守卫保留） |
 | T24 | 最多 2 次重规划后停止 | 通过 |
 | T24 | input/profile/policy 不匹配不复用 | 通过 |
 
@@ -91,8 +91,8 @@ experiments/phase0/.venv/Scripts/python.exe -m pytest \
 | --- | --- | --- | --- |
 | **D1** | 单活 runner 前提 | T05 为 `PARTIAL`（原生 checkpoint 已通，但「跨连接 ≠ 跨进程」），T23 的全部并发结论都建立在**单活调度器**上 | 多实例横向扩展未验证，不得据此宣称弹性 |
 | **D2** | checkpoint 用端口替身 | T23 的 checkpoint 故障注入走端口替身，真实 saver 故障未注入 | 故障域结论限于替身语义 |
-| **D3** | 30 轮 ≠ 100 轮 | T23 竞争实验实际 30 轮 × 2 线程 × 4 节点（120 claim），条款字面要求 100 轮 | 需求「无提前执行/无双领取」已证，但**轮次强度未达验收字面值**，属可补测项 |
-| **D4** | T20 真实预算台账未接线 | T24 用 `BudgetPort` + `StaticBudget`，`release_calls == 0`（唯一 PARTIAL 子契约，见 `wave-w6-record.md:68`） | 「成本归父 run 一次」只在替身上成立 |
+| **D3** | ~~30 轮 ≠ 100 轮~~ **已补测关闭（W17）** | 现为 **100 轮** × 2 线程 × 4 节点 = **400 条 claim**，无重复领取、无提前执行、无旧 epoch 覆盖（`test_task_coordination.py` 28 passed） | 条款字面已满足；证据 `wave-w17-record.md` §3.1 |
+| **D4** | ~~T20 真实预算台账未接线~~ **已补测关闭（W17）** | `Replanner` 的 `budget=` 现可接 `LedgerBudget`（真实 `p0_t20`）：读数含在途预留、不足即 `budget_exhausted`+`blocked` 且账本三类计数不变、充足放行、跨工作区拒绝（`test_replanning_ledger.py` 5 passed） | 「成本归父 run 一次」已在真实台账成立；证据 `wave-w17-record.md` §3.2 |
 | **D5** | 真实模型 plan `NOT_RUN` | T22 的 planner 用确定性 fixture，真实模型输出（JSON 截断/未知 kind/越权 workspace）未打真实模型 | 模型鲁棒性未证 |
 | **D6** | 回放类注入 `NOT_RUN` | T24 的「切 revision 前后 kill」「旧 revision 结果晚到回放」「HTTP 层」三项记 `NOT_RUN` | 崩溃一致性未证 |
 | **D7** | 对账为拉取式 | T23 对账不推模式，缺 `retry_wait` / `dead_letter`（属 T24 及后续） | 与 T08 死信语义需在集成期对齐 |
@@ -133,8 +133,8 @@ hash_without_path    82   # 路径不在同行/上行，未参与判定
 **不改变任何门级判定。**
 
 - `P0_Core_Gate_Review.md` 的 G1–G4 仍为 `PARTIAL`、G5 仍为 `NOT_RUN`；本报告只是把 PoC-07 的分散结论收成一份可审查文件。
-- `Phase0_Full_Gate_Review.md` 中 PoC-07 的「输入缺口」一条可以关闭，但 PoC-07 的判定**不因此升级**（残限 D1–D7 仍在，尤其 D3 字面未达）。
-- PoC-08 对 PoC-07 的依赖可以按 `PASS（限域）` 引用，但必须连带引用 D1/D2/D3。
+- `Phase0_Full_Gate_Review.md` 中 PoC-07 的「输入缺口」一条可以关闭，但 PoC-07 的判定**不因此升级**（残限 D1/D2/D5/D6/D7 仍在；D3/D4 已于 W17 补测关闭，判定仍为 `PASS（限域）`）。
+- PoC-08 对 PoC-07 的依赖可以按 `PASS（限域）` 引用，但必须连带引用 D1/D2/D5。
 
 ## 8. 复现
 
@@ -155,6 +155,13 @@ git show f0cf3e1:experiments/phase0/task_scheduler.py | wc -l         # → 1787
 
 ## 9. 遗留
 
-1. D3（30 轮 → 100 轮）与 D4（真实预算台账接线）是**可补测的两项**，建议与 T20/T21 的集成缺口合批处理，不在本报告内假装已解决。
+1. ~~D3（30 轮 → 100 轮）与 D4（真实预算台账接线）是可补测的两项~~ **已于 W17 补测关闭**：D3 提到 100 轮（400 claim）、D4 接真实 `p0_t20` 台账（5 例集成测试）。残余 D1/D2/D5/D6/D7 不变。
 2. §6 的 47 条真漂移需要一次专门的「证据 hash 回填批次」，本波次只做定性说明。
 3. 本报告未覆盖 P0-T22/T23/T24 之外的调度能力（如生产定时器、多站点连接器），不在 PoC-07 范围内。
+
+## 10. 变更记录
+
+| 日期 | 波次 | 改动 |
+| --- | --- | --- |
+| 2026-10-29 | W16 | 首次落盘：把 T22/T23/T24 的条款级结论收成一份可审查文件（判定 `PASS（限域）`，残限 D1–D7） |
+| 2026-10-30 | W17 | **D3 关闭**：竞争实验按条款字面提到 100 轮（400 claim），`test_task_coordination.py` 28 passed；**D4 关闭**：`Replanner` 新增 `LedgerBudget` 接真实 `p0_t20` 台账，`test_replanning_ledger.py` 5 passed。判定**仍为 `PASS（限域）`**，门级不变 |
