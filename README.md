@@ -69,6 +69,7 @@ docker compose -f deploy/compose/docker-compose.yml config
 | DELETE | `/api/v1/knowledge-bases/{kb_id}` | 软删除知识库并连带其文档 |
 | GET | `/api/v1/knowledge-bases/{kb_id}/documents` | 文档列表 |
 | POST | `/api/v1/knowledge-bases/{kb_id}/documents` | 上传并入库（multipart，`file` + 可选 `title`） |
+| POST | `/api/v1/knowledge-bases/{kb_id}/documents/from-url` | 从 http/https URL 抓取入库（`url` + 可选 `title`；每跳 SSRF 校验，成功 201、同内容幂等 200） |
 | GET | `/api/v1/documents/{document_id}` | 文档详情（含 `status`/`chunk_count`/`error`） |
 | DELETE | `/api/v1/documents/{document_id}` | 软删除文档并清空分块 |
 | GET | `/api/v1/documents/{document_id}/chunks` | 分块分页（`limit`/`offset`） |
@@ -92,14 +93,16 @@ docker compose -f deploy/compose/docker-compose.yml config
 
 上传行为：支持 `txt/md/html/pdf/docx`；同知识库内**内容 sha256 相同则幂等复用**（返回 `200` 与既有文档，非 409）；解析与分块在上传请求内同步完成，成功后 `status=ready`，失败则 `status=failed` 且 `error` 给出原因。
 
-尚未实现（计划内）：URL 导入（W21）、前端与一键部署（W22，同时接入 Celery/MinIO）；真实 embedding/chat 供应商适配器、embedding 相似度阈值的生产标定（ADR-0014 DG-3/DG-4）均未完成。
+URL 导入行为：仅接受 `http`/`https`，拒绝 userinfo；DNS 解析后校验对端地址，回环/私网/链路本地/保留网段（含 `169.254.169.254`）一律 `403 blocked_target`；重定向**逐跳**复校验（最多 3 跳），超限 `502`、响应超 5 MiB `413`、非 `html/xhtml/plain/markdown` 类型 `415`；抓取内容走与上传相同的解析分块链路，`source_type=url`、`source_url` 保留最终地址。
+
+尚未实现（计划内）：前端与一键部署（W22，同时接入 Celery/MinIO）；真实 embedding/chat 供应商适配器、embedding 相似度阈值的生产标定（ADR-0014 DG-3/DG-4）均未完成。
 
 ## 目录结构
 
 ```
 src/pyknora/           应用代码（FastAPI，Python 3.12）
-  api/                 路由：auth / health / workspaces / knowledge
-  ingest/              入库链路：parsers（5 格式）→ chunker → pipeline
+  api/                 路由：auth / health / workspaces / knowledge / retrieval / rag / models
+  ingest/              入库链路：parsers（5 格式）→ chunker → pipeline；url_fetch（SSRF 受控抓取）
   config.py            配置（pydantic-settings，前缀 PYKNORA_）
   db.py                异步引擎与会话（SQLAlchemy 2.0 + asyncpg）
   models.py            ORM：users / workspaces / memberships / knowledge_bases / documents / chunks
@@ -110,7 +113,7 @@ src/pyknora/           应用代码（FastAPI，Python 3.12）
   storage.py           对象存储协议 + 本地实现（W22 换 MinIO）
   migrate.py           幂等 SQL 迁移 runner（db/migrations/*.sql）
   main.py / serve.py   应用装配与本地启动
-db/migrations/         0001_identity.sql、0002_knowledge_documents.sql
+db/migrations/         0001_identity.sql、0002_knowledge_documents.sql、0003_retrieval_rag.sql、0004_model_configs.sql
 deploy/                Dockerfile、compose/docker-compose.yml
 tests/                 应用层测试（依赖真实 PG，自带测试库）
 experiments/phase0/    Phase 0 实验探针（只读研究，不进入产品路径）
@@ -130,12 +133,17 @@ docs/                  PRD、ADR、Phase 0 PoC、Phase 1 计划与波次记录
 | `PYKNORA_CHUNK_SIZE` / `PYKNORA_CHUNK_OVERLAP` | `800` / `120` | 分块目标字符数与重叠 |
 | `PYKNORA_MAX_CHUNKS_PER_DOCUMENT` | `2000` | 单文档分块上限 |
 | `PYKNORA_CORS_ORIGINS` | `["http://localhost:5173"]` | JSON 数组 |
+| `PYKNORA_URL_FETCH_TIMEOUT_SECONDS` | `15.0` | URL 导入单跳超时 |
+| `PYKNORA_URL_MAX_BYTES` | `5242880`（5 MiB） | URL 导入响应字节上限 |
+| `PYKNORA_URL_MAX_REDIRECTS` | `3` | URL 导入最大重定向跳数 |
+| `PYKNORA_URL_ALLOW_PRIVATE_NETWORK` | `false` | 仅本地开发/测试可开；生产必须关闭 |
 
 ## 已知限制
 
 - **Windows 下 uvicorn 固定使用 ProactorEventLoop**（`uvicorn/loops/asyncio.py`），而 `psycopg` 的异步连接在 Proactor 上不可用，因此应用侧驱动选 **asyncpg**；`+psycopg` 仅用于迁移与 Phase 0 同步脚本。
 - 入库为**同步内联**：Celery/Redis 队列与 MinIO 对象存储推迟到 W22；大文件会占用请求线程。
 - 扫描版 PDF 无文本层 → 入库 `failed`；OCR 不在 Phase 1 范围。
-- 向量化与检索尚未实现（W20）。
+- 检索的向量路由本地 `hashing-local` 确定性 embedding（字符 n-gram 哈希，非语义模型）填充，真实供应商与相似度阈值标定未完成。
+- URL 导入未做 DNS rebinding 防护（解析与连接之间无对端复校验）、无按域名速率限制、不遵循 `robots.txt`。
 - 认证仅邮箱口令 + JWT，无 OAuth/SSO；无前端。
 - 数据库 RLS 未启用，工作区隔离在应用层强制（后续加固项）。
