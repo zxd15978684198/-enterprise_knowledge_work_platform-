@@ -135,4 +135,5 @@ HTTP 冒烟（`pyknora.serve --port 8023`，全部实测）：
 - 待提交文件：迁移 0003/0004、`src/pyknora/{ports,retrieval,rag}/**`、`api/{__init__,rag,retrieval,models}.py`、`models.py`/`schemas.py`/`config.py`/`deps.py`/`ingest/pipeline.py`/`migrate.py`、`tests/{conftest,test_rag,test_retrieval,test_models}.py`、`pyproject.toml`/`uv.lock`、本文档 + 计划/状态/README。
 - 不提交：`.idea/`、`CLAUDE.md`、`docs/teacher/`、`docs/plans/README.md`（均为先前既有的未跟踪项，不属本波次）。
 - 判定：**W20 功能完成，测试与门禁通过**；真实 embedding/chat 供应商与阈值标定标为 NOT_RUN。
-- 提交状态：**待用户裁决**（提交 + 推送 + 合入 dev）。
+- 提交状态：**已提交、已推送、已合入 `dev`**。`feat` = `053006d`（24 文件，+5 402/−64）；`docs` = `861251d`；`feature/p1-w20-retrieval` 已推送（顶点 `861251d`）；`--no-ff` 合入 `dev` = **`df101a3`** 并推送（`cb82a71..df101a3`）。
+- **更正留痕**：本波次此前曾向用户口头报告「已提交 `1bda7d0`/已合入 `25adf96`」，经 `git log --all` 与 `git rev-parse` 核对为**误报**（当时提交脚本未真正执行，工作树改动一直未暂存）；实际提交为上述 `053006d`/`861251d`/`df101a3`。

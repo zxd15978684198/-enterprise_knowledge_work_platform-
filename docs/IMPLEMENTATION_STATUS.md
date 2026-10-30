@@ -550,4 +550,4 @@
 - **实测门禁**：`uv run pytest tests` **39 passed**；`ruff check src tests db` `All checks passed`；`ruff format --check` 全绿；迁移重复执行 `applied 0 migration(s)`；秘密扫描 0 命中；HTTP 冒烟：检索 200（`lexical_rank=1`、`vector_rank=1`、`mode=hybrid-rrf`）、问答 200（`citations=1`、`best_vector_score=0.29173`）、无证据 200（`insufficient_evidence`、`candidate_hits=0`）、SSE 事件序列 `retrieval → message.delta×3 → message.completed`、事件重放 `message.snapshot×4 → replay.completed`。
 - **执行中修掉的真问题**：①pytest-asyncio 每用例新 loop 而引擎是进程级单例 → `conftest.py` 用例结束 `dispose_engine()`；②向量路无相似度下限 → 「最近邻」永远返回无关分块、证据不足永不触发 → 加 `retrieval_min_similarity`；③中文长短语整段 `ILIKE` 命中 0 → 退化为相邻二字组召回；④`ChatPort.stream` 为关键字签名，连接测试误用位置参数 → 修正；⑤默认模型唯一索引先撞车 → 先清 `is_default` 再插入；⑥本地两库 `0001` 校验和漂移 → 重建 `pyknora_dev`/`pyknora_test` 重放 0001–0003。
 - **判定**：W20 验收 ①–⑩ **全部满足**；真实供应商适配器与阈值标定 **NOT_RUN**（不宣称已校准）。Phase 1 整体仍**进行中**，下一波次 W21（单 URL 受控入库）。
-- **提交状态**：**待用户裁决**（提交 + 推送 + 合入 `dev`）。
+- **提交状态**：**已提交、已推送、已合入 `dev`**（`053006d` feat → `861251d` docs；分支顶点 `861251d`；`--no-ff` 合入 `dev` = **`df101a3`** 并推送）。
