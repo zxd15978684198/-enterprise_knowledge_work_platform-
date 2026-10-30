@@ -20,6 +20,7 @@ from pyknora.bootstrap import ensure_storage_ready
 from pyknora.config import get_settings
 from pyknora.db import dispose_engine
 from pyknora.errors import install_error_handlers
+from pyknora.metrics import observe_request, route_template
 from pyknora.storage import S3StorageError
 
 logger = logging.getLogger("pyknora")
@@ -72,6 +73,10 @@ def create_app() -> FastAPI:
         response = await call_next(request)
         elapsed_ms = (time.perf_counter() - started) * 1000
         response.headers["x-request-id"] = request_id
+        # 用「折成低基数的真实路径」而不是路由对象：FastAPI 的嵌套 include_router
+        # 会让 route.path 只保留内层前缀（如 /metrics 而非 /api/v1/metrics）。
+        template = route_template(request.url.path) if request.scope.get("route") else "unmatched"
+        observe_request(request.method, template, response.status_code, elapsed_ms)
         logger.info(
             "%s %s -> %s %.1fms request_id=%s",
             request.method,

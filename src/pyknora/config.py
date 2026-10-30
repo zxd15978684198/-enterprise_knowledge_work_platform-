@@ -138,6 +138,12 @@ class Settings(BaseSettings):
     )
     celery_task_time_limit: int = Field(default=900, ge=30, description="单任务硬超时（秒）")
     celery_task_soft_time_limit: int = Field(default=840, ge=30, description="单任务软超时（秒）")
+    metrics_token: str = Field(
+        default="",
+        description=(
+            "非空时 /api/v1/metrics 需请求头 x-metrics-token；仅暴露聚合计数与时延，不含请求内容"
+        ),
+    )
 
     @property
     def sync_database_url(self) -> str:
