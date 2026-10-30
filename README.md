@@ -88,6 +88,12 @@ uv run python scripts/e2e_phase1.py --queue                           # 队列�
 uv run python scripts/e2e_phase1.py --url https://example.com          # 额外验证 URL 导入
 ```
 
+## 运维与排障（W23）
+
+- 运维手册（启动/迁移/健康判读/指标/日志追踪/常见故障/备份恢复/交接清单）：[`docs/phase1/RUNBOOK.md`](docs/phase1/RUNBOOK.md)
+- 已知债务与限域（能力/安全/可靠性/文档四类，含触发条件）：[`docs/phase1/DEBT.md`](docs/phase1/DEBT.md)
+- 进程内指标：`GET /api/v1/metrics`（`PYKNORA_METRICS_TOKEN` 非空时需 `x-metrics-token` 头），只含方法/路由模板/状态码/时延，不含请求内容与身份。
+
 ## 已实现 API（W18–W20）
 
 | 方法 | 路径 | 说明 |
