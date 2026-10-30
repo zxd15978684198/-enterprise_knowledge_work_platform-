@@ -77,4 +77,4 @@
 - 待提交：`db/migrations/0002_knowledge_documents.sql`、`src/pyknora/{models,config,schemas,storage}.py`、`src/pyknora/ingest/**`（4 文件）、`src/pyknora/api/{__init__,knowledge}.py`、`tests/test_knowledge.py`、`pyproject.toml`、`uv.lock`、`.gitignore`、`docs/phase1/{PLAN_Phase1_MVP,wave-w19-record}.md`、`docs/IMPLEMENTATION_STATUS.md`、`README.md`。
 - 不提交：`data/`（已 gitignore）、`.idea/`、`CLAUDE.md`、`docs/teacher/`、`docs/plans/README.md`（会话前既有）。
 - 判定：W19 验收 ①–⑩ **全部满足**；Phase 1 仍为进行中，下一波次 W20（混合检索 + RAG + SSE）。
-- **落地结果**：待提交后回填。
+- **落地结果**：`2a834ae` feat（13 文件 +1442/−11：迁移 0002 + models/config/schemas/storage + ingest 4 文件 + api 2 文件 + 测试 + 依赖 + .gitignore）→ `8bf10c5` docs（README/PLAN/wave record/状态文件）；已推送 `feature/p1-w19-knowledge`（`5914275..8bf10c5`）。

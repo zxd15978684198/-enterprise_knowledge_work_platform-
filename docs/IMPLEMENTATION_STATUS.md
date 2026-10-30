@@ -535,4 +535,4 @@
 - **执行中修掉的真问题（已留痕）**：①`pyknora_dev`/`pyknora_test` 两个本地库记录的 `0001` 校验和与仓库文件不一致，fixture 阶段即 `MigrationError` → 确认为本地历史漂移，**重建两库**重放 `0001`+`0002`（不改校验和、不改历史文件）；②`python-multipart` 缺失：`UploadFile`/`Form` 在无该包时运行期才抛错，已加依赖；③测试按扁平 `{"code"}` 断言统一错误体，实为 `{"error":{"code"}}`，已改；④`HTTP_413_REQUEST_ENTITY_TOO_LARGE` 弃用 → `HTTP_413_CONTENT_TOO_LARGE`；⑤测试辅助函数漏写 `async def`，产生 coroutine 未 await。
 - **设计取舍**：同步内联入库（Celery/Redis 与 MinIO 推迟到 W22，接口已隔离）；幂等键 = 内容 sha256，重复上传返回 200 + 既有记录而非 409；删除为软删除 + 物理删 chunks；`.md` 按纯文本摄取（不渲染，内容零丢失）。
 - **判定**：W19 验收 ①–⑩ **全部满足**；Phase 1 整体仍**进行中**，下一波次 W20（混合检索 + RAG + SSE）。
-- **提交状态**：本段写入时**尚未提交**，随后按既定规程提交/推送/合入（结果见 `wave-w19-record.md` §4 回填）。
+- **提交状态**：**已提交、已推送、已合入 `dev`**（`2a834ae` feat → `8bf10c5` docs；`feature/p1-w19-knowledge` 已推送，`--no-ff` 合入结果见 `wave-w19-record.md` §4）。
