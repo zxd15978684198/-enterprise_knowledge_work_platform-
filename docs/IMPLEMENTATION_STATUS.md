@@ -564,4 +564,4 @@
 - **真实 HTTP 冒烟（真实 uvicorn + dev 库）**：进程 A（放行内网）register 201 → workspace 201 → kb 201 → `from-url` **201**（`source_type=url`、`source_url=http://127.0.0.1:8099/page.html`、`status=ready`、`chunk_count=1`）→ 同 URL 二次 **200** 同 id → `/chunks` total=1；进程 B（默认配置）`169.254.169.254` → **403 `blocked_target`**、`127.0.0.1` → **403 `blocked_target`**、`file:///etc/passwd` → **422 `unsupported_scheme`**。
 - **执行中修掉的真问题**：①`fetch_url(timeout=)` 命中 ruff `ASYNC109` → 参数改 `timeout_seconds` 并在 `None` 时回落配置；②`_resolve_ips` 初版用 `__import__("asyncio")` → 改正常 import；③CRLF 文件按 LF 字符串替换 MISS → 改正则锚行；④本机 python 无法写 `%TEMP%` → junit/临时脚本改落 `.pytest_cache/` 并跑完即删；⑤冒烟脚本首版断言口径错误（放行内网进程里断言元数据地址应 403，实得 502）→ 改默认配置进程复测，非代码缺陷。
 - **判定**：W21 验收 ①–⑪ **全部满足**；遗留为 DNS rebinding TOCTOU、无按域名速率限制、无 robots.txt、PDF/DOCX 经 URL 未支持、同步内联（队列化留 P1）。Phase 1 整体仍**进行中**，下一波次 W22（一键部署 + 前端 + Celery/MinIO）。
-- **提交状态**：**待用户裁决**（Phase 1 规程：用户批准后才提交/推送/合入 `dev`）。
+- **提交状态**：**已提交、已推送、已合入 `dev`**（`62269a6` feat → `66320db` docs；分支顶点 `66320db`；`--no-ff` 合入 `dev` = **`fb7557d`** 并推送）。

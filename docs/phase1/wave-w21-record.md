@@ -99,3 +99,12 @@
 - 立即可提交状态：3 个改动文件（`+94`）+ 2 个新文件（`url_fetch.py`、`test_url_import.py`）+ 本记录 + README/STATUS/PLAN 文档更新。
 - 按 Phase 1 规程：**提交权在用户**。本记录 §4 在用户裁决后回填真实 SHA、推送与合入结果。
 - 建议提交拆分：①`feat(p1): W21 单 URL 受控导入`（代码 + 测试）→ ②`docs(p1): W21 波次记录与状态更新`。
+### 4.1 提交结果（2026-10-30）
+
+| 项 | 值 |
+| --- | --- |
+| feat 提交 | `62269a6` feat(p1): W21 单 URL 受控导入（SSRF 逐跳校验 + 类型/字节/跳数上限 + 幂等复用）——5 文件（`+893` 含新文件） |
+| docs 提交 | `66320db` docs(p1): W21 波次记录、README API/配置/限制与 PLAN/状态更新——4 文件 |
+| 分支 | `feature/p1-w21-url-import` 顶点 `66320db`，已推送 origin（新建分支） |
+| 合入 | `--no-ff` 合入 `dev` = **`fb7557d`**（`3d8ed07..fb7557d` 已推送 origin/dev） |
+| 回填 | 本条记录 + `IMPLEMENTATION_STATUS.md` 的提交状态由「待裁决」改为真实 SHA |
