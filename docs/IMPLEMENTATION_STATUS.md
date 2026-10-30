@@ -1,6 +1,6 @@
 # PyKnora 实施状态
 
-更新日期：2026-10-30（Asia/Shanghai）。Phase 0 实验阶段**收口完成**（W17 补测批已把 PoC-07 的 D3/D4 两条残限关闭，`dev` 顶点 `1989028`）：W1–W15 十五个波次全部执行完毕，四条修复分支（`fix/w5-t17`、`fix/w5-t18`、`fix/w7r-t05-t09`、`fix/w1-t02-pgvector`）与 W10 的 ruff 收口提交按序合入 `dev`（`dev` 顶点 `2c00b84`），**W14（机制批 M1/M2/M3）与 W15（D5 缺口补齐）已完成并经 `--no-ff` 合入 `dev`**；**W16 补建了 PoC-07 聚合验收报告 `docs/poc/evidence/poc07-report.md`**（判定 `PASS（限域）`，残限 D1–D7 原样保留），关闭 `Phase0_Full_Gate_Review.md:31` 登记的最后一个文件级输入缺口，但**门级判定不变**。P0-T01–P0-T32 三十二项任务级全部执行完毕（绝大多数 **PASS（限域）**；T01 为文档交付，T17/T18 经修复分支收口，PoC-09 为 `PARTIAL`）。**两道出口门仍不成立**：G-P0 = 5 门 0 门 PASS（G1–G4 = `PARTIAL`；G5 的「ANN 不可用」已由 W13 解除，但阈值校准归 ADR-0014 未批，故 G5 仍 `NOT_RUN`）；G-FULL = 九项 PoC **全部 `PARTIAL`、0 项无保留 PASS**。**Phase 0 不得标记为完整完成**，只能按 `05_Phase0_Acceptance.md:81-82` 走受限范围准入的三方评审。本轮新增三条**证据卫生机制**（不提升任何能力，只让结论可复核）：M1 把 `02_Phase0_PoC_Plan.md` 的状态列改为「依据到 `文件:行`」并写明唯一维护人；M2 用 `SHA256SUMS` + `evidence_manifest.json` 外部台账 + `evidence_meta.py` 校验 8 份证据 JSON（不注入、不改写历史）；M3 用 `verdict_lint.py` 4 条规则拦「限域写成通过」并固定 8 条存量基线。W15 补齐 T31 登记的 D5 输入缺口（SBOM/许可、远程扩展连接、证据指纹生命周期），并修复一个**结构性测试缺陷**：探针把证据写回 tracked 路径，导致台账用例在同一次回归里必然失败——改为测试会话重定向到临时目录后，全量回归 **1037 passed / 8 skipped / 576.82s**，且跑完仓库证据目录零改动。ADR 共 14 份（0007–0014），其中 **ADR-0010 已接受**，其余 13 份仍 `Proposed`。所有结论仅为实验环境内验证，不代表可生产。
+更新日期：2026-10-30（Asia/Shanghai）。**Phase 1（P0 MVP）已启动：W18 骨架完成**（分支 `feature/p1-w18-skeleton`，base `dev@c95ed6a`）——FastAPI 应用 + 身份/工作区 API（`/auth/*`、`/workspaces*`、`/health`）+ 幂等 SQL 迁移 runner + Dockerfile/compose，`uv run pytest` **14 passed**、`ruff check`/`format` 双通过、`/health` 与 `/auth/register` 冒烟通过；应用侧数据库驱动因 Windows `ProactorEventLoop` 限制由 psycopg 改为 **asyncpg**（`psycopg` 仅留给迁移与 Phase 0 同步脚本）。Phase 0 实验阶段**收口完成**（W17 补测批已把 PoC-07 的 D3/D4 两条残限关闭，`dev` 顶点 `1989028`）：W1–W15 十五个波次全部执行完毕，四条修复分支（`fix/w5-t17`、`fix/w5-t18`、`fix/w7r-t05-t09`、`fix/w1-t02-pgvector`）与 W10 的 ruff 收口提交按序合入 `dev`（`dev` 顶点 `2c00b84`），**W14（机制批 M1/M2/M3）与 W15（D5 缺口补齐）已完成并经 `--no-ff` 合入 `dev`**；**W16 补建了 PoC-07 聚合验收报告 `docs/poc/evidence/poc07-report.md`**（判定 `PASS（限域）`，残限 D1–D7 原样保留），关闭 `Phase0_Full_Gate_Review.md:31` 登记的最后一个文件级输入缺口，但**门级判定不变**。P0-T01–P0-T32 三十二项任务级全部执行完毕（绝大多数 **PASS（限域）**；T01 为文档交付，T17/T18 经修复分支收口，PoC-09 为 `PARTIAL`）。**两道出口门仍不成立**：G-P0 = 5 门 0 门 PASS（G1–G4 = `PARTIAL`；G5 的「ANN 不可用」已由 W13 解除，但阈值校准归 ADR-0014 未批，故 G5 仍 `NOT_RUN`）；G-FULL = 九项 PoC **全部 `PARTIAL`、0 项无保留 PASS**。**Phase 0 不得标记为完整完成**，只能按 `05_Phase0_Acceptance.md:81-82` 走受限范围准入的三方评审。本轮新增三条**证据卫生机制**（不提升任何能力，只让结论可复核）：M1 把 `02_Phase0_PoC_Plan.md` 的状态列改为「依据到 `文件:行`」并写明唯一维护人；M2 用 `SHA256SUMS` + `evidence_manifest.json` 外部台账 + `evidence_meta.py` 校验 8 份证据 JSON（不注入、不改写历史）；M3 用 `verdict_lint.py` 4 条规则拦「限域写成通过」并固定 8 条存量基线。W15 补齐 T31 登记的 D5 输入缺口（SBOM/许可、远程扩展连接、证据指纹生命周期），并修复一个**结构性测试缺陷**：探针把证据写回 tracked 路径，导致台账用例在同一次回归里必然失败——改为测试会话重定向到临时目录后，全量回归 **1037 passed / 8 skipped / 576.82s**，且跑完仓库证据目录零改动。ADR 共 14 份（0007–0014），其中 **ADR-0010 已接受**，其余 13 份仍 `Proposed`。所有结论仅为实验环境内验证，不代表可生产。
 
 ## 阶段收口：W1–W5 全部合入 dev（2026-10-28）
 
@@ -504,3 +504,19 @@
 - **过程偏离（已留痕）**：① 官方 PG 容器再次整体不在（只剩陌生 `pyknora-pg-p0`），按规程 `compose --profile core up -d` 拉回；② `pwsh` 运行器崩溃一次（`exit code 1073807364`），改用 `Start-Process` + 日志文件；③ 仓库根出现 3 个 `pyknora-evidence-*/`（`tempfile` 在本 venv 下返回仓库根，属既有坑），已删。
 - **提交状态**：**待用户裁决**（5 项改动 + 2 个新文件均未 `git add`）。
 - **下一步（推荐顺序）**：① 本波次提交 + 推送 + `--no-ff` 合入 `dev`；② 证据 hash 回填批（47 条真漂移 + 统一口径）；③ `Phase0_Full_Gate_Review.md` 等文档同步「D3/D4 已关闭」；④ 13 份 ADR 待法务/产品/安全裁决；⑤ G5 最后一项 = ADR-0014 阈值校准，需产品批准 `DG-3/DG-4`。
+
+## 本轮：Phase 1 启动，W18 波次执行（P0 MVP 骨架）
+
+- **为什么**：用户于 m06739 明确「把 Phase 1 做完即可，后续阶段不需要」。Phase 0 已收口（门级仍不成立，但不再阻塞），因此按 `docs/phase1/PLAN_Phase1_MVP.md` 启动 Phase 1，W18 交付可运行骨架。
+- **分支/规程**：`feature/p1-w18-skeleton`（base `dev@c95ed6a`），N=1；声明块见 `docs/phase1/wave-w18-record.md` §1（写权白名单、资源槽 `pyknora_dev`/`pyknora_test`、验收 ①–⑤）。
+- **交付**：
+  - 应用骨架：`src/pyknora/{config,db,models,schemas,security,deps,errors,main,migrate,serve}.py` + `api/{auth,health,workspaces}.py`；
+  - 迁移：`db/migrations/0001_identity.sql`（users/workspaces/memberships），`src/pyknora/migrate.py` 为幂等 runner（`app.schema_migrations` 记版本 + sha256）；
+  - 测试：`tests/conftest.py` + `test_health.py`/`test_auth.py`/`test_workspaces.py`，共 **14 例**；
+  - 容器化：`deploy/Dockerfile`、`deploy/compose/docker-compose.yml`（api + pgvector:pg17 + redis，密码走 `${PYKNORA_PG_PASSWORD:-pyknora}`）；
+  - 文档：`README.md`（快速开始/API/配置/限制）、`docs/phase1/PLAN_Phase1_MVP.md`（W18–W23）。
+- **实测门禁**：`ruff check` All passed；`ruff format --check` 19 files already formatted；`uv run pytest -q` **14 passed in 4.47s**；`docker compose config --quiet` exit 0；启动冒烟 `/health` 200（`database.status=ok`、`redis=not_configured`）、`POST /api/v1/auth/register` **201** 返回 JWT；秘密扫描 4 条命中均为 f-string 模板/本地 dev 占位（非真实凭据）；无 `pyknora-evidence-*` 残留。
+- **两个真问题（已留痕）**：① Windows 上 uvicorn 固定 `ProactorEventLoop`（`uvicorn/loops/asyncio.py:10`），`psycopg` 异步驱动不可用 → 应用侧改 **asyncpg**，`psycopg` 仅留迁移与 Phase 0 脚本；② `tests/phase0/conftest.py` 的临时证据目录因 `tempfile.gettempdir()` 回落仓库根，改为显式优先 `TEMP`/`TMP`。
+- **判定**：W18 验收 ①–⑤ 全部满足。Phase 1 整体仍为**进行中**（W19 起：知识库与文档、检索与 SSE、URL 导入、前端与一键部署）。
+- **提交状态**：**待用户裁决**（本轮改动均未 `git add`）。
+- **下一步**：① 用户确认后提交 + 推送 + `--no-ff` 合入 `dev`；② W19 = 知识库与文档上传/解析/分块；③ Phase 0 遗留（13 份 ADR 裁决、8 条口径债、`git stash` 清理）不阻塞 Phase 1，按需处理。
