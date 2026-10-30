@@ -1,0 +1,58 @@
+# PyKnora P0 MVP 一键启动：api + postgres(pgvector) + redis
+# 用法：docker compose -f deploy/compose/docker-compose.yml up -d --build
+name: pyknora
+
+services:
+  api:
+    build:
+      context: ../..
+      dockerfile: deploy/Dockerfile
+    environment:
+      PYKNORA_ENV: prod
+      PYKNORA_DATABASE_URL: postgresql+asyncpg://pyknora:${PYKNORA_PG_PASSWORD:-pyknora}@db:5432/pyknora_dev
+      PYKNORA_JWT_SECRET: ${PYKNORA_JWT_SECRET:-please-change-this-in-production}
+      PYKNORA_REDIS_URL: redis://redis:6379/0
+    command:
+      - sh
+      - -c
+      - python -m pyknora.migrate && uvicorn pyknora.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: pyknora
+      POSTGRES_PASSWORD: ${PYKNORA_PG_PASSWORD:-pyknora}
+      POSTGRES_DB: pyknora_dev
+    ports:
+      - "5433:5432"
+    volumes:
+      - pyknora-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pyknora -d pyknora_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+
+volumes:
+  pyknora-db:

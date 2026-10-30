@@ -47,7 +47,14 @@ SITE_START_TIMEOUT_S = 5.0
 # ---------------------------------------------------------------------------
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TRACKED_EVIDENCE_DIR = REPO_ROOT / "docs" / "poc" / "evidence"
-EVIDENCE_TMP_DIR = Path(tempfile.mkdtemp(prefix="pyknora-evidence-"))
+EVIDENCE_TMP_DIR = Path(
+    tempfile.mkdtemp(
+        prefix="pyknora-evidence-",
+        # 本仓库 venv 下 ``tempfile.gettempdir()`` 曾回落到仓库根，导致仓库里
+        # 残留 ``pyknora-evidence-*`` 目录；优先显式使用系统 TEMP/TMP。
+        dir=os.environ.get("TEMP") or os.environ.get("TMP") or None,
+    )
+)
 if TRACKED_EVIDENCE_DIR.is_dir():  # pragma: no branch - 仓库内恒为真
     shutil.copytree(TRACKED_EVIDENCE_DIR, EVIDENCE_TMP_DIR, dirs_exist_ok=True)
 os.environ["PYKNORA_EVIDENCE_DIR"] = str(EVIDENCE_TMP_DIR)
