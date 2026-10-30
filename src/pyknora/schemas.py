@@ -258,3 +258,10 @@ class ModelTestResult(BaseModel):
     matches_runtime: bool
     latency_ms: float | None = None
     detail: str = ""
+
+
+class UrlImportIn(BaseModel):
+    """单 URL 导入请求（URL 属不可信输入，由服务端做 SSRF 与资源校验）。"""
+
+    url: str = Field(min_length=1, max_length=2048, description="http/https 地址")
+    title: str | None = Field(default=None, max_length=300, description="可选标题")
