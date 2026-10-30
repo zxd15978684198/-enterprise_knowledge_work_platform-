@@ -60,3 +60,63 @@ class WorkspaceOut(ORMModel):
 class WorkspaceDetail(WorkspaceOut):
     role: str
     members: list[MemberOut]
+
+
+# —— 知识库与文档（W19）——
+
+
+class KnowledgeBaseCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=120)
+    description: str = Field(default="", max_length=2000)
+
+
+class KnowledgeBaseUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=120)
+    description: str | None = Field(default=None, max_length=2000)
+
+
+class KnowledgeBaseOut(ORMModel):
+    id: uuid.UUID
+    workspace_id: uuid.UUID
+    name: str
+    description: str
+    created_by: uuid.UUID
+    created_at: datetime
+    updated_at: datetime
+    document_count: int = 0
+    chunk_count: int = 0
+
+
+class DocumentOut(ORMModel):
+    id: uuid.UUID
+    workspace_id: uuid.UUID
+    knowledge_base_id: uuid.UUID
+    title: str
+    source_type: str
+    source_url: str | None
+    filename: str
+    mime_type: str
+    size_bytes: int
+    checksum: str
+    status: str
+    error: str | None
+    version: int
+    chunk_count: int
+    created_at: datetime
+    updated_at: datetime
+
+
+class ChunkOut(ORMModel):
+    id: uuid.UUID
+    document_id: uuid.UUID
+    ordinal: int
+    content: str
+    char_count: int
+    page: int | None
+
+
+class ChunkPage(BaseModel):
+    items: list[ChunkOut]
+    total: int
+    limit: int
+    offset: int
