@@ -7,15 +7,20 @@ import time
 import uuid
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
 
 from pyknora.api import api_router
 from pyknora.api import health as health_module
+from pyknora.bootstrap import ensure_storage_ready
 from pyknora.config import get_settings
 from pyknora.db import dispose_engine
 from pyknora.errors import install_error_handlers
+from pyknora.storage import S3StorageError
 
 logger = logging.getLogger("pyknora")
 
@@ -24,6 +29,13 @@ logger = logging.getLogger("pyknora")
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     settings = get_settings()
     logger.info("starting %s %s (env=%s)", settings.app_name, settings.version, settings.env)
+    try:
+        info = ensure_storage_ready()
+        logger.info("存储就绪 backend=%s ingest_mode=%s", info["backend"], info["ingest_mode"])
+    except S3StorageError as exc:
+        # 部署形态下存储不可用不应「带病启动」：健康检查会一直 degraded，直接失败更快暴露。
+        logger.error("对象存储不可用：%s", exc)
+        raise RuntimeError(f"对象存储不可用：{exc}") from exc
     try:
         yield
     finally:
@@ -73,6 +85,15 @@ def create_app() -> FastAPI:
     install_error_handlers(app)
     app.include_router(health_module.router)
     app.include_router(api_router)
+
+    web_dir = Path(settings.web_dir) if settings.web_dir else Path(__file__).parent / "web"
+    if web_dir.is_dir():
+        app.mount("/app", StaticFiles(directory=web_dir, html=True), name="web")
+
+        @app.get("/", include_in_schema=False)
+        async def index_redirect() -> RedirectResponse:
+            return RedirectResponse(url="/app/")
+
     return app
 
 

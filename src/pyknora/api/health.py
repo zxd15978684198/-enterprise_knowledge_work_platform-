@@ -41,7 +41,12 @@ async def _health_payload() -> dict[str, Any]:
         "env": settings.env,
         "checks": {
             "database": {"status": db_status},
-            "redis": {"status": "not_configured"},
+            "storage": {"status": "ok", "backend": settings.storage_backend},
+            "queue": {
+                "status": "ok",
+                "mode": settings.ingest_mode,
+                "broker": "redis" if settings.ingest_mode == "queue" else "in-process",
+            },
         },
     }
     if db_error:

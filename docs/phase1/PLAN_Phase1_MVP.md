@@ -37,12 +37,12 @@ Phase 0 的 `experiments/phase0/` 是验证代码，**不迁移**到 `src/`；Ph
 | **W19** | 知识库与文档：`/knowledge-bases*`、文档上传（PDF/DOCX/TXT/MD/HTML）、解析与 chunks 落库、`/documents/{id}`、`/documents/{id}/chunks`、`/reprocess`；**同步内联入库**（Celery/Redis 推迟到 W22），对象存储用本地实现（MinIO 推迟到 W22） | 上传→解析→chunk 全链路；同区内容 sha256 幂等；reprocess 版本 +1 且旧分块被替换 |
 | **W20** | 混合检索 + RAG + SSE + 模型配置：`/retrieval/search`（向量 + FTS + RRF）、`/models*`（最小 CRUD + 连接测试）、`/conversations*`、`/conversations/{id}/events`；引用结构与「证据不足」终止 | 检索指标与 Phase 0 基线同量级；SSE 事件序列符合 `PRD:503` |
 | **W21** | 单 URL 受控入库：`/knowledge-bases/{kb_id}/documents/from-url`、SSRF 每跳校验、抓取→解析→入库 | 内网/回环/重定向到内网被拒；正常网页可入库。**已完成**（`uv run pytest` 85 passed，见 `docs/phase1/wave-w21-record.md`） |
-| **W22** | 部署与前端：`docker compose up` 一键起（api/worker/postgres/redis/minio）+ **Celery worker/Redis 队列与 MinIO 对象存储接入**；最小前端（登录、KB 列表、上传、问答 + 引用）；端到端脚本 | 空机器 `docker compose up -d` 后健康；E2E 脚本通过 |
+| **W22** | 部署与前端：`docker compose up` 一键起（api/worker/postgres/redis/minio）+ **Celery worker/Redis 队列与 MinIO 对象存储接入**；最小前端（登录、KB 列表、上传、问答 + 引用）；端到端脚本 | 空机器 `docker compose up -d` 后健康；E2E 脚本通过。**已完成**（`uv run pytest` 105 passed、compose 五服务与 E2E 见 `docs/phase1/wave-w22-record.md`） |
 | **W23** | 收口：README/运维手册、指标与日志、安全回归、债务清单 | 全量测试绿；文档可交接 |
 
 波次规程沿用 Phase 0：每波次先落声明块（`docs/phase1/wave-wN-record.md`：N、写权白名单、资源槽、验收标准），完成后回填 §2/§3/§4，门禁通过后才提交。
 
-**进度**：W18 已完成（骨架 + 身份/工作区 + 迁移 + 容器化，`uv run pytest` 14 passed，见 `docs/phase1/wave-w18-record.md`）；**W19 已完成**（知识库与文档入库：5 格式解析 + 分块 + 落库 + 幂等去重，`uv run pytest` 23 passed，见 `docs/phase1/wave-w19-record.md`）；**W20 已完成**（混合检索 + RAG + SSE + 模型配置最小版，`uv run pytest` 39 passed，见 `docs/phase1/wave-w20-record.md`；真实 embedding/chat 供应商与阈值标定仍 NOT_RUN）。**W21 已完成**（单 URL 受控导入：SSRF 逐跳校验 + 类型/字节/跳数上限 + 与上传共用幂等链路，`uv run pytest` 85 passed，见 `docs/phase1/wave-w21-record.md`；DNS rebinding 防护与速率限制记为加固项）。下一波次 W22（部署与前端 + Celery/MinIO）。
+**进度**：W18 已完成（骨架 + 身份/工作区 + 迁移 + 容器化，`uv run pytest` 14 passed，见 `docs/phase1/wave-w18-record.md`）；**W19 已完成**（知识库与文档入库：5 格式解析 + 分块 + 落库 + 幂等去重，`uv run pytest` 23 passed，见 `docs/phase1/wave-w19-record.md`）；**W20 已完成**（混合检索 + RAG + SSE + 模型配置最小版，`uv run pytest` 39 passed，见 `docs/phase1/wave-w20-record.md`；真实 embedding/chat 供应商与阈值标定仍 NOT_RUN）。**W21 已完成**（单 URL 受控导入：SSRF 逐跳校验 + 类型/字节/跳数上限 + 与上传共用幂等链路，`uv run pytest` 85 passed，见 `docs/phase1/wave-w21-record.md`；DNS rebinding 防护与速率限制记为加固项）。**W22 已完成**（部署与前端：S3/MinIO + Celery/Redis 队列 + 五服务 Compose + 纯静态前端 + E2E 脚本，`uv run pytest` 105 passed，见 `docs/phase1/wave-w22-record.md`；真实 MinIO/队列往返见该记录 §3）。下一波次 W23（收口：README/运维、指标日志、安全回归、债务清单）。
 
 ## 4. 验收标准（Phase 1 出口）
 

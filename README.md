@@ -5,7 +5,7 @@
 | 阶段 | 范围 | 状态 |
 | --- | --- | --- |
 | Phase 0 | 架构验证与 PoC（32 项 P0 任务） | 已完成（见 `docs/poc/`） |
-| **Phase 1** | **P0 MVP：认证、知识库、文档、混合检索、RAG+SSE、单 URL 导入** | **进行中（W18–W20 已完成）** |
+| **Phase 1** | **P0 MVP：认证、知识库、文档、混合检索、RAG+SSE、单 URL 导入、一键部署与最小前端** | **进行中（W18–W22 已完成）** |
 | Phase 2–4 | Agent / Research / 企业知识整理 / P2 扩展 | 未开始（用户已明确不做） |
 
 进度与逐波次证据：`docs/IMPLEMENTATION_STATUS.md`、`docs/phase1/PLAN_Phase1_MVP.md`、`docs/phase1/wave-wN-record.md`。
@@ -44,10 +44,48 @@ uv run ruff check src tests
 uv run ruff format --check src tests
 ```
 
-容器化（W18 起可用，一键起全部服务见 W22）：
+容器化（W18 起可用，一键起全部服务见下节）：
 
 ```powershell
-docker compose -f deploy/compose/docker-compose.yml config
+docker compose -f deploy/compose/docker-compose.yml config -q
+```
+
+## 一键启动（Compose，W22）
+
+整套五服务（`api` + `worker` + `postgres/pgvector` + `redis` + `minio`）：
+
+```powershell
+docker compose -f deploy/compose/docker-compose.yml up -d --build
+docker compose -f deploy/compose/docker-compose.yml ps
+Invoke-WebRequest http://127.0.0.1:8000/health -UseBasicParsing | Select-Object -ExpandProperty Content
+```
+
+端口：api `8000`、postgres `5544`（与实验栈的 5433 错开）、redis `6381`、minio `9000`（控制台 `9001`）。
+`compose.yaml` 里的口令/密钥都是开发占位值，部署前必须覆盖 `PYKNORA_JWT_SECRET`、`PYKNORA_DB_PASSWORD`、`PYKNORA_S3_ACCESS_KEY`、`PYKNORA_S3_SECRET_KEY`。
+api 容器启动时先跑 `python -m pyknora.migrate` 再起 uvicorn；对象存储不可用时应用**快速失败**而不是带病运行。
+
+## 前端入口（W22）
+
+浏览器打开 `http://127.0.0.1:8000/app/`（根路径 `/` 会重定向过去）。前端是纯静态文件（`src/pyknora/web/`：`index.html`、`app.js`、`styles.css`），无 Node 构建步骤：
+注册/登录 → 选或建工作区 → 选或建知识库 → 上传文件或 URL 导入 → 提问并查看引用。
+前端持有的工作区/知识库 ID 只用于拼 URL，**权限仍由后端按 JWT 主体校验**。
+
+## 队列与存储开关（W22）
+
+| 变量 | 取值 | 默认 | 行为 |
+| --- | --- | --- | --- |
+| `PYKNORA_INGEST_MODE` | `inline` / `queue` | `inline` | `inline` 在请求内同步入库（开发/测试）；`queue` 只落库 `status=queued` 并投递 Celery，由 worker 推进到 `ready`/`failed` |
+| `PYKNORA_STORAGE_BACKEND` | `local` / `s3` | `local` | `local` 写 `PYKNORA_UPLOAD_DIR` 目录；`s3` 走 MinIO/S3（启动时 `ensure_bucket` 自动建桶） |
+| `PYKNORA_S3_ENDPOINT_URL` | URL | `http://127.0.0.1:9000` | S3 兼容端点（MinIO） |
+| `PYKNORA_S3_BUCKET` | 名称 | `pyknora` | 对象桶名 |
+| `PYKNORA_WEB_DIR` | 路径 | 空（用包内 `web/`） | 镜像里用绝对路径覆盖静态目录 |
+
+端到端冒烟（需服务已启动）：
+
+```powershell
+uv run python scripts/e2e_phase1.py                                   # 内联模式
+uv run python scripts/e2e_phase1.py --queue                           # 队列模式：轮询到 ready
+uv run python scripts/e2e_phase1.py --url https://example.com          # 额外验证 URL 导入
 ```
 
 ## 已实现 API（W18–W20）
@@ -82,7 +120,7 @@ docker compose -f deploy/compose/docker-compose.yml config
 | DELETE | `/api/v1/models/{model_id}` | 删除模型配置 |
 | POST | `/api/v1/models/{model_id}/test` | 连接测试（`local` 直连；其他 provider 返回 `ok=false` 与原因） |
 | GET | `/api/v1/workspaces/{workspace_id}/conversations` | 会话列表 |
-| POST | `/api/v1/workspaces/{workspace_id}/conversations` | 新建会话（可绑定知识库） |
+| POST | `/api/v1/conversations` | 新建会话（body 带 `workspace_id`，可绑定知识库） |
 | GET | `/api/v1/conversations/{conversation_id}` | 会话详情（含消息） |
 | DELETE | `/api/v1/conversations/{conversation_id}` | 删除会话（连带消息与事件） |
 | POST | `/api/v1/conversations/{conversation_id}/messages` | 提问并同步返回答案 + 引用（`insufficient_evidence` 显式终止） |
@@ -95,7 +133,7 @@ docker compose -f deploy/compose/docker-compose.yml config
 
 URL 导入行为：仅接受 `http`/`https`，拒绝 userinfo；DNS 解析后校验对端地址，回环/私网/链路本地/保留网段（含 `169.254.169.254`）一律 `403 blocked_target`；重定向**逐跳**复校验（最多 3 跳），超限 `502`、响应超 5 MiB `413`、非 `html/xhtml/plain/markdown` 类型 `415`；抓取内容走与上传相同的解析分块链路，`source_type=url`、`source_url` 保留最终地址。
 
-尚未实现（计划内）：前端与一键部署（W22，同时接入 Celery/MinIO）；真实 embedding/chat 供应商适配器、embedding 相似度阈值的生产标定（ADR-0014 DG-3/DG-4）均未完成。
+尚未实现：真实 embedding/chat 供应商适配器（当前为确定性替身 `hashing-local`/`extractive-local`）、embedding 相似度阈值的生产标定（ADR-0014 DG-3/DG-4）、OAuth/SSO、Rerank 与查询重写。
 
 ## 目录结构
 
@@ -110,11 +148,17 @@ src/pyknora/           应用代码（FastAPI，Python 3.12）
   security.py          JWT 与口令散列（argon2）
   deps.py              依赖注入：当前用户、工作区成员校验
   errors.py            统一错误封装与请求 ID 中间件
-  storage.py           对象存储协议 + 本地实现（W22 换 MinIO）
+  storage.py           对象存储协议 + 本地目录 / S3(MinIO) 两实现（W22）
+  queue.py             Celery 应用与入库任务（W22，worker 侧自建引擎）
+  bootstrap.py         启动自检：存储就绪/建桶（W22）
+  web/                 最小前端静态文件（index.html + app.js + styles.css，W22）
   migrate.py           幂等 SQL 迁移 runner（db/migrations/*.sql）
   main.py / serve.py   应用装配与本地启动
-db/migrations/         0001_identity.sql、0002_knowledge_documents.sql、0003_retrieval_rag.sql、0004_model_configs.sql
-deploy/                Dockerfile、compose/docker-compose.yml
+db/migrations/         0001_identity / 0002_knowledge_documents / 0003_retrieval_rag / 0004_model_configs / 0005_ingest_queue_status
+compose.yaml           一键部署定义（api/worker/postgres/redis/minio）
+Dockerfile             api 与 worker 共用镜像
+deploy/                compose 入口（include 根 compose.yaml）
+scripts/e2e_phase1.py  Phase 1 端到端冒烟（纯 HTTP）
 tests/                 应用层测试（依赖真实 PG，自带测试库）
 experiments/phase0/    Phase 0 实验探针（只读研究，不进入产品路径）
 docs/                  PRD、ADR、Phase 0 PoC、Phase 1 计划与波次记录
