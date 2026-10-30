@@ -102,5 +102,5 @@
 ## 4. 提交记录
 
 - 分支：`feature/p1-w22-deploy-frontend`（base `dev@efdb5db`）。
-- 提交与推送：**待回填**（门禁已过，按 m08528 授权直接提交/推送/合入 `dev`）。
-- 合入：**待回填**（`--no-ff` 合入 `dev`，回填真实 SHA 与推送区间）。
+- 提交：`07e5a8c` feat（21 文件，+2675/−958：存储/队列/装配/前端/编排/迁移/测试/E2E/依赖）→ `99efc02` docs（4 文件，+179/−11：README 三节、PLAN 完成标记、本记录 §2–§3、状态文件）。`git push -u origin feature/p1-w22-deploy-frontend` 成功（新分支，顶点 `99efc02`）。
+- 合入：`git merge --no-ff` → **`51c0e72`**；`dev` 由 `efdb5db` 推进到 `51c0e72` 并推送 `origin/dev`（`efdb5db..51c0e72`）。本段回填提交后再次 `--no-ff` 合入 `dev`（同 W19–W21 规程）。
